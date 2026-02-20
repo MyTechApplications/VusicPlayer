@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="VusicPlayer.MiniPlayerWind"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:lvs="using:LibVLCSharp.Platforms.Windows"
+    mc:Ignorable="d"
+    Title="MiniPlayerWind"
+   >
+
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <lvs:VideoView Grid.Row="0" x:Name="videoView" Visibility="Visible" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <Image Name="thumbnail" Grid.Row="0" Stretch="UniformToFill"/>
+        <Border VerticalAlignment="Top" Background="Transparent" Padding="10,5">
+            <TextBlock x:Name="txtTitle" 
+                       Text="Song Title - Artist" 
+                       Foreground="White" 
+                       FontSize="12" 
+                       HorizontalAlignment="Left"
+                       TextTrimming="CharacterEllipsis"/>
+        </Border>
+        <local:SliderReuse x:Name="sldMain" IsEnabled="True" Grid.Row="1" Margin="10,0" HorizontalAlignment="Stretch" />
+
+        <Grid Grid.Row="2" Margin="5,0,5,10" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="btnPrev" Grid.Column="0" Background="Transparent" BorderBrush="Transparent" Click="btnPrev_Click" HorizontalAlignment="Center">
+                <Image Width="22" Source="/Assets/previous.png"/>
+            </Button>
+            <Button x:Name="btnPlayPause" Grid.Column="1" Background="Transparent" BorderBrush="Transparent" Click="btnPlayPause_Click" HorizontalAlignment="Center">
+                <Image x:Name="imgPlayPause" Width="22" Source="/Assets/play.png"/>
+            </Button>
+            <Button x:Name="btnNext" Grid.Column="2" Background="Transparent" BorderBrush="Transparent" Click="btnNext_Click" HorizontalAlignment="Center">
+                <Image Width="22" Source="/Assets/next.png"/>
+            </Button>
+            <Button x:Name="btnVolume" Grid.Column="3" Background="Transparent" BorderBrush="Transparent" Click="btnVolume_Click" HorizontalAlignment="Center">
+                <Image Width="22" Source="/Assets/volume.png"/>
+            </Button>
+            <Button x:Name="btnOptions" Grid.Column="4" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Center">
+                <Button.Flyout>
+
+                    <MenuFlyout>
+
+                        <MenuFlyoutItem Text="Speed"></MenuFlyoutItem>
+
+                        <MenuFlyoutItem Text="Skip Forward 10 seconds"></MenuFlyoutItem>
+
+                        <MenuFlyoutItem Text="Skip Backward 10 seconds"></MenuFlyoutItem>
+
+                    </MenuFlyout>
+
+                </Button.Flyout>
+                <Image Width="22" Source="/Assets/options.png"/>
+            </Button>
+            <Button x:Name="btnResizeBack" Grid.Column="5" Background="Transparent" BorderBrush="Transparent" Click="btnResizeBack_Click" HorizontalAlignment="Center">
+                <Image Width="22" Source="/Assets/resizewindow.png"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

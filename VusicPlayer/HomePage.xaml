@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page Background="Transparent"
+    x:Class="VusicPlayer.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+
+    <Grid Margin="50, 20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Welcome" Style="{StaticResource TitleLargeTextBlockStyle}" Grid.Row="0"></TextBlock>
+        <Button Margin="0, 10" Grid.Row="1" Click="Button_Click">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE838;"></TextBlock>
+                <TextBlock Margin="10, 0" Text="Open Folder"></TextBlock>
+            </StackPanel>
+        </Button>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Name="btnSort" ToolTipService.ToolTip="Sort Files" Grid.Column="0">
+                <FontIcon Glyph="&#xE8CB;"></FontIcon>
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Click="MenuFlyoutItem_Click" Text="Sort by Name">
+
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem  Click="MenuFlyoutItem_Click_1" Text="Sort by Date"></MenuFlyoutItem>
+                        <MenuFlyoutItem  Click="MenuFlyoutItem_Click_2"  Text="Sort by Size"></MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+            <Button Name="btnPlayAll" Click="btnPlayAll_Click" ToolTipService.ToolTip="Play All" Grid.Column="1" Margin="10, 0">
+                <FontIcon Glyph="&#xE768;"></FontIcon>
+            </Button>
+
+        </Grid>
+        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Name="txtRecentHeading" Text="Continue Playing" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
+        <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtEmptyRecents" Grid.Row="4" Visibility="Collapsed" Text="Start watching videos to see them here!" Margin="0, 40"></TextBlock>
+        <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtFolderName" Grid.Row="5" Margin="0, 0"></TextBlock>
+        <GridView Visibility="Visible"  
+ x:Name="GridContinuePlaying" SelectionMode="Single" IsItemClickEnabled="True"
+ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
+            <GridView.ItemTemplate>
+                <DataTemplate >
+                    <StackPanel Width="150">
+                        <StackPanel.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Remove from Continue Playing" Click="MenuFlyoutItem_Click_3" Icon="Remove"></MenuFlyoutItem>
+                            </MenuFlyout>
+                        </StackPanel.ContextFlyout>
+                        <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
+
+                        <TextBlock Text="{Binding FilePath}" Visibility="Collapsed" TextWrapping="Wrap" />
+                        <ProgressBar Margin="0, 10" x:Name="prgContinuePlaying" Maximum="{Binding TotalDuration}" Value="{Binding CurrentDuration}" Width="200" IsIndeterminate="False"></ProgressBar>
+                        <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+        <GridView  CanDragItems="True"
+      AllowDrop="True"
+      CanReorderItems="True" x:Name="VideoGrid" SelectionMode="Single" IsItemClickEnabled="True"
+      ItemClick="VideoGrid_ItemClick" DragItemsCompleted="VideoGrid_DragItemsCompleted" Grid.Row="6" Margin="0, 30">
+            <GridView.ItemTemplate>
+                <DataTemplate >
+                    <StackPanel Width="150">
+                        <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
+                        <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+    </Grid>
+</Page>

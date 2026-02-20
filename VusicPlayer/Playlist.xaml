@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VusicPlayer.Playlist"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Margin="50, 20" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MaxWidth="400"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <ContentDialog PrimaryButtonClick="dlgEditProperties_PrimaryButtonClick" PrimaryButtonText="Save" CloseButtonText="Cancel" DefaultButton="Primary" Title="Edit Song Properties" Name="dlgEditProperties">
+            <ScrollView>
+                
+                <StackPanel Orientation="Vertical">
+                    <InfoBar x:Name="FileStatusInfoBar"
+         Title="Action Required"
+         Message="Checking file status..."
+         Severity="Warning"
+         IsOpen="False"
+         Margin="0,0,0,10">
+                        <InfoBar.ActionButton>
+                            <Button x:Name="btnFixFile" Content="Fix" Click="btnFixFile_Click" />
+                        </InfoBar.ActionButton>
+                    </InfoBar>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Song Name"></TextBlock>
+                        <TextBox Margin="10, 0" PlaceholderText="Song name...." Name="txtSongName"></TextBox>
+                    </StackPanel>
+                    <StackPanel Margin="0, 10" Orientation="Horizontal">
+                        <TextBlock Text="Song Artist"></TextBlock>
+                        <TextBox Margin="10, 0" PlaceholderText="Artist name...." Name="txtArtistName"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Song Album"></TextBlock>
+                        <TextBox Margin="10, 0" PlaceholderText="Album name...." Name="txtAlbumName"></TextBox>
+                    </StackPanel>
+                    <StackPanel Margin="0, 10" Orientation="Horizontal">
+                        <TextBlock Text="Contributing Artist"></TextBlock>
+                        <TextBox Margin="10, 0" PlaceholderText="Contributing Artist...." Name="txtContributingArtist"></TextBox>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <TextBlock Text="Track Number"></TextBlock>
+                        <TextBox Margin="10, 0" InputScope="Number" PlaceholderText="Track number...." Name="txtTrack"></TextBox>
+                    </StackPanel>
+                    <StackPanel Margin="0, 10" Orientation="Horizontal">
+                        <TextBlock Text="Genre"></TextBlock>
+                        <TextBox Margin="10, 0" PlaceholderText="Genre...." Name="txtGenre"></TextBox>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <TextBlock Text="Year"></TextBlock>
+                        <TextBox InputScope="Number" MaxLength="4" Margin="10, 0" PlaceholderText="Year...." Name="txtYear"></TextBox>
+                    </StackPanel>
+                    <Button Name="btnOpenFileLoc" Margin="0, 10" Click="btnOpenFileLoc_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/gotoicon.png" Width="25"></Image>
+                            <TextBlock Margin="5, 0" Text="Go to File Location"></TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </ScrollView>
+        </ContentDialog>
+        <ContentDialog Name="dlgEditPlaylist" PrimaryButtonClick="dlgEditPlaylist_PrimaryButtonClick" Title="Edit Playlist Info" PrimaryButtonText="Save" DefaultButton="Primary" CloseButtonText="Cancel">
+            <ScrollView>
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Margin="0, 20"  Orientation="Horizontal">
+                        <TextBlock Text="Playlist Name"></TextBlock>
+                        <TextBox Margin="10, 0" PlaceholderText="my playlist's name" Text="Playlist (1)" GotFocus="txtEditPlaylistName_GotFocus" Name="txtEditPlaylistName"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Genre"></TextBlock>
+                        <TextBox Margin="10, 0" PlaceholderText="my playlist's genre" Text=""  Name="txtEditGenre"></TextBox>
+                    </StackPanel>
+                    <Button Margin="0, 20"  Name="btnEditPlaylistCover" Click="btnEditPlaylistCover_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/addimgicon.png" Width="20"></Image>
+                            <TextBlock Margin="5,0 " Text="Edit Playlist Cover" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button  Style="{StaticResource AccentButtonStyle}" Name="btnEditAddSongs" Click="btnEditAddSongs_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/addicon.png" Width="20"></Image>
+                            <TextBlock Margin="5,0 " Text="Add Songs" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Image Name="imgPlaylistCov" Margin="0, 20" Width="275"></Image>
+                    <StackPanel Name="CoverOptions" Visibility="Collapsed" Orientation="Horizontal">
+                        <Button Name="btnChangeCover" Click="btnEditPlaylistCover_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="20" Source="/Assets/refreshimgicon.png"/>
+                                <TextBlock Margin="5, 0" Text="Change Cover"></TextBlock>
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="10, 0" Name="btnRemovePlaylistCover" Click="btnRemovePlaylistCover_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="20" Source="/Assets/removeicon.png"/>
+                                <TextBlock Margin="5, 0" Text="Remove Cover"></TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0, 20" Text="Added Songs:" ></TextBlock>
+                    <TextBlock Name="txtNullAddedSongs" Text="No songs have been added yet!" Visibility="Collapsed" ></TextBlock>
+                    <ListView Name="lstViewPlaylistAddedSongs"  CanDragItems="True" CanReorderItems="True" AllowDrop="True"
+    SelectionMode="Single">
+                        <ListView.ItemTemplate>
+
+                            <DataTemplate >
+                                <Grid Margin="0, 5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="0, 12" Grid.Column="0" Text="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Visibility="Visible" TextWrapping="Wrap" />
+                                    <HyperlinkButton Grid.Column="1" Click="HyperlinkButton_Click"  Visibility="Visible"  Margin="10, 0">
+                                        <TextBlock Text="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
+                                    </HyperlinkButton>
+
+                                    <TextBlock Grid.Column="2" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Artist}" Visibility="Visible" TextWrapping="Wrap" Margin="0,10"/>
+                                    <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="3" Text="{Binding AlbumName}" Visibility="Visible" TextWrapping="Wrap" Margin="10, 10"/>
+                                    <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 10"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </ScrollView>
+        </ContentDialog>
+        <Grid HorizontalAlignment="Stretch" Grid.Column="0" VerticalAlignment="Stretch" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Viewbox Grid.Row="0" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,20">
+                <Image Name="imgPlaylistCover" Width="300" Height="300" />
+            </Viewbox>
+
+            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
+                <TextBlock Text="Playlist name" Name="txtPlaylistName" 
+                   Style="{StaticResource TitleTextBlockStyle}" 
+                   HorizontalAlignment="Center" 
+                   TextWrapping="Wrap" />
+
+                <TextBlock Text="Playlist Genre" Margin="0, 5" Name="txtGenreCov" 
+                   Style="{StaticResource SubtitleTextBlockStyle}" 
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                   HorizontalAlignment="Center" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="• Playlist" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="&#xEC92;" FontFamily="Segoe Fluent Icons" 
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="25, 3" />
+                    <TextBlock Margin="-20, 0" Text="7 October 2008" ToolTipService.ToolTip="Created on" 
+                       Name="txtDateCreation" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                 
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 5">
+            
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="n items" Margin="0, 2" Name="txtItemCount" 
+                   Style="{StaticResource CaptionTextBlockStyle}" 
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                   HorizontalAlignment="Center" />
+                    <TextBlock Text="&#xE823;" FontFamily="Segoe Fluent Icons" 
+Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="25, 3" />
+                    <TextBlock Margin="-25, 0" Text="00:00" ToolTipService.ToolTip="Total Runtime of playlist" 
+Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </StackPanel>
+
+            <ItemsControl Grid.Row="2" Margin="0, 20" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VariableSizedWrapGrid Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <Button Margin="5" ToolTipService.ToolTip="Rename Playlist" Click="Button_Click_1">
+                    <Button.Flyout>
+                        <Flyout x:Name="flyoutRename">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox GotFocus="txtRename_GotFocus" Width="150" Grid.Column="0" 
+                                 Name="txtRename" PlaceholderText="Rename playlist" />
+                                <Button Grid.Column="1" Click="Button_Click">
+                                    <Image Margin="5, 0" Width="20" Source="/Assets/tickicon.png" />
+                                </Button>
+                            </Grid>
+                        </Flyout>
+                    </Button.Flyout>
+                    <Image Width="25" Source="/Assets/editicon.png" />
+                </Button>
+
+                <Button Name="btnPlayAll" Click="btnPlayAll_Click" Margin="5"
+                ToolTipService.ToolTip="Play all songs in Playlist">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="25" Source="/Assets/play.png" />
+                        <TextBlock Margin="5,2" Text="Play all" />
+                    </StackPanel>
+                </Button>
+
+                <ToggleButton Name="btnShuffle" Click="btnShuffle_Click" Margin="5"
+                      ToolTipService.ToolTip="Shuffle playlist">
+                    <Image Width="25" Source="/Assets/shuffleicon.png" />
+                </ToggleButton>
+
+                <Button Name="btnAddSongs" Margin="5"
+                ToolTipService.ToolTip="Add songs to this playlist">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="25" Source="/Assets/addicon.png" />
+                        <TextBlock Margin="5,2" Text="Add Songs" />
+                    </StackPanel>
+                </Button>
+
+                <Button Name="btnDeletePlaylist" Margin="5" ToolTipService.ToolTip="Delete Playlist">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="25" Source="/Assets/deleteicon.png" />
+                        <TextBlock Margin="5,2 " Text="Delete playlist" />
+                    </StackPanel>
+                </Button>
+            </ItemsControl>
+            <Button Name="btnEditPlaylistInfo" Grid.Row="3" HorizontalAlignment="Center" Content="Edit Playlist Info" Click="btnEditPlaylistInfo_Click"></Button>
+        </Grid>
+        <StackPanel Visibility="Collapsed" VerticalAlignment="Center" Orientation="Vertical" Grid.Column="1" Name="panelEmptyplaylists">
+            <Image Source="/Assets/openfolder.png" Width="100"></Image>
+            <TextBlock Margin="0, 40" HorizontalAlignment="Center" Name="txtEmptyPlaylist" Text="You have no songs in this playlist" VerticalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
+            <Button Name="btnAdd" HorizontalAlignment="Center" Click="btnAddSongs_Click" Style="{StaticResource AccentButtonStyle}">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon FontFamily="Segoe Fluent Icons" 
+                  Glyph="&#xE710;" 
+                  FontSize="16"
+                  VerticalAlignment="Center"/>
+
+                    <TextBlock Text="Add Songs" 
+                   Margin="8,0,0,0" 
+                   VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <ScrollView VerticalAlignment="Stretch" Margin="10, 0" Name="ListPanel" Grid.Column="1">
+            <StackPanel  Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Name="txtPlaylistContentHeader" Style="{StaticResource SubtitleTextBlockStyle}" Text="Playlist content"></TextBlock>
+                    <TextBlock Margin="10,5" Style="{StaticResource BaseTextBlockStyle}" ToolTipService.ToolTip="Playlist will play shuffled" Text="shuffled" Name="txtShuffled" Visibility="Collapsed" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                </StackPanel>
+                <ListView   Margin="0, 10" CanDragItems="True" Visibility="Visible" CanReorderItems="True" AllowDrop="True"
+    SelectionMode="Multiple" ItemClick="lstViewPlaylist_ItemClick" Name="lstViewPlaylist" DragItemsCompleted="lstViewPlaylist_DragItemsCompleted">
+               
+                <ListView.ItemTemplate>
+                    
+                    <DataTemplate >
+                        <Grid Margin="0, 5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Play Song" Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Remove Song" Name="removesongfromplaylistcreation" Click="removesongfromplaylistcreation_Click" Icon="Delete"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Song Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE946;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Add to playlist"  Name="mnftAddtoPlaylist" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xECC8;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Add to play queue"  Name="mnftAddtoQueue" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE81E;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Edit info"  Name="mnftEditInfo" Click="mnftEditInfo_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE70F;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Go to artist"  Name="mnftGoToArtist" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE77B;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Go to album"  Name="mnftGoToAlbum" Click="mnftGoToAlbum_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE93C;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Add to Favourites"  Name="mnftAddToFavourites" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE735;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                    <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE70E;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Move down"  Name="mnftMovedown" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE70D;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Move to top"  Name="mnftMovetotop" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74A;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Move to bottom"  Name="mnftMovetobottom" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74B;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                    <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE713;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Grid.ContextFlyout>
+                                <Button Padding="0" MinHeight="0" MinWidth="0" Margin="0, 0" Width="35" Grid.Column="0" Content="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Click="Button_Click_2" Visibility="Visible" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" >
+                                    <Button.Resources>
+                                        <Thickness x:Key="ButtonPadding">0</Thickness>
+                                    </Button.Resources>
+                                </Button>
+                                <HyperlinkButton Click="txtTitle_Click" Grid.Column="1" Name="txtTitle"   Visibility="Visible"  Margin="0, 0">
+                                <TextBlock Text="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
+                                </HyperlinkButton>
+                                <HyperlinkButton Grid.Column="2" Name="txtArtistHyp" Click="txtArtistHyp_Click"   Visibility="Visible"  Margin="0, 0">
+                                    <TextBlock Text="{Binding Artist}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                                </HyperlinkButton>
+                                <HyperlinkButton Grid.Column="3" Name="txtAlbumHyp" Click="txtAlbumHyp_Click"   Visibility="Visible"  Margin="10, 0">
+                                    <TextBlock Text="{Binding AlbumName}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                                </HyperlinkButton>
+                            <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 20"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+        </ScrollView>
+    </Grid>
+</Page>

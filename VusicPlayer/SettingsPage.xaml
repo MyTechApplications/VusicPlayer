@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VusicPlayer.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Spacing="32" Padding="24">
+
+            <!-- ===================== -->
+            <!-- Appearance Section -->
+            <!-- ===================== -->
+            <TeachingTip Name="ttClearedStuff" PreferredPlacement="Bottom"></TeachingTip>
+            <StackPanel Spacing="12">
+                <TextBlock Text="Appearance"
+                           Style="{StaticResource TitleTextBlockStyle}" />
+
+                <TextBlock Text="Theme"
+                           Style="{StaticResource BodyStrongTextBlockStyle}" />
+
+                <RadioButtons x:Name="ThemeRadioButtons"
+                              SelectionChanged="ThemeRadioButtons_SelectionChanged">
+                    <x:String>System Default</x:String>
+                    <x:String>Light</x:String>
+                    <x:String>Dark</x:String>
+                </RadioButtons>
+            </StackPanel>
+
+
+
+            <!-- ===================== -->
+            <!-- Video Section -->
+            <!-- ===================== -->
+
+            <StackPanel Spacing="12">
+                <TextBlock Text="Video"
+                           Style="{StaticResource TitleTextBlockStyle}" />
+
+                <ToggleSwitch x:Name="ToggleSubtitles"
+                              Header="Always enable subtitles if available" Toggled="ToggleSubtitles_Toggled"/>
+                <Button Content="Clear Continue Watching">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Spacing="12" Padding="12" Width="250">
+                                <TextBlock Text="Are you sure you want to clear Continue Watching?"
+                           TextWrapping="Wrap"/>
+                                <Button Content="Confirm"
+                        Click="Button_Click"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+
+
+
+
+            <!-- ===================== -->
+            <!-- Music Section -->
+            <!-- ===================== -->
+
+            <StackPanel Spacing="12">
+                <TextBlock Text="Music"
+                           Style="{StaticResource TitleTextBlockStyle}" />
+
+                <Expander Header="Search Folders"
+          IsExpanded="False">
+
+                    <StackPanel Spacing="16" Padding="12">
+
+                        <!-- Default Folders -->
+                        <StackPanel x:Name="FoldersPanel" Spacing="8">
+
+                            <!-- Documents -->
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Documents"
+                           VerticalAlignment="Center"/>
+                                <Button Content="Open"
+                        Click="OpenDocuments_Click"/>
+                                <Button Content="Remove"
+                        Click="RemoveDocuments_Click"/>
+                            </StackPanel>
+
+                            <!-- Music -->
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Music"
+                           VerticalAlignment="Center"/>
+                                <Button Content="Open"
+                        Click="OpenMusic_Click"/>
+                                <Button Content="Remove"
+                        Click="RemoveMusic_Click"/>
+                            </StackPanel>
+
+                            <!-- Downloads -->
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Downloads"
+                           VerticalAlignment="Center"/>
+                                <Button Content="Open"
+                        Click="OpenDownloads_Click"/>
+                                <Button Content="Remove"
+                        Click="RemoveDownloads_Click"/>
+                            </StackPanel>
+
+                            <!-- Videos -->
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Videos"
+                           VerticalAlignment="Center"/>
+                                <Button Content="Open"
+                        Click="OpenVideos_Click"/>
+                                <Button Content="Remove"
+                        Click="RemoveVideos_Click"/>
+                            </StackPanel>
+
+                            <!-- Pictures -->
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Pictures"
+                           VerticalAlignment="Center"/>
+                                <Button Content="Open"
+                        Click="OpenPictures_Click"/>
+                                <Button Content="Remove"
+                        Click="RemovePictures_Click"/>
+                            </StackPanel>
+
+                        </StackPanel>
+
+
+                        <!-- Add Folder -->
+                        <Button Content="Add Folder"
+                Click="AddFolder_Click"/>
+
+                    </StackPanel>
+
+                </Expander>
+
+                <!-- Clear Recent Music -->
+                <Button Content="Clear Recent Music">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Spacing="12" Padding="12" Width="250">
+                                <TextBlock Text="Are you sure you want to clear recent music?"
+                           TextWrapping="Wrap"/>
+                                <Button Content="Confirm"
+                        Click="Button_Click_2"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+
+
+
+                <!-- Delete All Playlists -->
+                <Button Content="Delete All Playlists">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Spacing="12" Padding="12" Width="250">
+                                <TextBlock Text="This will permanently delete all playlists. Continue?"
+                           TextWrapping="Wrap"/>
+                                <Button Content="Delete"
+                        Click="Button_Click_3"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+
+
+
+
+            <!-- ===================== -->
+            <!-- About Section -->
+            <!-- ===================== -->
+
+            <StackPanel Spacing="12">
+                <TextBlock Text="About"
+                           Style="{StaticResource TitleTextBlockStyle}" />
+
+                <StackPanel Orientation="Horizontal" Spacing="16">
+
+                    <Image Source="ms-appx:///Assets/appicon.png"
+                           Width="64"
+                           Height="64"/>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Vusic Player"
+                                   Style="{StaticResource BodyStrongTextBlockStyle}" />
+
+                        <TextBlock Text="Version 1.0.0"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+
+                        <TextBlock Text="Build 2026.02.18"
+                                   Style="{StaticResource CaptionTextBlockStyle}" />
+                    </StackPanel>
+
+                </StackPanel>
+
+                <HyperlinkButton Background="Transparent" BorderBrush="Transparent"  Content="Help and Support"
+                                 NavigateUri="https://yourwebsite.com/help"/>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</Page>

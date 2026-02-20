@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VusicPlayer.SearchResults"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <StackPanel Name="txtEmptySearchResults" VerticalAlignment="Center" Visibility="Collapsed" Grid.Row="4" Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Assets/searchicon.png" Width="200" HorizontalAlignment="Center"></Image>
+            <TextBlock HorizontalAlignment="Center"  Text="No search results" Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
+         
+        </StackPanel>
+        <ListView Name="lstSearchResults">
+            <ListView.ItemTemplate>
+
+                <DataTemplate >
+                    <Grid Margin="0, 5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Play Song" Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Song Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE946;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Add to playlist"  Name="mnftAddtoPlaylist" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xECC8;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Add to play queue"  Name="mnftAddtoQueue" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE81E;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Edit info"  Name="mnftEditInfo" Click="mnftEditInfo_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE70F;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Go to artist"  Name="mnftGoToArtist" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE77B;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Go to album"  Name="mnftGoToAlbum" Click="mnftGoToAlbum_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE93C;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Add to Favourites"  Name="mnftAddToFavourites" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE735;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE70E;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Move down"  Name="mnftMovedown" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE70D;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Move to top"  Name="mnftMovetotop" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74A;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Move to bottom"  Name="mnftMovetobottom" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74B;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE713;"></FontIcon>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
+                        <Button Padding="0" MinHeight="0" MinWidth="0" Margin="0, 0" Width="35" Grid.Column="0" Content="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Click="Button_Click_2" Visibility="Visible" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" >
+                            <Button.Resources>
+                                <Thickness x:Key="ButtonPadding">0</Thickness>
+                            </Button.Resources>
+                        </Button>
+                        <HyperlinkButton Click="txtTitle_Click" Grid.Column="1" Name="txtTitle"   Visibility="Visible"  Margin="0, 0">
+                            <TextBlock Text="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
+                        </HyperlinkButton>
+                        <HyperlinkButton Grid.Column="2" Name="txtArtistHyp" Click="txtArtistHyp_Click"   Visibility="Visible"  Margin="0, 0">
+                            <TextBlock Text="{Binding Artist}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                        </HyperlinkButton>
+                        <HyperlinkButton Grid.Column="3" Name="txtAlbumHyp" Click="txtAlbumHyp_Click"   Visibility="Visible"  Margin="10, 0">
+                            <TextBlock Text="{Binding AlbumName}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                        </HyperlinkButton>
+                        <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 20"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>
