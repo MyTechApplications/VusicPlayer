@@ -1,0 +1,9 @@
+Vusic Player v1.0.0.2 – OceanCyan Tech
+
+Added support for opening video files directly from File Explorer.
+
+Check for Updates button now displays the update dialog correctly.
+
+You can now set Aspect Ratio for the Video Player from the Video Button
+
+General performance improvements and bug fixes.
