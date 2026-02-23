@@ -1,0 +1,30 @@
+Version 1.0.0.3
+New Features
+Subfolder Support: You can now view subfolders directly within the Folders Page.
+
+Path Navigation: Added a quick-access path button below each folder name for easier navigation.
+
+Visual Refresh: Introduced a brand-new Splash Screen.
+
+Improvements
+Video Player Optimization: * Resolved slider lag for a smoother seeking experience.
+
+Improved the Media Ended event handling.
+
+Enhanced the Next Video button progress bar accuracy.
+
+Workflow Efficiency: The Home Window now automatically closes when launching a video directly from File Explorer.
+
+UI Cleanup: Streamlined the Folders Page by moving the "Properties" action exclusively to the Preview Panel.
+
+Bug Fixes
+Stability: Fixed a critical crash occurring when opening Properties for a file currently loaded in the Preview Panel.
+
+Navigation: Fixed an issue preventing the next video from playing correctly on specific index paths.
+
+Functionality: * Fixed the Rename context flyout item.
+
+Resolved theme-related rendering issues on the Video Player Page.
+
+Known Issues
+Rename functionality for subfolders is currently unavailable and will be added in a future update.
