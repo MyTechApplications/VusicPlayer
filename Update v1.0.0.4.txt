@@ -1,0 +1,40 @@
+🎵 VusicPlayer – Version 1.0.0.4
+✨ New & Improved
+
+🖼 Album Page Enhancements
+You can now set a custom album cover and save it directly from the Album page.
+
+🏠 Home Page Improvement
+Added a helpful message when no recent folders are available, so the page doesn’t appear empty.
+
+🎨 Better Theme Consistency
+
+Video Player button font colors now properly match the selected theme.
+
+The app theme now loads correctly on startup.
+
+🎶 Playlist Page Fixes
+Fixed issues where:
+
+The “Add Songs” button was not working.
+
+The “Delete Playlist” button was not working.
+
+🖼 Thumbnail Loading Fix
+Resolved an issue where thumbnails were not loading correctly in:
+
+Recent Music panel
+
+Continue Playing panel
+
+🔄 Update System Improvements
+
+Smarter Update Handling (Fresh Installs Only)
+
+The updater now automatically closes VusicPlayer.exe if it's running during updates.
+
+⚠ For users who installed versions before 1.0.0.4, this improvement will not apply. A PC restart may be required to complete updates properly.
+
+Update Ready Notification (New from 1.0.0.4 onward)
+
+When an update is downloaded and ready to install, a message will appear in the “Check for Updates” dialog inside Settings, informing you that a restart is required.
