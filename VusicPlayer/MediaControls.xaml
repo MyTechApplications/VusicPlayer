@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="VusicPlayer.MediaControls"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+     xmlns:ui="using:CommunityToolkit.WinUI"
+    mc:Ignorable="d">
+
+    <!--<Grid Name="RootPanel"    VerticalAlignment="Bottom" HorizontalAlignment="Center" IsHitTestVisible="True">
+        <Border        Margin="0,0,0,40" CornerRadius="24" BorderThickness="1" Name="GlowSurround" Background="Transparent">
+            <ui:Effects.Shadow>
+                <ui:AttachedDropShadow 
+x:Name="NeonGlow"
+Color="Crimson" 
+BlurRadius="30" 
+                            CastTo="{x:Bind GlowSurround}"
+Opacity="0.9" 
+Offset="0,0,0"/>
+            </ui:Effects.Shadow>
+        </Border>
+        <Border x:Name="GlassRoot"
+        HorizontalAlignment="Center" 
+        VerticalAlignment="Bottom"
+        Margin="0,0,0,40"
+        CornerRadius="24"
+        BorderThickness="0"
+        IsHitTestVisible="True">
+
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#66FFFFFF" Offset="0.0" />
+                    <GradientStop Color="#11FFFFFF" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#CC1A1A1A" Offset="0.0" />
+                    <GradientStop Color="#E60A0A0A" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid Margin="20" HorizontalAlignment="Center">
+
+                <StackPanel Name="ControlsOverlay" Width="650" Padding="20,10,20,15">
+                    <Button Background="Transparent" Padding="2" ToolTipService.ToolTip="Pin this panel" HorizontalAlignment="Right" Name="btnPin" Click="btnPin_Click" >
+                        <FontIcon FontSize="10" Glyph="&#xE718;" Name="fntPin"></FontIcon>
+                    </Button>
+
+                    <local:SliderReuse x:Name="sldMain" 
+                           HorizontalAlignment="Stretch" 
+                           Margin="0,-5,0,0"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Spacing="200">
+                        <TextBlock Text=" " Margin="0, 0, 0, 10" Foreground="White" Style="{StaticResource BodyStrongTextBlockStyle}" Name="txtFileName"></TextBlock>
+                    </StackPanel>
+                    <Grid x:Name="grdTexts" Margin="5,0,5, 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" HorizontalAlignment="Left" Foreground="White" Text="00:00:00" Name="txtRunningDuration" FontSize="11" Opacity="0.8"/>
+                        <TextBlock Grid.Column="1" HorizontalAlignment="Right" Foreground="White" Text="00:00:00" Name="txtTotalDuration" FontSize="11" Opacity="0.8"/>
+                    </Grid>
+
+                    <StackPanel x:Name="ControlsPanel" 
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="5"
+                    PointerMoved="GlassRoot_PointerMoved"
+                    PointerEntered="GlassRoot_PointerEntered" PointerExited="ControlsPanel_PointerExited">
+                        <StackPanel.Resources>
+                            <Storyboard x:Name="NeonPulseStoryboard" RepeatBehavior="Forever" AutoReverse="True">
+                                <DoubleAnimation 
+            Storyboard.TargetName="NeonGlow" 
+            Storyboard.TargetProperty="Opacity" 
+            From="0.4" To="0.9" Duration="0:0:1"/>
+                            </Storyboard>
+                        </StackPanel.Resources>
+                        <Button Name="btnOpenVid" Padding="2" Margin="0, 0" Background="Transparent" BorderBrush="Transparent" Click="btnOpenVideo_Click">
+
+                            <FontIcon Glyph="&#xE838;" Foreground="White" FontSize="14"/>
+
+                        </Button>
+
+                        <StackPanel Margin="5, 0" HorizontalAlignment="Left" Orientation="Horizontal">
+                            <Button Background="Transparent" BorderBrush="Transparent" Click="btnVol_Click" Padding="2" Name="btnVol">
+                                <FontIcon Glyph="&#xE767;" Name="fntIcon" Foreground="White" FontSize="14" Opacity="0.8"/>
+                            </Button>
+
+                            <StackPanel Name="volStackPanel" Orientation="Horizontal" Spacing="0" VerticalAlignment="Center">
+
+                                <local:SliderReuse x:Name="sldVol" IsTooltipEnabled="False" Margin="10, 0" IsEnabled="False" Maximum="130" Width="70" ValueChanged="sldVolume_ValueChanged_1">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip Visibility="Collapsed" x:Name="VolumeToolTip" Content="100%" />
+                                    </ToolTipService.ToolTip>
+                                </local:SliderReuse>
+                                <StackPanel Margin="0, 10" Orientation="Horizontal" >
+                                    <TextBlock FontSize="12" Foreground="White" Name="txtVolumepercent" />
+                                    <TextBlock FontSize="12" Text="%" Foreground="White"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Margin="40, 0" Orientation="Horizontal">
+                            <Button Name="btnSeekBefore" Padding="2" Background="Transparent" BorderBrush="Transparent" Click="btnSeekBefore_Click">
+                                <Image Name="imgSeekbefore" Width="26" Source="/Assets/skip10secondsbackwardlighticon.png"/>
+                            </Button>
+
+                            <Button Name="btnPlayPause" Background="Transparent" BorderBrush="Transparent" Click="btnPlayPause_Click">
+                                <Image Name="imgPlayPause" Width="26" Source="/Assets/play.png"/>
+                                <Button.KeyboardAccelerators>
+                                    <KeyboardAccelerator Key="Space"></KeyboardAccelerator>
+                                </Button.KeyboardAccelerators>
+                            </Button>
+
+                            <Button Name="btnSeekAfter" Padding="2" Background="Transparent" BorderBrush="Transparent" Click="btnSeekAfter_Click">
+                                <Image Name="imgSeekAfter" Width="26" Source="/Assets/skip10secondsforwardiconlight.png"/>
+                            </Button>
+                        </StackPanel>
+                        <Button Name="btnFullScreen" Padding="5" Margin="10, 0" Background="Transparent" BorderBrush="Transparent" Click="btnFullScreen_Click" IsEnabled="False">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="F"></KeyboardAccelerator>
+                            </Button.KeyboardAccelerators>
+                            <FontIcon Glyph="&#xE740;" Foreground="White" FontSize="16"/>
+                        </Button>
+
+
+                        <Button Name="btnSubtitles" ToolTipService.ToolTip="Subtitles" Margin="0, 0" Background="Transparent" BorderBrush="Transparent" Click="btnSubtitles_Click_1">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="S"></KeyboardAccelerator>
+                            </Button.KeyboardAccelerators>
+                            <FontIcon Glyph="&#xED1E;" Foreground="White" FontSize="14"/>
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="SubtitleMenu">
+                                    <MenuFlyoutItem Text="Load Subtitle Track" Click="MenuFlyoutItem_Click"/>
+                                    <MenuFlyoutSubItem Text="Existing Tracks" Name="trackexistinglist">
+                                        <MenuFlyoutItem Name="SearchSubtitles" Click="SearchSubtitles_Click" Text="Search" Icon="Find"></MenuFlyoutItem>
+
+                                    </MenuFlyoutSubItem>
+
+                                </MenuFlyout>
+
+                            </Button.Flyout>
+                        </Button>
+                        <Button Name="btnVideo" Margin="0, 0" ToolTipService.ToolTip="Video Options" Background="Transparent" BorderBrush="Transparent" Click="btnVideo_Click">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="V"></KeyboardAccelerator>
+                            </Button.KeyboardAccelerators>
+                            <FontIcon Glyph="&#xE714;" Foreground="White" FontSize="14"/>
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="VideoMenu">
+                                    <MenuFlyoutSubItem Text="Video Tracks" Name="videotracks">
+                                        <MenuFlyoutItem Name="SearchVideoTracks" Click="SearchSubtitles_Click" Text="Search" Icon="Find"></MenuFlyoutItem>
+
+                                    </MenuFlyoutSubItem>
+                                    <MenuFlyoutItem Text="Take Snapshot" Name="mnftTakeSnapshot" Click="mnftTakeSnapshot_Click">
+
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSubItem Text="Aspect Ratio" Name="mnftAspectRatio">
+                                        <RadioMenuFlyoutItem Text="Default" Click="AspectRatio_Click"/>
+                                        <RadioMenuFlyoutItem  Text="16:9" Click="AspectRatio_Click"/>
+                                        <RadioMenuFlyoutItem Text="4:3" Click="AspectRatio_Click"/>
+                                        <RadioMenuFlyoutItem Text="1:1" Click="AspectRatio_Click"/>
+                                        <RadioMenuFlyoutItem Text="21:9" Click="AspectRatio_Click"/>
+                                        <RadioMenuFlyoutItem Text="2.35:1" Click="AspectRatio_Click"/>
+
+                                    </MenuFlyoutSubItem>
+                                    <MenuFlyoutItem Click="mnftSnapshotDirectory_Click" Text="Change Snapshot Directory" Name="mnftSnapshotDirectory"></MenuFlyoutItem>
+                                </MenuFlyout>
+
+                            </Button.Flyout>
+                        </Button>
+                        <Button Name="btnAudio" ToolTipService.ToolTip="Audio Options" Margin="0, 0" Background="Transparent" BorderBrush="Transparent" Click="btnAudio_Click"   >
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="A"></KeyboardAccelerator>
+                            </Button.KeyboardAccelerators>
+                            <FontIcon Glyph="&#xE8D6;" Foreground="White" FontSize="14"/>
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="AudioMenu">
+                                    <MenuFlyoutSubItem Text="Audio Tracks" Name="audiotracks">
+                                        <MenuFlyoutItem Name="SearchAudioTracks" Click="SearchSubtitles_Click" Text="Search" Icon="Find"></MenuFlyoutItem>
+
+                                    </MenuFlyoutSubItem>
+                                    <MenuFlyoutItem Text="Audio Device" Name="mnftAudioDevice" Click="mnftAudioDevice_Click">
+
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Audio Options" Name="mnftAudioOptions" Click="mnftAudioOptions_Click">
+
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+
+                            </Button.Flyout>
+                        </Button>
+                        <Button Name="btnOptions" Margin="0, 0" Background="Transparent" BorderBrush="Transparent" Click="btnHome_Click" ToolTipService.ToolTip="Open Home Page"   >
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Name="mnftHome" Click="mnftHome_Click" Text="Home">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE80F;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <ToggleMenuFlyoutItem IsChecked="True" Name="mnftGlowEffect" Click="mnftGlowEffect_Click" Text="Glow Effect">
+                                        <ToggleMenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xF4A5;"></FontIcon>
+                                        </ToggleMenuFlyoutItem.Icon>
+                                    </ToggleMenuFlyoutItem>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                            <FontIcon Glyph="&#xE712;" Foreground="White" FontSize="14"/>
+
+                        </Button>
+                        <TeachingTip Name="ttSearch" Target="{x:Bind btnSubtitles }" Title="Search Subtitles" >
+                            <AutoSuggestBox Name="asbSearchSubtitles" SuggestionChosen="AutoSuggestBox_SuggestionChosen" QueryIcon="Find" PlaceholderText="Search For Subtitles" QuerySubmitted="AutoSuggestBox_QuerySubmitted" TextChanged="AutoSuggestBox_TextChanged"></AutoSuggestBox>
+                            <TeachingTip.IconSource>
+                                <SymbolIconSource Symbol="Find" />
+                            </TeachingTip.IconSource>
+
+                        </TeachingTip>
+                        <ContentDialog PrimaryButtonClick="dialogmediaoptions_PrimaryButtonClick" Name="dialogmediaoptions" Title="Media Options" PrimaryButtonText="Save" CloseButtonText="Cancel" DefaultButton="Primary">
+
+                            <Grid Name=" OptionsContent" Visibility="Visible">
+
+                                <StackPanel Margin="0, 20" Orientation="Vertical">
+
+                                    <TextBlock Style="{StaticResource BodyLargeStrongTextBlockStyle}" Text="Subtitles"></TextBlock>
+
+                                    <StackPanel Margin="0, 20" Orientation="Horizontal">
+
+                                        <TextBlock Text="Font " Margin="0, 4"></TextBlock>
+
+                                        <ComboBox Margin="10, 0" Name="cmbFonts" SelectionChanged="cmbFonts_SelectionChanged"></ComboBox>
+
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+
+                                        <TextBlock Margin="0, 4" Text="Font Size "></TextBlock>
+
+                                        <NumberBox Margin="10, 0" SpinButtonPlacementMode="Inline" SmallChange="10" Name="numFontSize" Minimum="14" Maximum="72" AcceptsExpression="False" ValueChanged="numFontSize_ValueChanged"></NumberBox>
+
+                                    </StackPanel>
+
+                                    <RichTextBlock Margin="0, 10" Name="txtSample">
+
+                                        <Paragraph>This is how your subtitles will appear (1234567890)</Paragraph>
+
+                                    </RichTextBlock>
+
+                                    <Button >
+
+                                        <StackPanel Orientation="Horizontal">
+
+                                            <TextBlock Text="Color"></TextBlock>
+
+                                            <Rectangle Name="rctColor" Margin="10, 0" Width="30" Height="20" Fill="White"></Rectangle>
+
+                                        </StackPanel>
+
+                                        <Button.Flyout>
+
+                                            <Flyout>
+
+                                                <ColorPicker Name="clrPicker"
+
+      ColorSpectrumShape="Ring"
+
+      IsMoreButtonVisible="False"
+
+                                             ColorChanged="clrPicker_ColorChanged"
+
+      IsColorSliderVisible="True"
+
+      IsColorChannelTextInputVisible="True"
+
+      IsHexInputVisible="True"
+
+      IsAlphaEnabled="False"
+
+      IsAlphaSliderVisible="True"
+
+      IsAlphaTextInputVisible="True" />
+
+                                            </Flyout>
+
+                                        </Button.Flyout>
+
+                                    </Button>
+
+                                    <TextBlock Margin="0, 10" Text="Options will be applied the next time you load media"></TextBlock>
+
+                                </StackPanel>
+
+                            </Grid>
+
+                        </ContentDialog>
+                    </StackPanel>
+
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>-->
+
+</UserControl>

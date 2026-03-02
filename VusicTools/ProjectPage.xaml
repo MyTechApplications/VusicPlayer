@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VusicTools.ProjectPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicTools"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+     xmlns:lvs="using:LibVLCSharp.Platforms.Windows">
+
+    <Grid Margin="20, 20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Top Bar -->
+            <RowDefinition Height="*"/>
+            <!-- Preview -->
+            <RowDefinition Height="300"/>
+            <!-- Bottom Panels -->
+        </Grid.RowDefinitions>
+
+        <!-- ========================= -->
+        <!-- TOP BAR -->
+        <!-- ========================= -->
+        <Grid Grid.Row="0" Padding="12" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Renamable Project Title -->
+            <TextBox x:Name="txtProjectTitle"
+                     Text="Untitled Project"
+                     FontSize="20"
+                     FontWeight="SemiBold"
+                     BorderThickness="0" Grid.Column="4"
+                     VerticalAlignment="Center" Background="Transparent" BorderBrush="Transparent"/>
+
+            <Button Grid.Column="0" >
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/Assets/saveicon.png" Width="20"></Image>
+                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Save"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="1">
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/Assets/saveasicon.png" Width="20"></Image>
+                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Save As"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Name="btnExport" Style="{StaticResource AccentButtonStyle}" Click="btnExport_Click" Grid.Column="2" >
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/Assets/exporticon.png" Width="20"></Image>
+                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Export"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="3" >
+                <StackPanel Orientation="Vertical">
+                    <Image Source="/Assets/tutorialicon.png" Width="20"></Image>
+                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Tutorial"></TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- ========================= -->
+        <!-- PREVIEW + PLAYER CONTROLS -->
+        <!-- ========================= -->
+        <Grid Grid.Row="1" Padding="12" RowSpacing="8">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <!-- Video -->
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Video Preview -->
+            <lvs:VideoView Name="videoViewMain" Grid.Row="0"/>
+            <ContentDialog
+    x:Name="ExportDialog"
+    Title="Export Project"
+    PrimaryButtonText="Export"
+    CloseButtonText="Cancel"
+    DefaultButton="Primary">
+
+                <Grid>
+
+                    <Pivot x:Name="ExportPivot">
+
+                        <PivotItem Header="Video">
+
+                            <Grid Padding="12" RowSpacing="12" ColumnSpacing="12">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- File Name -->
+                                <TextBlock Text="File Name" Grid.Row="0"/>
+                                <TextBox x:Name="txtVideoFileName"
+                     Grid.Row="0"
+                     Grid.Column="1"
+                     Grid.ColumnSpan="2"/>
+
+                                <!-- Export To Folder -->
+                                <TextBlock Text="Export To" Grid.Row="1"/>
+                                <TextBox x:Name="txtVideoExportFolder"
+                     Grid.Row="1"
+                     Grid.Column="1"/>
+                                <Button Content="Browse"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Click="Button_Click"/>
+
+                                <!-- Format -->
+                                <TextBlock Text="Format" Grid.Row="2"/>
+                                <ComboBox x:Name="cmbVideoFormat"
+                      Grid.Row="2"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      SelectedIndex="0">
+                                    <ComboBoxItem Content="MP4 (H.264)"/>
+                                    <ComboBoxItem Content="MOV"/>
+                                    <ComboBoxItem Content="MKV"/>
+                                    <ComboBoxItem Content="AVI"/>
+                                    <ComboBoxItem Content="WEBM"/>
+                                </ComboBox>
+
+                                <!-- Resolution -->
+                                <TextBlock Text="Resolution" Grid.Row="3"/>
+                                <ComboBox Grid.Row="3"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      SelectedIndex="0">
+                                    <ComboBoxItem Content="1920 x 1080"/>
+                                    <ComboBoxItem Content="3840 x 2160"/>
+                                    <ComboBoxItem Content="1280 x 720"/>
+                                </ComboBox>
+
+                                <!-- Frame Rate -->
+                                <TextBlock Text="Frame Rate" Grid.Row="4"/>
+                                <ComboBox Grid.Row="4"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      SelectedIndex="1">
+                                    <ComboBoxItem Content="24 fps"/>
+                                    <ComboBoxItem Content="30 fps"/>
+                                    <ComboBoxItem Content="60 fps"/>
+                                </ComboBox>
+                                <!-- Quality -->
+                                <TextBlock Text="Quality" Grid.Row="5"/>
+                                <ComboBox Grid.Row="5"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      SelectedIndex="0">
+                                    <ComboBoxItem Content="High"/>
+                                    <ComboBoxItem Content="Medium"/>
+                                    <ComboBoxItem Content="Low"/>
+                                </ComboBox>
+
+                            </Grid>
+                        </PivotItem>
+                        <PivotItem Header="Audio">
+
+                            <Grid Padding="12" RowSpacing="12" ColumnSpacing="12">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- File Name -->
+                                <TextBlock Text="File Name" Grid.Row="0"/>
+                                <TextBox x:Name="txtAudioFileName"
+                     Grid.Row="0"
+                     Grid.Column="1"
+                     Grid.ColumnSpan="2"/>
+
+                                <!-- Export To Folder -->
+                                <TextBlock Text="Export To" Grid.Row="1"/>
+                                <TextBox x:Name="txtAudioExportFolder"
+                     Grid.Row="1"
+                     Grid.Column="1"/>
+                                <Button Content="Browse"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Click="Button_Click_1"/>
+
+                                <!-- Format -->
+                                <TextBlock Text="Format" Grid.Row="2"/>
+                                <ComboBox x:Name="cmbAudioFormat"
+                      Grid.Row="2"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      SelectedIndex="0">
+                                    <ComboBoxItem Content="MP3"/>
+                                    <ComboBoxItem Content="WAV"/>
+                                    <ComboBoxItem Content="AAC"/>
+                                    <ComboBoxItem Content="FLAC"/>
+                                    <ComboBoxItem Content="OGG"/>
+                                </ComboBox>
+
+                                <!-- Sample Rate -->
+                                <TextBlock Text="Sample Rate" Grid.Row="3"/>
+                                <ComboBox Grid.Row="3"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      SelectedIndex="1">
+                                    <ComboBoxItem Content="44100 Hz"/>
+                                    <ComboBoxItem Content="48000 Hz"/>
+                                    <ComboBoxItem Content="96000 Hz"/>
+                                </ComboBox>
+
+                                <!-- Bitrate -->
+                                <TextBlock Text="Bitrate" Grid.Row="4"/>
+                                <ComboBox Grid.Row="4"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      SelectedIndex="1">
+                                    <ComboBoxItem Content="128 kbps"/>
+                                    <ComboBoxItem Content="192 kbps"/>
+                                    <ComboBoxItem Content="320 kbps"/>
+                                </ComboBox>
+
+                            </Grid>
+                        </PivotItem>
+
+                    </Pivot>
+                </Grid>
+            </ContentDialog>
+            <!-- Duration -->
+            <TextBlock Name="txtDurationHandle" Grid.Row="2"
+                       Text="00:00:00 / 00:00:00"
+                       HorizontalAlignment="Center"/>
+
+            <!-- Timeline Slider -->
+            <local:SliderReuse Grid.Row="1"
+                               HorizontalAlignment="Stretch"/>
+
+            <!-- Playback Controls -->
+            <Grid Grid.Row="3" ColumnSpacing="10" Margin="0, 10" HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <Button Background="Transparent" Padding="2"  BorderBrush="Transparent" Name="btnSeekBefore" Grid.Column="0" ToolTipService.ToolTip="Skip 10 seconds before">
+                    <Image Source="/Assets/skip10secondsbackwardlighticon.png" Width="25"></Image>
+                </Button>
+                <Button Background="Transparent" Padding="2"  BorderBrush="Transparent"  Name="btnPlayPause" Grid.Column="1" ToolTipService.ToolTip="Play">
+                    <Image Source="/Assets/play.png" Width="25"></Image>
+                </Button>
+                <Button Background="Transparent" Padding="2" BorderBrush="Transparent"  Name="btnSeekAfter" Grid.Column="2" ToolTipService.ToolTip="Skip 10 seconds after">
+                    <Image Source="/Assets/skip10secondsforwardiconlight.png" Width="25"></Image>
+                </Button>
+                <Button Background="Transparent"  Padding="2" BorderBrush="Transparent"  Name="btnVolume" Grid.Column="3" ToolTipService.ToolTip="Volume">
+                    <Image Source="/Assets/volume.png" Width="20"></Image>
+                </Button>
+                <StackPanel Grid.Column="4" Margin="10, 0">
+                    <local:SliderReuse Name="sldVolume" Width="100" HorizontalAlignment="Stretch" />
+                </StackPanel>
+                <Button Background="Transparent" BorderBrush="Transparent" Padding="2" Name="btnFullScreen" Margin="0, 0" Grid.Column="5" ToolTipService.ToolTip="Full Screen">
+                    <Image Source="/Assets/fullscreen.png" Width="25" ></Image>
+                </Button>
+            </Grid>
+        </Grid>
+
+        <!-- ========================= -->
+        <!-- MEDIA + TRACKS PANEL -->
+        <!-- ========================= -->
+        <Grid Grid.Row="2" ColumnSpacing="8">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- MEDIA PANEL -->
+            <Grid Grid.Column="0" Padding="8" RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0" Click="btnImportMedia_Click" Background="Transparent" BorderBrush="Transparent" Name="btnImportMedia" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel Padding="0" Orientation="Vertical">
+                        <Image Width="60" Source="/Assets/default.png"></Image>
+                        <TextBlock Style="{StaticResource BodyLargeStrongTextBlockStyle}" Text="Import Media or Drag Media below"></TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <GridView x:Name="MediaGrid"
+    AllowDrop="True"
+    DragOver="MediaGrid_DragOver"
+    Drop="MediaGrid_Drop"
+    CanDragItems="True"
+    DragItemsStarting="MediaGrid_DragItemsStarting_1" Grid.Row="1">
+       
+
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="local:MediaItem">
+                            <StackPanel Width="120">
+                                <Border Height="70"
+                        Background="Gray"
+                        CornerRadius="8"/>
+                                <TextBlock Text="{Binding Name}"
+                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+
+                </GridView>
+            </Grid>
+
+            <!-- TRACKS PANEL -->
+            <Border Grid.Column="1"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="8">
+
+                <local:Timeline
+    x:Name="Timeline"
+    Grid.Row="3"
+    Margin="0,10,0,0"/>
+             
+            </Border>
+        </Grid>
+
+    </Grid>
+</Page>

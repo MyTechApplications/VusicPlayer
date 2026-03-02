@@ -1,17 +1,24 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml.Media.Imaging;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace VusicPlayer
 {
-    public class RecentMusic
+    public class RecentMusic : INotifyPropertyChanged
     {
         public string SongName { get; set; }
         public string SongPath { get; set; }
         public string FolderName { get; set; }
-
-        public string Thumbnail { get; set; }
+ 
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        [JsonIgnore]
+        public BitmapImage Thumbnail { get; set; }
     }
 }

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VusicPlayer.FoldersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Margin="30, 0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition ></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="This Folder Is Empty" Name="txtEmptyFolder" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <Grid Name="PreviewGrid" Grid.Column="0" Visibility="Collapsed" Padding="10" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Header with Close Button -->
+                <RowDefinition Height="*"/>
+                <!-- Content -->
+            </Grid.RowDefinitions>
+            <TeachingTip CanDrag="True" Name="ttRenameFile" PreferredPlacement="Center" IsOpen="False">
+                <StackPanel Orientation="Vertical">
+                    <TextBox Name="txtRenameFile" PlaceholderText="Rename File"></TextBox>
+                    <Button Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10, 5" Click="Button_Click_3" Padding="2">
+
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="25" Source="/Assets/tickicon.png"></Image>
+                            <TextBlock Text="Rename" Margin="10, 0"></TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </TeachingTip>
+            <!-- Close But ton -->
+            <Button Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Right" Grid.Row="0" Click="Button_Click" ToolTipService.ToolTip="Close Preview Pane">
+                <Image Source="/Assets/removeicon.png" Width="20"/>
+            </Button>
+
+            <!-- Content -->
+            <ScrollViewer Margin="0, 10" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Vertical" Spacing="10">
+
+                    <!-- Thumbnail + File Info -->
+                    <StackPanel Orientation="Vertical" Spacing="10">
+                        <!-- Thumbnail -->
+                     
+                            <Image x:Name="PreviewThumbnail" Width="150" Height="100" Stretch="UniformToFill"/>
+
+
+                        <!-- File Info -->
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" Spacing="4">
+                            <!-- File Name -->
+                            <TextBlock x:Name="PreviewFileName" Text="FileName.mp4" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
+
+                            <!-- File Path -->
+                            <HyperlinkButton x:Name="PreviewFilePath"  Click="PreviewFilePath_Click"/>
+
+                            <!-- Metadata -->
+                            <StackPanel Orientation="Vertical" Spacing="2" Margin="0,5,0,0">
+                                <TextBlock x:Name="PreviewDuration" Text="Duration: 00:00:00"/>
+                                <TextBlock x:Name="PreviewSize" Text="Size: 0 MB"/>
+                                <TextBlock x:Name="PreviewCreated" Text="Created: 01-01-2026"/>
+                                <TextBlock x:Name="PreviewModified" Text="Modified: 01-01-2026"/>
+                            </StackPanel>
+
+                            <!-- Attributes -->
+                            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,0">
+                                <CheckBox x:Name="ChkReadOnly" Content="Read-only" Checked="ChkReadOnly_Checked" Unchecked="ChkReadOnly_Unchecked"/>
+                                <CheckBox x:Name="ChkHidden" Content="Hidden" Checked="ChkHidden_Checked" Unchecked="ChkHidden_Unchecked"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10" Margin="0,10,0,0">
+                        <Button x:Name="BtnRename" Click="BtnRename_Click_1" ToolTipService.ToolTip="Rename">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Image Source="/Assets/renameicon.png" Width="16"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnDelete" Click="BtnDelete_Click_2" ToolTipService.ToolTip="Delete">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Image Source="/Assets/deleteicon.png" Width="16"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnProperties" Click="BtnProperties_Click_1" ToolTipService.ToolTip="Properties">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Image Source="/Assets/infoicon.png" Width="16"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock Name="txtFolderName" Grid.Row="0" Margin="0, 0" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
+                
+                <Button Margin="10, 0" ToolTipService.ToolTip="Rename Folder" Name="btnRenameFolder" Click="Button_Click_1">
+                    <Image Width="20" Source="/Assets/editicon.png"></Image>
+                </Button>
+                <TeachingTip Name="ttRenameFolder" IsOpen="False" Target="{x:Bind btnRenameFolder}">
+                    <StackPanel Orientation="Vertical">
+                        <TextBox Name="txtRenameFolder" PlaceholderText="Rename Folder"></TextBox>
+                        <Button Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10, 5" Click="Button_Click_2" Padding="2">
+                      
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="25" Source="/Assets/tickicon.png"></Image>
+                                <TextBlock Text="Rename" Margin="10, 0"></TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </TeachingTip>
+                <TeachingTip Name="ttFolderRenamedSuccess" IsOpen="False" PreferredPlacement="Bottom">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                        <TextBlock Name="txtRenameSuccess"></TextBlock>
+
+                            <Image Width="50" Source="/Assets/tickicon.png" Margin="10, 0"></Image>
+                        </StackPanel>
+                        <Button Name="btnUndo" Content="Undo" Margin="0, 10" Click="btnUndo_Click"></Button>
+                        <ProgressBar Name="prgFolderRenameComplete" Maximum="100"></ProgressBar>
+                    </StackPanel>
+                </TeachingTip>
+            </StackPanel>
+            <HyperlinkButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Click="HyperlinkButton_Click" Margin="0, 10" Padding="0" Name="hypPath">
+                <TextBlock Name="txtFolderPath" Grid.Row="1" Margin="0, 10" Style="{StaticResource CaptionTextBlockStyle}" Text="Path"></TextBlock>
+            </HyperlinkButton>
+            <TextBlock  Grid.Row="2" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Folder" Margin="0, 0" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
+            <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="0, 20">
+                <Button Name="btnSort" ToolTipService.ToolTip="Sort Files" >
+                    <Image Width="25" Source="/Assets/sorticon.png"></Image>
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <RadioMenuFlyoutItem Click="RadioMenuFlyoutItem_Click" Text="Sort by Name">
+
+                            </RadioMenuFlyoutItem>
+                            <RadioMenuFlyoutItem  Click="RadioMenuFlyoutItem_Click_1" Text="Sort by Date"></RadioMenuFlyoutItem>
+                            <RadioMenuFlyoutItem  Click="RadioMenuFlyoutItem_Click_2"  Text="Sort by Size"></RadioMenuFlyoutItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
+                <Button Name="btnRename" Click="btnRename_Click" Margin="10, 0" ToolTipService.ToolTip="Rename Selected File" >
+                    <Image Width="25" Source="/Assets/renameicon.png"></Image>
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Click="MenuFlyoutItem_Click_4" Text="Mass rename">
+
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
+                <Button Name="btnDelete" Click="btnDelete_Click_1" ToolTipService.ToolTip="Delete Selected File" >
+                    <Image Width="25" Source="/Assets/deleteicon.png"></Image>
+
+                </Button>
+          
+              
+  <CheckBox Content="Select" Name="chckSelectMultiple" Checked="chckSelectMultiple_Checked" Unchecked="chckSelectMultiple_Unchecked" Margin="10, 0"></CheckBox>
+                <ContentDialog>
+                <Grid VerticalAlignment="Center" Name="AccessDeniedGrid" Visibility="Visible">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/sourceerror.png" HorizontalAlignment="Center" Width="45"></Image>
+                        <TextBlock Text="Access Denied for the Folder!" Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center" Margin="10, 0"></TextBlock>
+                    </StackPanel>
+                    </Grid>
+                </ContentDialog>
+                <ContentDialog Title="Confirm Delete" Name="dlgConfirmDelete" Content="Are you sure you want to delete this file?" PrimaryButtonText="Delete" PrimaryButtonClick="dlgConfirmDelete_PrimaryButtonClick" DefaultButton="Close" CloseButtonText="Cancel"></ContentDialog>
+                <ContentDialog Title="Folder Missing" Name="dlgFolderNotExist" Content="This folder path is missing. You will be re
+                               ed back to Home Page." PrimaryButtonText="OK" PrimaryButtonClick="dlgFolderNotExist_PrimaryButtonClick"></ContentDialog>
+                <ContentDialog Title="File Missing" Name="dlgFileNotExist" Content="This file path is missing." CloseButtonText="SKIP" PrimaryButtonClick="dlgFileNotExist_PrimaryButtonClick" ></ContentDialog>
+            </StackPanel>
+            <GridView  CanDragItems="True" Grid.Row="4"
+AllowDrop="True"
+CanReorderItems="True" x:Name="VideoGrid" SelectionMode="Single" IsItemClickEnabled="True"
+ItemClick="VideoGrid_ItemClick"  Margin="0, 30">
+                <GridView.ItemTemplate>
+
+                    <DataTemplate >
+                        <StackPanel Width="150">
+                            <StackPanel.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Preview" Click="MenuFlyoutItem_Click">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE8A1;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    
+                                    <MenuFlyoutItem Text="Rename" Click="MenuFlyoutItem_Click_6" Icon="Rename"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Properties" Click="MenuFlyoutItem_Click_7" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE946;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Open File Location" Click="MenuFlyoutItem_Click_9">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE8DA;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Delete" Click="MenuFlyoutItem_Click_8" Icon="Delete"></MenuFlyoutItem>
+                                </MenuFlyout>
+                            </StackPanel.ContextFlyout>
+                            <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
+                            <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Name="txtItems" VerticalAlignment="Bottom" Margin="0, 10" HorizontalAlignment="Left" Grid.Row="5"></TextBlock>
+        </Grid>
+    </Grid>
+</Page>

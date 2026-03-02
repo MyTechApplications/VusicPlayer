@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
+            <TeachingTip Name="ttPlaylistDeleted" Title="Playlist Deleted" IsOpen="False"></TeachingTip>
         <ContentDialog PrimaryButtonClick="dlgConfirmDeletePlaylist_PrimaryButtonClick" Name="dlgConfirmDeletePlaylist" Content="Are you sure you want to delete this playlist?" Title="Delete Playlist" PrimaryButtonText="Delete" DefaultButton="Primary" CloseButtonText="Cancel"></ContentDialog>
         <Grid Grid.Row="2">
         <Grid.ColumnDefinitions>
@@ -94,8 +95,9 @@
                 <FontIcon Glyph="&#xE74D;"></FontIcon>
             </Button>
         </StackPanel>
-        <StackPanel Name="txtEmptyPlaylists" Visibility="Collapsed" Grid.Row="6" Orientation="Vertical" HorizontalAlignment="Center">
+        <StackPanel Name="txtEmptyPlaylists" Visibility="Collapsed" Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
             <Image Source="/Assets/musicfolder.png" Width="200" HorizontalAlignment="Center"></Image>
+                <StackPanel Margin="20, 0" Orientation="Vertical" VerticalAlignment="Center">
             <TextBlock HorizontalAlignment="Center"  Text="You have no playlists created!" Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
             <Button Style="{StaticResource AccentButtonStyle}" Margin="0, 20" Name="btnAdd" HorizontalAlignment="Center" Click="btnNewPlaylist_Click" >
                 <StackPanel Orientation="Horizontal">
@@ -109,8 +111,9 @@ VerticalAlignment="Center"/>
  VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
-        </StackPanel>
-        <GridView CanReorderItems="True"  AllowDrop="True" CanDragItems="True"  DragItemsCompleted="GrdViewPlaylists_DragItemsCompleted"  ItemClick="GrdViewPlaylists_ItemClick"      SelectionMode="Single" IsItemClickEnabled="True" Name="GrdViewPlaylists" Grid.Row="6">
+                </StackPanel>
+            </StackPanel>
+            <GridView CanReorderItems="True"  AllowDrop="True" CanDragItems="True"  DragItemsCompleted="GrdViewPlaylists_DragItemsCompleted"  ItemClick="GrdViewPlaylists_ItemClick"      SelectionMode="Single" IsItemClickEnabled="True" Name="GrdViewPlaylists" Grid.Row="6">
             <GridView.ItemTemplate>
                 <DataTemplate >
                     <StackPanel Width="150">
@@ -129,108 +132,141 @@ VerticalAlignment="Center"/>
             </GridView.ItemTemplate>
         </GridView>
         <ContentDialog Name="dlgNewPlaylist" PrimaryButtonClick="dlgNewPlaylist_PrimaryButtonClick" Title="Create a new playlist" PrimaryButtonText="+ Create" DefaultButton="Primary" CloseButtonText="Cancel">
-            <ScrollViewer>
-                <StackPanel Padding="10" Spacing="12">
 
-                    <Button Name="btnReset" HorizontalAlignment="Left">
-                        <Button.Flyout>
-                            <Flyout>
-                                <Button Name="btnActualReset" Content="Reset new playlist creation" Click="btnActualReset_Click"/>
-                            </Flyout>
-                        </Button.Flyout>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Image Source="ms-appx:///Assets/reseticon.png" Width="18"/>
-                            <TextBlock Text="Reset Playlist Creation" VerticalAlignment="Center" Style="{StaticResource BodyTextBlockStyle}"/>
+                <Grid Name="contentsNewPlaylist">
+                    <ScrollViewer>
+                        <StackPanel Padding="24" Spacing="24" MaxWidth="1000" HorizontalAlignment="Stretch">
+
+                            <Grid>
+                          
+
+                                <Button Name="btnReset" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                        Background="Transparent" BorderBrush="Transparent">
+                                    <Button.Flyout>
+                                        <Flyout>
+                                            <Button Name="btnActualReset" Content="Reset playlist creation" 
+                                    Click="btnActualReset_Click" Style="{StaticResource AccentButtonStyle}"/>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Image Source="ms-appx:///Assets/reseticon.png" Width="16" Height="16"/>
+                                        <TextBlock Text="Reset Fields" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <Grid ColumnSpacing="24">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Spacing="12">
+                                    <Border CornerRadius="8" Width="200" Height="200" 
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                        <Image Name="imgPlaylistCov" Stretch="UniformToFill" />
+                                    </Border>
+
+                                    <Button Name="btnAddPlaylistCover" Click="btnAddPlaylistCover_Click" HorizontalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Image Source="ms-appx:///Assets/addimgicon.png" Width="16"/>
+                                            <TextBlock Text="Set Cover Art" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Grid Name="CoverOptions" Visibility="Collapsed" ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Name="btnChangeCover" Click="btnAddPlaylistCover_Click" ToolTipService.ToolTip="Change Cover" Grid.Column="0" HorizontalAlignment="Stretch">
+                                            <Image Width="14" Source="ms-appx:///Assets/refreshimgicon.png"/>
+                                        </Button>
+                                        <Button Name="btnRemovePlaylistCover" Click="btnRemovePlaylistCover_Click" ToolTipService.ToolTip="Remove Cover" Grid.Column="1" HorizontalAlignment="Stretch">
+                                            <Image Width="14" Source="ms-appx:///Assets/removeicon.png"/>
+                                        </Button>
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Spacing="20" VerticalAlignment="Top">
+                                    <TextBox Name="txtPlaylistName" 
+                             Header="Playlist Name" 
+                             PlaceholderText="Give your playlist a title" 
+                             Text="Playlist (1)" TextChanged="txtPlaylistName_TextChanged"
+                             GotFocus="txtPlaylistName_GotFocus"/>
+
+                                    <TextBox Name="txtGenre" 
+                             Header="Genre" 
+                             PlaceholderText="e.g. Rock, Lo-Fi, Workout"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <MenuFlyoutSeparator/>
+
+                            <Grid>
+                                <TextBlock Name="txtAddedSongs" Text="Added Songs" 
+                           Style="{StaticResource SubtitleTextBlockStyle}" 
+                           FontWeight="SemiBold" VerticalAlignment="Center"/>
+
+                                <Button Name="btnAddSongs" Click="btnAddSongs_Click" 
+                        Style="{StaticResource AccentButtonStyle}" 
+                        HorizontalAlignment="Right">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Image Source="ms-appx:///Assets/addicon.png" Width="16"/>
+                                        <TextBlock Text="Add Songs"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <TextBlock Name="txtNullAddedSongs" Text="No songs have been added yet!" 
+                       Visibility="Collapsed" FontStyle="Italic" 
+                       HorizontalAlignment="Center" Margin="0,40"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+
+                            <ListView Name="lstViewPlaylistAddedSongs" 
+                      CanDragItems="True" 
+                      CanReorderItems="True" 
+                      AllowDrop="True"
+                      SelectionMode="Single"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      CornerRadius="8"
+                      BorderThickness="1"
+                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="12,8" ColumnSpacing="16">
+                                            <Grid.ContextFlyout>
+                                                <MenuFlyout>
+                                                    <MenuFlyoutItem Text="Remove Song" Click="removesongfromplaylistcreation_Click" Icon="Delete"/>
+                                                </MenuFlyout>
+                                            </Grid.ContextFlyout>
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="&#xEC4F;" FontFamily="Segoe Fluent Icons" 
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       Grid.Column="0" VerticalAlignment="Center"/>
+
+                                            <TextBlock Text="{Binding SongName}" Grid.Column="1" 
+                                       VerticalAlignment="Center" FontWeight="SemiBold" 
+                                       TextTrimming="CharacterEllipsis"/>
+
+                                            <TextBlock Text="{Binding SongDuration}" Grid.Column="2" 
+                                       VerticalAlignment="Center" 
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </StackPanel>
-                    </Button>
-
-                    <Grid Margin="0,12" ColumnSpacing="16" RowSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Playlist Name" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"/>
-                        <TextBox Name="txtPlaylistName" PlaceholderText="my playlist's name" Text="Playlist (1)" 
-                     GotFocus="txtPlaylistName_GotFocus" Grid.Row="0" Grid.Column="1"/>
-
-                        <TextBlock Text="Genre" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"/>
-                        <TextBox Name="txtGenre" PlaceholderText="my playlist's genre" Grid.Row="1" Grid.Column="1"/>
-                    </Grid>
-
-                    <StackPanel Spacing="8">
-                        <Button Name="btnAddPlaylistCover" Click="btnAddPlaylistCover_Click">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Image Source="ms-appx:///Assets/addimgicon.png" Width="18"/>
-                                <TextBlock Text="Add Playlist Cover" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Name="btnAddSongs" Style="{StaticResource AccentButtonStyle}" Click="btnAddSongs_Click">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Image Source="ms-appx:///Assets/addicon.png" Width="18"/>
-                                <TextBlock Text="Add Songs" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-
-                    <Image Name="imgPlaylistCov" Margin="0,12" Width="275" HorizontalAlignment="Left" Stretch="UniformToFill"/>
-
-                    <StackPanel Name="CoverOptions" Visibility="Collapsed" Orientation="Horizontal" Spacing="10">
-                        <Button Name="btnChangeCover" Click="btnAddPlaylistCover_Click">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Image Width="16" Source="ms-appx:///Assets/refreshimgicon.png"/>
-                                <TextBlock Text="Change Cover" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Name="btnRemovePlaylistCover" Click="btnRemovePlaylistCover_Click">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Image Width="16" Source="ms-appx:///Assets/removeicon.png"/>
-                                <TextBlock Text="Remove Cover" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-
-                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,20,0,4" Text="Added Songs:"/>
-
-                    <TextBlock Name="txtNullAddedSongs" Text="No songs have been added yet!" 
-                   Visibility="Collapsed" FontStyle="Italic" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-
-                    <ListView Name="lstViewPlaylistAddedSongs" 
-                  CanDragItems="True" 
-                  CanReorderItems="True" 
-                  AllowDrop="True"
-                  SelectionMode="Single"
-                  Margin="0,8">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Padding="8" ColumnSpacing="12">
-                                    <Grid.ContextFlyout>
-                                        <MenuFlyout>
-                                            <MenuFlyoutItem Text="Remove Song" Click="removesongfromplaylistcreation_Click" Icon="Delete"/>
-                                        </MenuFlyout>
-                                    </Grid.ContextFlyout>
-
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Text="&#xEC4F;" FontFamily="Segoe Fluent Icons" Grid.Column="0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding SongName}" Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{Binding SongDuration}" Grid.Column="2" VerticalAlignment="Center" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </StackPanel>
-            </ScrollViewer>
-        </ContentDialog>
+                    </ScrollViewer>
+                </Grid>
+            </ContentDialog>
         </Grid>
     </ScrollViewer>
 </Page>

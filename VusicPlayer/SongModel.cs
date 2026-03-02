@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI;
 
 namespace VusicPlayer
 {
@@ -33,11 +34,16 @@ namespace VusicPlayer
             get => _albumName;
             set { _albumName = value; OnPropertyChanged(); }
         }
-        private Brush _titleColor = new SolidColorBrush(Colors.White); // Default color
-        public Brush TitleColor
+        private Color _titleColor = Microsoft.UI.Colors.White; // Safe for any thread!
+
+        public Color TitleColor
         {
             get => _titleColor;
-            set { _titleColor = value; OnPropertyChanged(nameof(TitleColor)); }
+            set
+            {
+                _titleColor = value;
+                OnPropertyChanged(nameof(TitleColor));
+            }
         }
         private string? _glyph = "\uEC4F";// Default color
         public string Glyph

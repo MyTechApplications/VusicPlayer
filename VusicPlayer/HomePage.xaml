@@ -8,9 +8,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-
+    <ScrollViewer>
     <Grid Margin="50, 20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -31,22 +33,7 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Button Name="btnSort" ToolTipService.ToolTip="Sort Files" Grid.Column="0">
-                <FontIcon Glyph="&#xE8CB;"></FontIcon>
-                <Button.Flyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem Click="MenuFlyoutItem_Click" Text="Sort by Name">
-
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem  Click="MenuFlyoutItem_Click_1" Text="Sort by Date"></MenuFlyoutItem>
-                        <MenuFlyoutItem  Click="MenuFlyoutItem_Click_2"  Text="Sort by Size"></MenuFlyoutItem>
-                    </MenuFlyout>
-                </Button.Flyout>
-            </Button>
-            <Button Name="btnPlayAll" Click="btnPlayAll_Click" ToolTipService.ToolTip="Play All" Grid.Column="1" Margin="10, 0">
-                <FontIcon Glyph="&#xE768;"></FontIcon>
-            </Button>
-
+         
         </Grid>
         <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Name="txtRecentHeading" Text="Continue Playing" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
         <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtEmptyRecents" Grid.Row="4" Visibility="Collapsed" Text="Start watching videos to see them here!" Margin="0, 40"></TextBlock>
@@ -71,18 +58,38 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
-        <GridView  CanDragItems="True"
+        <TextBlock Name="txtFoldersHeader" Text="Recent Folders" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
+            <TextBlock Name="txtEmptyFolders" Text="No folders opened yet!" Margin="0, 30" Style="{StaticResource BodyLargeTextBlockStyle}" Grid.Row="7" Visibility="Collapsed"></TextBlock>
+            <GridView  CanDragItems="True"
       AllowDrop="True"
-      CanReorderItems="True" x:Name="VideoGrid" SelectionMode="Single" IsItemClickEnabled="True"
-      ItemClick="VideoGrid_ItemClick" DragItemsCompleted="VideoGrid_DragItemsCompleted" Grid.Row="6" Margin="0, 30">
+      CanReorderItems="True" x:Name="FolderGrid" SelectionMode="Single" IsItemClickEnabled="True"
+      ItemClick="FolderGrid_ItemClick" DragItemsCompleted="FolderGrid_DragItemsCompleted" Grid.Row="7" Margin="0, 0">
+               
             <GridView.ItemTemplate>
                 <DataTemplate >
                     <StackPanel Width="150">
-                        <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
-                        <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
+                            <StackPanel.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Open Folder" Click="MenuFlyoutItem_Click_5" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE838;"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Remove from Recent Folders" Click="MenuFlyoutItem_Click_4" Icon="Remove"></MenuFlyoutItem>
+                                </MenuFlyout>
+                            </StackPanel.ContextFlyout>
+                        <Image Source="{Binding Thumbnail}" Width="100" Height="100" Stretch="UniformToFill"/>
+                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap" />
                     </StackPanel>
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
-    </Grid>
+        <ContentDialog Name="cldg">
+            <StackPanel Orientation="Horizontal">
+                <Image Width="30" Source="/Assets/sourceerror.png" ></Image>
+                <TextBlock Name="cldgContent" Margin="20, 0"></TextBlock>
+            </StackPanel>
+        </ContentDialog>
+        </Grid>
+    </ScrollViewer>
 </Page>

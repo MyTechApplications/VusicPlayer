@@ -7,16 +7,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+    <Page.Resources>
+        <Style x:Key="GlassyDialogStyle" TargetType="ContentDialog">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <AcrylicBrush 
+                TintOpacity="0.5" 
+                TintLuminosityOpacity="0.5"
+                TintColor="{ThemeResource SystemAltHighColor}" 
+                FallbackColor="{ThemeResource SystemAltHighColor}" />
+                </Setter.Value>
+            </Setter>
 
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorDefaultBrush}" />
+            <Setter Property="CornerRadius" Value="12" />
+        </Style>
+    </Page.Resources>
     <Grid Margin="50, 20" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MaxWidth="400"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <ContentDialog PrimaryButtonClick="dlgEditProperties_PrimaryButtonClick" PrimaryButtonText="Save" CloseButtonText="Cancel" DefaultButton="Primary" Title="Edit Song Properties" Name="dlgEditProperties">
-            <ScrollView>
+
+        <ContentDialog  PrimaryButtonClick="dlgEditProperties_PrimaryButtonClick" PrimaryButtonText="Save" CloseButtonText="Cancel" DefaultButton="Primary" Title="Edit Song Properties" Name="dlgEditProperties">
+            <ScrollView Background="Transparent">
                 
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Vertical" Background="Transparent">
                     <InfoBar x:Name="FileStatusInfoBar"
          Title="Action Required"
          Message="Checking file status..."
@@ -27,7 +44,7 @@
                             <Button x:Name="btnFixFile" Content="Fix" Click="btnFixFile_Click" />
                         </InfoBar.ActionButton>
                     </InfoBar>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Background="Transparent">
                         <TextBlock Text="Song Name"></TextBlock>
                         <TextBox Margin="10, 0" PlaceholderText="Song name...." Name="txtSongName"></TextBox>
                     </StackPanel>
@@ -57,7 +74,7 @@
                     </StackPanel>
                     <Button Name="btnOpenFileLoc" Margin="0, 10" Click="btnOpenFileLoc_Click">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Assets/gotoicon.png" Width="25"></Image>
+                            <Image Source="/Assets/openfolder.png" Width="25"></Image>
                             <TextBlock Margin="5, 0" Text="Go to File Location"></TextBlock>
                         </StackPanel>
                     </Button>
@@ -141,7 +158,12 @@
             </Grid.RowDefinitions>
 
             <Viewbox Grid.Row="0" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,20">
-                <Image Name="imgPlaylistCover" Width="300" Height="300" />
+                <Border CornerRadius="100" BorderThickness="0" BorderBrush="White" Opacity="0.9">
+                    <Border.Shadow>
+                        <ThemeShadow />
+                    </Border.Shadow>
+                    <Image x:Name="imgPlaylistCover" Source="/Assets/appicon.png"  Stretch="UniformToFill"/>
+                </Border>
             </Viewbox>
 
             <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
@@ -218,20 +240,21 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 </ToggleButton>
 
                 <Button Name="btnAddSongs" Margin="5"
-                ToolTipService.ToolTip="Add songs to this playlist">
+                ToolTipService.ToolTip="Add songs to this playlist" Click="btnAddSongs_Click">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="25" Source="/Assets/addicon.png" />
                         <TextBlock Margin="5,2" Text="Add Songs" />
                     </StackPanel>
                 </Button>
-
-                <Button Name="btnDeletePlaylist" Margin="5" ToolTipService.ToolTip="Delete Playlist">
+                <Button Name="btnDeletePlaylist" Click="btnDeletePlaylist_Click" Margin="5" ToolTipService.ToolTip="Delete Playlist">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="25" Source="/Assets/deleteicon.png" />
                         <TextBlock Margin="5,2 " Text="Delete playlist" />
                     </StackPanel>
                 </Button>
             </ItemsControl>
+            <ContentDialog Title="Are you sure you want to delete this playlist?" Content="This cannot be undone!" Name="dlgDeleteConfirmPlaylist" PrimaryButtonText="Delete" DefaultButton="Primary" CloseButtonText="Cancel" PrimaryButtonClick="dlgDeleteConfirmPlaylist_PrimaryButtonClick"></ContentDialog>
+
             <Button Name="btnEditPlaylistInfo" Grid.Row="3" HorizontalAlignment="Center" Content="Edit Playlist Info" Click="btnEditPlaylistInfo_Click"></Button>
         </Grid>
         <StackPanel Visibility="Collapsed" VerticalAlignment="Center" Orientation="Vertical" Grid.Column="1" Name="panelEmptyplaylists">
@@ -253,7 +276,14 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 
         <ScrollView VerticalAlignment="Stretch" Margin="10, 0" Name="ListPanel" Grid.Column="1">
             <StackPanel  Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
+
+                <InfoBar IsOpen="False" Severity="Warning" Name="iBMissingFiles" Title="Missing files">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="infoBarMessage" Text="Some files could not be located." Margin="0,0,8,0"/>
+                        <Button Content="Relocate" Click="RelocateButton_Click"/>
+                    </StackPanel>
+                </InfoBar>
+                <StackPanel Orientation="Horizontal" Margin="0, 20">
                     <TextBlock Name="txtPlaylistContentHeader" Style="{StaticResource SubtitleTextBlockStyle}" Text="Playlist content"></TextBlock>
                     <TextBlock Margin="10,5" Style="{StaticResource BaseTextBlockStyle}" ToolTipService.ToolTip="Playlist will play shuffled" Text="shuffled" Name="txtShuffled" Visibility="Collapsed" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
                 </StackPanel>

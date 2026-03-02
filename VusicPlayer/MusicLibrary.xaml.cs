@@ -23,8 +23,11 @@ using Windows.Foundation.Collections;
 using Windows.Media.Playlists;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
 using FrameworkElement = Microsoft.UI.Xaml.FrameworkElement;
 using RoutedEventArgs = Microsoft.UI.Xaml.RoutedEventArgs;
+using Window = Microsoft.UI.Xaml.Window;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -43,7 +46,12 @@ namespace VusicPlayer
             CallValues();
             MyItems.CollectionChanged += MyItems_CollectionChanged;
             RecentMusicItems.CollectionChanged += RecentMusicItems_CollectionChanged;
+            loadedSongs.CollectionChanged += LoadedSongs_CollectionChanged;
+        }
 
+        private void LoadedSongs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            txtAddedSongs.Text = "Added Songs: " + $"{loadedSongs.Count} {(loadedSongs.Count == 1 ? "item" : "items")}";
         }
 
         private async void RecentMusicItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -89,6 +97,7 @@ namespace VusicPlayer
             }
             foreach (var item in recentmusicitems)
             {
+                item.Thumbnail = await GetFileThumbnailAsync(item.SongPath);
                 RecentMusicItems.Add(item);
             }
             grdViewRecentMusic.ItemsSource = RecentMusicItems;
@@ -111,37 +120,116 @@ namespace VusicPlayer
         }
         public ObservableCollection<PlaylistProperties> MyItems { get; set; } = new();
         public ObservableCollection<RecentMusic> RecentMusicItems { get; set; } = new();
+        // Change your model property to this:
+        // public ImageSource Thumbnail { get; set; }
+
         public async Task<BitmapImage> GetFileThumbnailAsync(string path)
         {
+            // Define your fallback asset
+            Uri fallbackUri = new Uri("ms-appx:///Assets/appicon.png");
+
             try
             {
+                if (string.IsNullOrEmpty(path))
+                    return new BitmapImage(fallbackUri);
+                if (!File.Exists(path)) return new BitmapImage(fallbackUri); ;
                 StorageFile file = await StorageFile.GetFileFromPathAsync(path);
 
-                // GetScaledImageAsThumbnailAsync allows for higher resolution than the disk cache
-                // Use a larger requested size (e.g., 320 or 640) for better quality
+                // Get thumbnail from the file's metadata
                 using var thumbnail = await file.GetScaledImageAsThumbnailAsync(
-                    ThumbnailMode.VideosView,
+                    ThumbnailMode.MusicView, // Better for audio files
                     320,
                     ThumbnailOptions.UseCurrentScale);
 
                 if (thumbnail != null)
                 {
                     BitmapImage bitmapImage = new BitmapImage();
+                    // This connects the stream to the UI object
                     await bitmapImage.SetSourceAsync(thumbnail);
                     return bitmapImage;
                 }
             }
-            catch { /* Handle errors */ }
+            catch (Exception ex)
+            {
+                Logger.Log($"Thumbnail extraction failed: {ex.Message}", "MusicLibrary", Logger.LogLevelType.Error);
+            }
 
-            return new BitmapImage(new Uri("ms-appx:///Assets/Placeholder.png"));
+            // If everything fails, return the app icon
+            return new BitmapImage(fallbackUri);
         }
         private async void btnNewPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            await dlgNewPlaylist.ShowAsync();
+            if (App.HomeWindowInstance == null) return;
+            OceanContentDialog.Show("Create New Playlist", "Create", "", "Cancel", OceanContentDialogDefault.Primary, contentsNewPlaylist, this.XamlRoot, 600, 760, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+            OceanContentDialog.PrimaryRequested += Dlg_PrimaryRequested;
+
             if (lstViewPlaylistAddedSongs.Items.Count == 0)
             {
                 txtNullAddedSongs.Visibility = Visibility.Visible;
             }
+        }
+        OceanDialog dlg2;
+        OceanPopup oceanPopup;
+        private async void Dlg_PrimaryRequested()
+        {
+            dlg2.Close();
+            HomeWindow.ShowWindow();
+            oceanPopup.Hide();
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            string baseName = txtPlaylistName.Text.Trim();
+            if (string.IsNullOrEmpty(baseName)) baseName = "New Playlist";
+
+            string finalName = baseName;
+            int counter = 1;
+
+            // 2. Check for duplicates in your SavedPlaylists collection
+            // Use LINQ's Any() to check if a playlist with the same name exists
+            while (currentSettings.SavedPlaylists.Any(p => p.PlaylistName.Equals(finalName, StringComparison.OrdinalIgnoreCase)))
+            {
+                finalName = $"{baseName} ({counter++})";
+            }
+            string baseDirectory = AppContext.BaseDirectory;
+            string defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultdark.png");
+            if (!isdarkmode)
+            {
+
+                defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultlight.png");
+            }
+
+            if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
+            {
+                defaultPath = bitmap.UriSource.ToString();
+            }
+
+            // 3. Create the new playlist object
+            var newPlaylist = new PlaylistProperties
+            {
+                PlaylistName = finalName,
+
+                PlaylistCount = $"{loadedSongs.Count} {(loadedSongs.Count == 1 ? "item" : "items")}",
+                PlaylistNowPlaying = "",
+                PlaylistGenre = txtGenre.Text,
+                SongsPaths = loadedSongs.Select(s => s.SongPath).ToList(),
+                Thumbnail = defaultPath,
+                DateCreation = DateTime.Now.Date,
+            };
+
+            // 4. Add to the collection and save
+            currentSettings.SavedPlaylists.Add(newPlaylist);
+            MyItems.Add(newPlaylist);
+            if (GrdViewPlaylists.Items.Count == 0)
+            {
+                chckmultiple.Visibility = Visibility.Collapsed;
+                txtEmptyPlaylists.Visibility = Visibility.Visible;
+                GrdViewPlaylists.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                chckmultiple.Visibility = Visibility.Visible;
+                txtEmptyPlaylists.Visibility = Visibility.Collapsed;
+                GrdViewPlaylists.Visibility = Visibility.Visible;
+            }
+            await SettingsHelper.SaveSettingsAsync(currentSettings);
         }
 
         private async void btnOpenMusic_Click(object sender, RoutedEventArgs e)
@@ -229,66 +317,65 @@ namespace VusicPlayer
         BitmapImage? img;
         private async void btnAddSongs_Click(object sender, RoutedEventArgs e)
         {
-           
+            var picker = new FileOpenPicker();
+            btnAddPlaylistCover.IsEnabled = false;
+            btnAddSongs.IsEnabled = false;
+            var hwnd = WindowNative.GetWindowHandle(App.MainWindowInstance);
+            InitializeWithWindow.Initialize(picker, hwnd);
+
+            picker.FileTypeFilter.Add(".mp3");
+            picker.FileTypeFilter.Add(".wav");
+            picker.FileTypeFilter.Add(".m4a");
+            picker.FileTypeFilter.Add(".ogg");
+
+            var files = await picker.PickMultipleFilesAsync();
+
+            if (files == null) return;
+
+            foreach (var file in files)
+            {
+                if (!loadedSongs.Any(s => s.SongPath == file.Path))
+                {
+                    var musicProps = await file.Properties.GetMusicPropertiesAsync();
+
+                    string duration = FormatDuration(musicProps.Duration);
+
+                    loadedSongs.Add(new NewPlaylistSongProperty
+                    {
+                        SongPath = file.Path,
+                        SongDuration = duration
+                    });
+                }
+            }
+            lstViewPlaylistAddedSongs.ItemsSource = loadedSongs;
+            btnAddPlaylistCover.IsEnabled = true;
+            btnAddSongs.IsEnabled = true;
+        }
+        private string FormatDuration(TimeSpan duration)
+        {
+            if (duration.Hours > 0)
+                return duration.ToString(@"hh\:mm\:ss");
+
+            return duration.ToString(@"mm\:ss");
         }
         bool isdarkmode = true;
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if (e.Parameter is string receivedparam)
+            {
+                if (receivedparam.Contains("DeletedPlaylist"))
+                {
+                    ttPlaylistDeleted.Title = "Playlist was Deleted: " + receivedparam.Replace("DeletedPlaylist", "");
+
+                    ttPlaylistDeleted.IsOpen = true;
+                    await Task.Delay(5000);
+                    ttPlaylistDeleted.IsOpen = false;
+                }
+            }
+        }
         private async void dlgNewPlaylist_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            var currentSettings = await SettingsHelper.LoadSettingsAsync();
-            string baseName = txtPlaylistName.Text.Trim();
-            if (string.IsNullOrEmpty(baseName)) baseName = "New Playlist";
 
-            string finalName = baseName;
-            int counter = 1;
-
-            // 2. Check for duplicates in your SavedPlaylists collection
-            // Use LINQ's Any() to check if a playlist with the same name exists
-            while (currentSettings.SavedPlaylists.Any(p => p.PlaylistName.Equals(finalName, StringComparison.OrdinalIgnoreCase)))
-            {
-                finalName = $"{baseName} ({counter++})";
-            }
-            string baseDirectory = AppContext.BaseDirectory;
-            string defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultdark.png");
-            if (!isdarkmode)
-            {
-
-                defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultlight.png");
-            }
-
-            if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
-            {
-                defaultPath = bitmap.UriSource.ToString();
-            }
-
-            // 3. Create the new playlist object
-            var newPlaylist = new PlaylistProperties
-            {
-                PlaylistName = finalName,
-
-                PlaylistCount = $"{loadedSongs.Count} {(loadedSongs.Count == 1 ? "item" : "items")}",
-                PlaylistNowPlaying = "",
-                PlaylistGenre = txtGenre.Text,
-                SongsPaths = loadedSongs.Select(s => s.SongPath).ToList(),
-                Thumbnail = defaultPath,
-                DateCreation = DateTime.Now.Date,
-            };
-
-            // 4. Add to the collection and save
-            currentSettings.SavedPlaylists.Add(newPlaylist);
-            MyItems.Add(newPlaylist);
-            if (GrdViewPlaylists.Items.Count == 0)
-            {
-                chckmultiple.Visibility = Visibility.Collapsed;
-                txtEmptyPlaylists.Visibility = Visibility.Visible;
-                GrdViewPlaylists.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                chckmultiple.Visibility = Visibility.Visible;
-                txtEmptyPlaylists.Visibility = Visibility.Collapsed;
-                GrdViewPlaylists.Visibility = Visibility.Visible;
-            }
-            await SettingsHelper.SaveSettingsAsync(currentSettings);
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -376,7 +463,8 @@ namespace VusicPlayer
         private async void btnAddPlaylistCover_Click(object sender, RoutedEventArgs e)
         {
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
-
+            btnAddPlaylistCover.IsEnabled = false;
+            btnAddSongs.IsEnabled = false;
             // Get the handle from the specific instance we know is alive
             IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance);
 
@@ -403,6 +491,8 @@ namespace VusicPlayer
                 ToolTipService.SetToolTip(imgPlaylistCov, Path.GetFileName(file.Path));
                 imgPlaylistCov.Source = new BitmapImage(new Uri(file.Path));
             }
+            btnAddPlaylistCover.IsEnabled = true;
+            btnAddSongs.IsEnabled = true;
         }
 
         private void btnRemovePlaylistCover_Click(object sender, RoutedEventArgs e)
@@ -473,14 +563,27 @@ namespace VusicPlayer
         {
             var clickedRecent = e.ClickedItem as RecentMusic;
             if (clickedRecent == null) return;
-            if(App.MainWindowInstance is HomeWindow wind)
+            if (App.MainWindowInstance is HomeWindow wind)
             {
                 ObservableCollection<string> pt = new();
                 pt.Add(clickedRecent.SongPath);
                 wind.LoadFileFromPath(pt);
             }
         }
+        public async void UpdatePath(string oldpath, string newpath)
+        {
+            foreach (var item in RecentMusicItems.ToList())
+            {
+                if (item.SongPath == oldpath)
+                {
+                    RecentMusicItems.Remove(item);
 
+                    var currentSettings = await SettingsHelper.LoadSettingsAsync();
+                    currentSettings.RecentMusic = RecentMusicItems;
+                    await SettingsHelper.SaveSettingsAsync(currentSettings);
+                }
+            }
+        }
         private async void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element && element.DataContext is RecentMusic song)
@@ -511,6 +614,11 @@ namespace VusicPlayer
                     Process.Start("explorer.exe", $"/select,\"{filePath}\"");
                 }
             }
+        }
+
+        private void txtPlaylistName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 

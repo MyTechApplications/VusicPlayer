@@ -37,9 +37,44 @@ namespace VusicPlayer
             InitializeComponent();
             GridContinuePlaying.ItemsSource = MyItems;
             CallValue();
-
+            CallFolderValue();
             MyItems.CollectionChanged += MyItems_CollectionChanged;
+            folders2.CollectionChanged += Folders2_CollectionChanged;
+            if(FolderGrid.Items.Count == 0)
+            {
+                txtEmptyFolders.Visibility = Visibility.Visible;
+                txtFoldersHeader.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                txtEmptyFolders.Visibility = Visibility.Collapsed;
+                txtFoldersHeader.Visibility = Visibility.Visible;
+            }
         }
+
+        private async void Folders2_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Remove ||
+            e.Action == NotifyCollectionChangedAction.Add ||
+            e.Action == NotifyCollectionChangedAction.Move)
+            {
+                var currentSettings = await SettingsHelper.LoadSettingsAsync();
+                currentSettings.FoldersRecent = folders2;
+                await SettingsHelper.SaveSettingsAsync(currentSettings);
+                if (FolderGrid.Items.Count == 0)
+                {
+                    txtEmptyFolders.Visibility = Visibility.Visible;
+                    txtFoldersHeader.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    txtEmptyFolders.Visibility = Visibility.Collapsed;
+                    txtFoldersHeader.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        ObservableCollection<FolderModel> folders2 = new();
         private async void CallValue()
         {
             MyItems.Clear();
@@ -49,12 +84,51 @@ namespace VusicPlayer
             {
                 if (item.FilePath != null)
                 {
-                    item.Thumbnail = await GetFileThumbnailAsync(item.FilePath);
+                    var thumbnail = await GetFileThumbnailAsync(item.FilePath);
+
+                   
+
+                    item.Thumbnail = thumbnail;
                     MyItems.Add(item);
                 }
             }
             UpdateUIState();
         }
+        private async void CallFolderValue()
+        {
+            folders2.Clear();
+            var settings = await SettingsHelper.LoadSettingsAsync();
+            var currentPlaying = settings.FoldersRecent;
+            foreach (var item in currentPlaying)
+            {
+                if (item.Path != null)
+                {
+                    var thumbnail = await GetFolderThumbnailAsync(item.Path);
+
+                    // If it's null or empty, use default
+                    if (thumbnail == null)
+                    {
+                        // Build path to default image in your project folder
+                        var exeFolder = AppContext.BaseDirectory; // folder where your app .exe is
+                        var defaultPath = Path.Combine(exeFolder, "Assets", "folder.png");
+
+                        // Load the default image
+                        var bitmap = new BitmapImage();
+                        using (var stream = File.OpenRead(defaultPath))
+                        {
+                            await bitmap.SetSourceAsync(stream.AsRandomAccessStream());
+                        }
+
+                        thumbnail = bitmap;
+                    }
+
+                    item.Thumbnail = thumbnail;
+                    folders2.Add(item);
+                }
+            }
+            FolderGrid.ItemsSource = folders2;
+        }
+
 
         private async void MyItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -72,8 +146,6 @@ namespace VusicPlayer
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-
-    
         }
 
         private void UpdateUIState()
@@ -86,30 +158,80 @@ namespace VusicPlayer
         // Helper to keep the code clean
         public async Task<BitmapImage> GetFileThumbnailAsync(string path)
         {
+            // Define your fallback asset
+            Uri fallbackUri = new Uri("ms-appx:///Assets/default.png");
+
             try
             {
+                if (string.IsNullOrEmpty(path))
+                    return new BitmapImage(fallbackUri);
+                if (!File.Exists(path)) return new BitmapImage(fallbackUri); ;
                 StorageFile file = await StorageFile.GetFileFromPathAsync(path);
 
-                // GetScaledImageAsThumbnailAsync allows for higher resolution than the disk cache
-                // Use a larger requested size (e.g., 320 or 640) for better quality
+                // Get thumbnail from the file's metadata
                 using var thumbnail = await file.GetScaledImageAsThumbnailAsync(
-                    ThumbnailMode.VideosView,
+                    ThumbnailMode.MusicView, // Better for audio files
                     320,
                     ThumbnailOptions.UseCurrentScale);
 
                 if (thumbnail != null)
                 {
                     BitmapImage bitmapImage = new BitmapImage();
+                    // This connects the stream to the UI object
                     await bitmapImage.SetSourceAsync(thumbnail);
                     return bitmapImage;
                 }
             }
-            catch { /* Handle errors */ }
+            catch (Exception ex)
+            {
+                Logger.Log($"Thumbnail extraction failed: {ex.Message}", "HomePage", Logger.LogLevelType.Error);
+            }
 
-            return new BitmapImage(new Uri("ms-appx:///Assets/Placeholder.png"));
+            // If everything fails, return the app icon
+            return new BitmapImage(fallbackUri);
         }
+        public async Task<BitmapImage> GetFolderThumbnailAsync(string path)
+        {
+            try
+            {
+                if (Directory.Exists(path))
+                {
+                    StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
+
+                    // Get a thumbnail for the folder
+                    using var thumbnail = await folder.GetThumbnailAsync(
+                        ThumbnailMode.ListView, // or ThumbnailMode.DocumentsView
+                        320,
+                        ThumbnailOptions.UseCurrentScale);
+
+                    if (thumbnail != null) // some extra safety
+                    {
+                        BitmapImage bitmapImage = new BitmapImage();
+                        await bitmapImage.SetSourceAsync(thumbnail);
+                        return bitmapImage;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Logger.Log("Unexpected Error in loading folder thumbnail: " + ex.Message, "HomePage", Logger.LogLevelType.Error);
+            }
+
+            // Fallback for unpackaged app
+            var exeFolder = AppContext.BaseDirectory;
+            var defaultPath = Path.Combine(exeFolder, "Assets", "foldericon.png");
+
+            BitmapImage defaultBitmap = new BitmapImage();
+            using (var stream = File.OpenRead(defaultPath))
+            {
+                await defaultBitmap.SetSourceAsync(stream.AsRandomAccessStream());
+            }
+
+            return defaultBitmap;
+        }
+
         public ObservableCollection<VideoProgress> MyItems { get; set; } = new();
-        private List<VideoItem> loadedVideos = new List<VideoItem>();
+        private ObservableCollection<VideoItem> loadedVideos = new ObservableCollection<VideoItem>();
 
         private async Task<List<VideoItem>> LoadVideosAsync(string folderPath)
         {
@@ -150,7 +272,7 @@ namespace VusicPlayer
             var folderPicker = new FolderPicker();
 
             // Required for WinUI 3 Desktop apps
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.m_window);
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance);
             WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
 
             folderPicker.SuggestedStartLocation = PickerLocationId.VideosLibrary;
@@ -160,99 +282,131 @@ namespace VusicPlayer
             if (folder != null)
             {
                 txtFolderName.Text = folder.Name;
-                var videos = await LoadVideosAsync(folder.Path);
-                loadedVideos = await LoadVideosAsync(folder.Path);
+                //        var videos = await LoadVideosAsync(folder.Path);
+                //    loadedVideos = await LoadVideosAsync(folder.Path);
+                var FolderProp = new FolderModel { Name = txtFolderName.Text, Path = folder.Path, };
+                if (FolderProp != null)
+                {
+                    this.Frame.Navigate(typeof(FoldersPage), FolderProp);
 
-                VideoGrid.ItemsSource = loadedVideos;
+                }
+
+                //           FolderGrid.ItemsSource = loadedVideos;
             }
         }
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            if (VideoGrid.Items != null)
-                VideoGrid.ItemsSource = loadedVideos.OrderBy(v => v.FileName).ToList();
+            if (FolderGrid.Items != null)
+                FolderGrid.ItemsSource = loadedVideos.OrderBy(v => v.FileName).ToList();
         }
 
         private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
         {
-            if (VideoGrid.Items != null)
-                VideoGrid.ItemsSource = loadedVideos.OrderByDescending(v => v.DateModified).ToList();
+            if (FolderGrid.Items != null)
+                FolderGrid.ItemsSource = loadedVideos.OrderByDescending(v => v.DateModified).ToList();
         }
 
         private void MenuFlyoutItem_Click_2(object sender, RoutedEventArgs e)
         {
-            if (VideoGrid.Items != null)
-                VideoGrid.ItemsSource = loadedVideos.OrderByDescending(v => v.Size).ToList();
+            if (FolderGrid.Items != null)
+                FolderGrid.ItemsSource = loadedVideos.OrderByDescending(v => v.Size).ToList();
         }
 
-        private async void VideoGrid_ItemClick(object sender, ItemClickEventArgs e)
+        private async void FolderGrid_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var clickedVideo = (VideoItem)e.ClickedItem;
-
-            if (clickedVideo.FilePath != null)
+            var folderr = (FolderModel)e.ClickedItem;
+            if (Directory.Exists(folderr.Path))
             {
-                var settings = await SettingsHelper.LoadSettingsAsync();
+                this.Frame.Navigate(typeof(FoldersPage), folderr);
+            }
+            else
+            {
+                cldg.Title = "Missing Folder";
+                cldgContent.Text = $"This folder is missing:  {folderr.Path + Environment.NewLine}";
 
-                // 2. Try to find if THIS specific file exists in the saved progress
-                var savedProgress = settings.SavedItems
-                    .FirstOrDefault(i => i.FilePath == clickedVideo.FilePath);
-
-                double startPosition = 0;
-                bool isNewVideo = true;
-
-                // 3. If found, override the 0 position with the saved progress
-                if (savedProgress != null)
-                {
-                    startPosition = savedProgress.CurrentDuration;
-                    isNewVideo = false; // It's not a fresh start anymore
-                    System.Diagnostics.Debug.WriteLine($"Found saved progress for {clickedVideo.FileName}: Resuming at {startPosition}");
-                }
-
-                // 4. Open the player with the determined position
-                UpdateList();
-                var playerWindow = new MainWindow(loadedVideos, clickedVideo.FilePath, startPosition, isNewVideo);
+                cldg.DefaultButton = ContentDialogButton.Primary;
+                ToolTipService.SetToolTip(cldgContent, folderr.Path);
+                cldg.CloseButtonText = "OK";
+                await cldg.ShowAsync();
+                folders2.Remove(folderr);
                
-                playerWindow.Activate();
-                App.SetCurrentMainWindow(playerWindow);
-
             }
         }
-        private void UpdateList()
-        {
-            if (VideoGrid.ItemsSource is IEnumerable items)
-            {
-                loadedVideos = items.Cast<VideoItem>().ToList();
-            }
-        }
+       
         private void btnPlayAll_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
-        private void VideoGrid_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+        private void FolderGrid_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
         {
-            UpdateList();
         }
-
-        private void GridContinuePlaying_ItemClick(object sender, ItemClickEventArgs e)
+     
+        private async void GridContinuePlaying_ItemClick(object sender, ItemClickEventArgs e)
         {
             var clickedVideo = (VideoProgress)e.ClickedItem;
-
-            if (clickedVideo.FilePath != null)
+            prg = clickedVideo;
+            if (File.Exists(clickedVideo.FilePath))
             {
-                UpdateList();
-                var playerWindow = new MainWindow(loadedVideos, clickedVideo.FilePath, clickedVideo.CurrentDuration, false);
-              
-                playerWindow.Activate();
-                App.SetCurrentMainWindow(playerWindow);
+                if (clickedVideo.FilePath != null)
+                {
+                    var playerWindow = new MainWindow(loadedVideos, clickedVideo.FilePath, clickedVideo.CurrentDuration, false);
+
+                    playerWindow.Activate();
+                    App.VideoPlayerWindowInstance = playerWindow;
+
+                    App.SetCurrentMainWindow(playerWindow);
+
+                }
+            }
+            else
+            {
+                cldg.Title = "Missing File";
+                cldgContent.Text = $"This file is missing:  {clickedVideo.FilePath + Environment.NewLine} You can relocate its path or remove it from continue watching";
+                cldg.PrimaryButtonText = "Relocate";
+                cldg.DefaultButton = ContentDialogButton.Primary;
+                ToolTipService.SetToolTip(cldgContent, clickedVideo.FilePath);
+                cldg.CloseButtonText = "Remove from continue watching";
+                cldg.PrimaryButtonClick += Cldg_PrimaryButtonClick;
+                cldg.CloseButtonClick += Cldg_CloseButtonClick;
+                await cldg.ShowAsync();
+            }
+        }
+
+        private async void Cldg_CloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            MyItems.Remove(prg);
+
+            // 2. Save the ACTUAL current state to disk
+            // Load the full settings first to make sure we don't overwrite other data
+            var settings = await SettingsHelper.LoadSettingsAsync();
+
+            // Find the specific item in the settings list and remove it
+            var target = settings.SavedItems.FirstOrDefault(i => i.FilePath == prg.FilePath);
+            if (target != null)
+            {
+                settings.SavedItems.Remove(target);
+                await SettingsHelper.SaveSettingsAsync(settings);
             }
 
+            // 3. Toggle empty state if needed
+            if (MyItems.Count == 0)
+            {
+                txtRecentHeading.Visibility = Visibility.Collapsed;
+                GridContinuePlaying.Visibility = Visibility.Collapsed;
+                txtEmptyRecents.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void Cldg_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
         }
 
         private void GridContinuePlaying_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
         {
 
         }
-
+        VideoProgress prg = new();
         private async void MenuFlyoutItem_Click_3(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element && element.DataContext is VideoProgress itemToRemove)
@@ -281,5 +435,57 @@ namespace VusicPlayer
                 }
             }
         }
+
+        private async void MenuFlyoutItem_Click_4(object sender, RoutedEventArgs e)
+        {
+            //Remove folder item
+            if (sender is FrameworkElement element && element.DataContext is FolderModel itemToRemove)
+            {
+                // 1. Remove from UI
+                folders2.Remove(itemToRemove);
+
+                // 2. Save the ACTUAL current state to disk
+                // Load the full settings first to make sure we don't overwrite other data
+                var settings = await SettingsHelper.LoadSettingsAsync();
+
+                // Find the specific item in the settings list and remove it
+                var target = settings.FoldersRecent.FirstOrDefault(i => i.Path == itemToRemove.Path);
+                if (target != null)
+                {
+                    settings.FoldersRecent.Remove(target);
+                    await SettingsHelper.SaveSettingsAsync(settings);
+                }
+
+                // 3. Toggle empty state if needed
+                if (folders2.Count == 0)
+                {
+                    txtEmptyFolders.Visibility = Visibility.Visible;
+                    txtFoldersHeader.Visibility = Visibility.Collapsed;
+                }
+            }
         }
+
+        private async void MenuFlyoutItem_Click_5(object sender, RoutedEventArgs e)
+        {
+            //Open folder
+            var menuflyoutitme = sender as MenuFlyoutItem;
+            if (menuflyoutitme == null) return;
+            var data = menuflyoutitme.DataContext as FolderModel;
+            if (data == null) return;
+            if(Directory.Exists(data.Path))
+            {
+                this.Frame.Navigate(typeof(FoldersPage), data);
+            }
+            else
+            {
+                cldg.Title = "Missing Folder";
+                cldgContent.Text = $"This folder is missing:  {data.Path + Environment.NewLine}";
+                cldg.DefaultButton = ContentDialogButton.Primary;
+                ToolTipService.SetToolTip(cldgContent, data.Path);
+                cldg.CloseButtonText = "OK";
+                await cldg.ShowAsync();
+                folders2.Remove(data);
+            }
+        }
+    }
 }

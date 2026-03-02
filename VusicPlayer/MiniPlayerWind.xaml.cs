@@ -177,7 +177,6 @@ namespace VusicPlayer
                 sldMain.Value = currentTimeMs / 1000.0;
                 if(stateofplay == "paused")
                 {
-                    Debug.WriteLine("YES FUCKING PAUSED");
                     _mediaPlayer.Pause();
                     maintimer.Stop();
                 }

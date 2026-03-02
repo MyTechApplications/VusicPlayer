@@ -109,7 +109,6 @@ namespace VusicPlayer
                 {
                     if (paths.Count != 0)
                     {
-                        Debug.WriteLine("cleared");
                         paths.Clear();
                     }
                     paths = new();

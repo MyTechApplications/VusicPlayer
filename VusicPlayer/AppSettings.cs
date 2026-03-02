@@ -11,6 +11,9 @@ namespace VusicPlayer
     public class AppSettings
     {
         public ObservableCollection<VideoProgress> SavedItems { get; set; } = new();
+        public ObservableCollection<FolderModel> FoldersRecent { get; set; } = new();
+        public ObservableCollection<ArtistDetails> ArtistsList { get; set; } = new();
+        public ObservableCollection<AlbumDetails> AlbumsList { get; set; } = new();
         public ObservableCollection<PlaylistProperties> SavedPlaylists { get; set; } = new();
         public ObservableCollection<AppPersonalization> UserSettings { get; set; } = new();
         public ObservableCollection<RecentMusic> RecentMusic { get; set; } = new();

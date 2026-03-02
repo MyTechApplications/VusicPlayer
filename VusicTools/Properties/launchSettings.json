@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "VusicTools (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "VusicTools (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

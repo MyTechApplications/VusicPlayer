@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
@@ -18,6 +19,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.Search;
+using Windows.UI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -27,7 +29,7 @@ namespace VusicPlayer;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class Album : Page,  IUpdateableMusicPage
+public sealed partial class Album : Page, IUpdateableMusicPage
 {
     public Album()
     {
@@ -66,25 +68,141 @@ public sealed partial class Album : Page,  IUpdateableMusicPage
 
     private void txtRename_GotFocus(object sender, RoutedEventArgs e)
     {
-
-    }
-
-    private void btnRenameAlbum_Click(object sender, RoutedEventArgs e)
+        if (sender is TextBox textBox)
+        {
+            // Use the Dispatcher to run this after the click event fully completes
+            textBox.DispatcherQueue.TryEnqueue(() =>
+            {
+                textBox.SelectAll();
+            });
+        }
+    } 
+    private async void btnRenameAlbum_Click(object sender, RoutedEventArgs e)
     {
+        /*    if (string.IsNullOrWhiteSpace(txtRename.Text))
+            {
+                txtRename.Text = txtAlbumName.Text;
+            }
 
+            txtAlbumName.Text = txtRename.Text;
+
+            List<string> failedFiles = new List<string>();
+            int successCount = 0;
+
+            foreach (var item in FoundSongs)
+            {
+                try
+                {
+                    StorageFile file = await StorageFile.GetFileFromPathAsync(item.FilePath);
+                    var propertiesToSave = new Dictionary<string, object>
+            {
+                { "System.Music.AlbumTitle", txtAlbumName.Text }
+            };
+
+                    await file.Properties.SavePropertiesAsync(propertiesToSave);
+                    successCount++;
+                }
+                catch (Exception ex)
+                {
+                    // Add the file name or path to our failure list
+                    failedFiles.Add(item.Title ?? item.FilePath);
+                    Logger.Log($"Skipped {item.FilePath}: {ex.Message}");
+                }
+            }
+
+            // 2. Show the result to the user
+            if (failedFiles.Count > 0)
+            {
+                ShowCompletionNotification(successCount, failedFiles);
+            }   SearchFiles();
+       */
     }
+    private void ShowCompletionNotification(int successCount, List<string> failedFiles)
+    {
+        UpdateResultTip.Subtitle = $"Updated {successCount} files.";
+
+        if (failedFiles.Count > 0)
+        {
+            // Create a summary of why it failed (Permissions/File in use)
+            string fileList = string.Join(", ", failedFiles.Take(3)); // Show first 3
+            if (failedFiles.Count > 3) fileList += "...";
+
+            UpdateResultTip.Content = $"Some files could not be updated because they were read-only or in use by another app: \n{fileList}";
+            UpdateResultTip.IsOpen = true;
+        }
+    }
+
+    string currentAlbumname = "";
+    SongModel selectedSongs = new();
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+
         if (e.Parameter is SongModel selectedSongArtist)
         {
+            selectedSongs = selectedSongArtist;
             txtAlbumName.Text = selectedSongArtist.AlbumName;
+            currentAlbumname = selectedSongArtist.AlbumName;
+
+            // 1. Load existing thumbnail from settings
+            await LoadExistingThumbnailAsync();
+
+            // 2. Search for the songs in this album
             SearchFiles();
-            FoundSongs.CollectionChanged += (s, e) =>
+
+            // 3. Update the UI count label dynamically
+            FoundSongs.CollectionChanged += (s, args) =>
             {
                 int count = FoundSongs.Count;
-                txtSongCount.Text = "• " + $"{count} {(count == 1 ? "item" : "items")}";
+                txtSongCount.Text = $"• {count} {(count == 1 ? "item" : "items")}";
+                if (FoundSongs.Count == 0)
+                {
+                    txtSongCount.Text = "• No songs found";
+                    txtNoSongs.Visibility = Visibility.Visible;
+                    txtAlbumHeader.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    txtNoSongs.Visibility = Visibility.Collapsed;
+                    txtAlbumHeader.Visibility = Visibility.Visible;
+                }
             };
+        }
+        if (FoundSongs.Count == 0)
+        {
+            txtSongCount.Text = "• No songs found";
+            txtNoSongs.Visibility = Visibility.Visible;
+            txtAlbumHeader.Visibility = Visibility.Collapsed;
+        }
+    }
+    private async Task LoadExistingThumbnailAsync()
+    {
+        // Define the fallback URI
+        Uri fallbackUri = new Uri("ms-appx:///Assets/defaultalbum.png");
+
+        var currentSettings = await SettingsHelper.LoadSettingsAsync();
+
+        // Look for a saved entry matching the current album name
+        var existingAlbum = currentSettings.AlbumsList?
+            .FirstOrDefault(a => a.Name == currentAlbumname);
+
+        if (existingAlbum != null && !string.IsNullOrEmpty(existingAlbum.Thumbnail))
+        {
+            try
+            {
+                // Attempt to load the user's custom thumbnail
+                imgAlbumCover.Source = new BitmapImage(new Uri(existingAlbum.Thumbnail));
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Failed to load thumbnail, reverting to default: {ex.Message}", "AlbumPage", Logger.LogLevelType.Error);
+                imgAlbumCover.Source = new BitmapImage(fallbackUri);
+            }
+        }
+        else
+        {
+            // No entry found or no thumbnail string exists; use default
+            imgAlbumCover.Source = new BitmapImage(fallbackUri);
         }
     }
     ObservableCollection<string> paths = new();
@@ -119,8 +237,8 @@ public sealed partial class Album : Page,  IUpdateableMusicPage
         this.DispatcherQueue.TryEnqueue(() =>
         {
             // Get the system's standard text color for the current theme
-            var normalBrush = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"];
-            var highlightBrush = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
+            var normalBrush = (Color)Application.Current.Resources["TextFillColorPrimaryBrush"];
+            var highlightBrush = Microsoft.UI.Colors.Cyan;
             var Playing = "\uE769";
             foreach (var item in lstViewPlaylist.Items)
             {
@@ -218,7 +336,7 @@ public sealed partial class Album : Page,  IUpdateableMusicPage
         txtTotalDuration.Text = formatted;
         // 3. Finalize UI
         var sortedArtists = uniqueArtists.OrderBy(a => a);
-        txtArtistsInvolved.Text = "• "+string.Join(", ", sortedArtists);
+        txtArtistsInvolved.Text = "• " + string.Join(", ", sortedArtists);
 
         // Optional: Hide progress bar after a short delay
         await Task.Delay(500);
@@ -254,7 +372,14 @@ public sealed partial class Album : Page,  IUpdateableMusicPage
 
     private void txtArtistHyp_Click(object sender, RoutedEventArgs e)
     {
+        var clickedArtist = sender as HyperlinkButton;
 
+        var clickedItem = clickedArtist?.DataContext as SongModel;
+        if (clickedArtist != null)
+        {
+
+            this.Frame.Navigate(typeof(ArtistInfo), clickedItem);
+        }
     }
     SongModel selectedSong = new();
     private void mnftPlaySong_Click(object sender, RoutedEventArgs e)
@@ -308,4 +433,105 @@ public sealed partial class Album : Page,  IUpdateableMusicPage
             PlaySelection();
         }
     }
+
+    private async void btnSetAlbumCover_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new Windows.Storage.Pickers.FileOpenPicker();
+
+        // Get the handle from the specific instance we know is alive
+        IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance);
+
+        if (hwnd == IntPtr.Zero)
+        {
+            // If for some reason the main window is gone, try the current active one
+            hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.CurrentActiveWindow);
+        }
+        picker.CommitButtonText = "Choose";
+        // 2. Initialize the picker with the handle
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.FileTypeFilter.Add(".png");
+        picker.FileTypeFilter.Add(".jpg");
+        picker.FileTypeFilter.Add(".jpeg");
+        picker.FileTypeFilter.Add(".ico");
+
+        var file = await picker.PickSingleFileAsync();
+
+        if (file != null)
+        {
+            imgAlbumCover.Source = new BitmapImage(new Uri(file.Path));
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            var albums = currentSettings.AlbumsList;
+            var existingAlbum = albums.FirstOrDefault(a => a.Name == currentAlbumname);
+
+            if (existingAlbum != null)
+            {
+                // 1. Update the existing entry
+                existingAlbum.Thumbnail = file.Path;
+            }
+            else
+            {
+                // 2. Create a new entry if it doesn't exist
+                var newAlbum = new AlbumDetails
+                {
+                    Name = currentAlbumname,
+                    Thumbnail = file.Path
+                    // Add other default properties here
+                };
+                albums.Add(newAlbum);
+            }
+
+            // Don't forget to save the changes back to storage!
+            await SettingsHelper.SaveSettingsAsync(currentSettings);
+        }
+
+    }
+    private async void RefreshStuff()
+    {
+        ts = TimeSpan.Zero;
+        txtAlbumName.Text = selectedSongs.AlbumName;
+        currentAlbumname = selectedSongs.AlbumName;
+
+        // 1. Load existing thumbnail from settings
+        await LoadExistingThumbnailAsync();
+
+        // 2. Search for the songs in this album
+        SearchFiles();
+
+        // 3. Update the UI count label dynamically
+        FoundSongs.CollectionChanged += (s, args) =>
+        {
+            int count = FoundSongs.Count;
+            txtSongCount.Text = $"• {count} {(count == 1 ? "item" : "items")}";
+            if (FoundSongs.Count == 0)
+            {
+                txtSongCount.Text = "• No songs found";
+                txtNoSongs.Visibility = Visibility.Visible;
+                txtAlbumHeader.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                txtNoSongs.Visibility = Visibility.Collapsed;
+                txtAlbumHeader.Visibility = Visibility.Visible;
+            }
+
+
+            if (FoundSongs.Count == 0)
+            {
+                txtSongCount.Text = "• No songs found";
+                txtNoSongs.Visibility = Visibility.Visible;
+                txtAlbumHeader.Visibility = Visibility.Collapsed;
+            }
+        };
+    }
+    private async void btnRefresh_Click(object sender, RoutedEventArgs e)
+    {
+        RefreshStuff();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        txtRename.Text = txtAlbumName.Text;
+    }
 }
+

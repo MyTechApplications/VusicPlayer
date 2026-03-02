@@ -56,7 +56,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
-                <Button Margin="5" ToolTipService.ToolTip="Rename Album" >
+                <Button Margin="5" ToolTipService.ToolTip="Rename Album" Click="Button_Click">
                     <Button.Flyout>
                         <Flyout x:Name="flyoutRename">
                             <Grid>
@@ -66,7 +66,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 </Grid.ColumnDefinitions>
                                 <TextBox GotFocus="txtRename_GotFocus" Width="150" Grid.Column="0" 
                              Name="txtRename" PlaceholderText="Rename album" />
-                                <Button Grid.Column="1" Click="btnRenameAlbum_Click" Name="btnRenameAlbum" >
+                                <Button Background="Transparent" BorderBrush="Transparent" Margin="5, 0" Grid.Column="1" Click="btnRenameAlbum_Click" Name="btnRenameAlbum" >
                                     <Image Margin="5, 0" Width="20" Source="/Assets/tickicon.png" />
                                 </Button>
                             </Grid>
@@ -76,7 +76,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 </Button>
 
                 <Button Name="btnPlayAll" Click="btnPlayAll_Click" Margin="5"
-            ToolTipService.ToolTip="Play all songs of Artist">
+            ToolTipService.ToolTip="Play all songs of Album">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="25" Source="/Assets/play.png" />
                         <TextBlock Margin="5,2" Text="Play all" />
@@ -89,17 +89,34 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 </ToggleButton>
 
                 <Button Name="btnAddSongs" Click="btnAddSongs_Click" Margin="5"
-            ToolTipService.ToolTip="Add songs to this Artist">
+            ToolTipService.ToolTip="Add songs to this Album">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="25" Source="/Assets/addicon.png" />
                         <TextBlock Margin="5,2" Text="Add Songs" />
                     </StackPanel>
                 </Button>
+                <Button Name="btnSetAlbumCover" Click="btnSetAlbumCover_Click" Margin="5"
+ToolTipService.ToolTip="Set Album Cover">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="25" Source="/Assets/addimgicon.png" />
+                        <TextBlock Margin="5,2" Text="Set Album Cover" />
+                    </StackPanel>
+                </Button>
             </ItemsControl>
+            <TeachingTip x:Name="UpdateResultTip"
+             Title="Update Complete"
+             CloseButtonContent="Got it">
+            </TeachingTip>
         </Grid>
         <ScrollView Margin="10, 0" Grid.Column="1">
             <StackPanel Orientation="Vertical">
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Album Contents"></TextBlock>
+                <TextBlock Text="No songs in this album!" Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtNoSongs" Visibility="Collapsed" HorizontalAlignment="Center" Margin="0, 20"></TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Album Contents" Name="txtAlbumHeader"></TextBlock>
+                    <Button Margin="20, 0" BorderBrush="Transparent" Style="{StaticResource AccentButtonStyle}" Name="btnRefresh" Click="btnRefresh_Click" ToolTipService.ToolTip="Refresh Album">
+                        <FontIcon Glyph="&#xE72C;"></FontIcon>
+                    </Button>
+                </StackPanel>
                 <ListView  Margin="0, 10" CanDragItems="True" CanReorderItems="True" AllowDrop="True"
     SelectionMode="Multiple" ItemClick="lstViewPlaylist_ItemClick" Name="lstViewPlaylist" DragItemsCompleted="lstViewPlaylist_DragItemsCompleted">
 

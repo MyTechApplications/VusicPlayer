@@ -19,27 +19,37 @@
   <ItemGroup>
     <None Remove="Album.xaml" />
     <None Remove="ArtistInfo.xaml" />
+    <None Remove="Controls\Timeline.xaml" />
+    <None Remove="FoldersPage.xaml" />
     <None Remove="HomePage.xaml" />
     <None Remove="HomeWindow.xaml" />
+    <None Remove="LogPage.xaml" />
+    <None Remove="MediaControls.xaml" />
     <None Remove="MiniPlayerWind.xaml" />
     <None Remove="MusicLibrary.xaml" />
+    <None Remove="OceanDialog.xaml" />
+    <None Remove="OceanPopup.xaml" />
     <None Remove="Playlist.xaml" />
+    <None Remove="QueuePage.xaml" />
     <None Remove="SearchResults.xaml" />
     <None Remove="SettingsPage.xaml" />
     <None Remove="SliderReuse.xaml" />
+    <None Remove="SplashScreen.xaml" />
     <None Remove="UserControl1.xaml" />
     <None Remove="VideoLib.xaml" />
+    <None Remove="VideoLibrary.xaml" />
+    <None Remove="VideoOptionsWindow.xaml" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="Assets\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="appicon.ico" />
+	</ItemGroup>
 
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
@@ -55,11 +65,60 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
+    <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
+    <PackageReference Include="Flyleaf.FFmpeg.Bindings" Version="8.0.1" />
+    <PackageReference Include="FlyleafLib" Version="3.10.2" />
+    <PackageReference Include="FlyleafLib.Controls.WinUI" Version="1.3.2" />
     <PackageReference Include="LibVLCSharp" Version="3.9.5" />
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.2" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="VideoOptionsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="MediaControls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="OceanDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="OceanPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="LogPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="SplashScreen.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="QueuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="VideoLibrary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="FoldersPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="SearchResults.xaml">
@@ -121,6 +180,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\Timeline.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
@@ -136,6 +200,7 @@
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">False</PublishTrimmed>
+    <ApplicationIcon>appicon.ico</ApplicationIcon>
   </PropertyGroup>
 </Project>

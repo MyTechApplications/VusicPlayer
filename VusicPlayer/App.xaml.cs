@@ -9,25 +9,30 @@ namespace VusicPlayer
     public partial class App : Application
     {
         public static Window? m_window { get; private set; }
-        public static Window? MainWindowInstance { get; private set; }
+        public static Window? MainWindowInstance { get; set; }
+        public static Window? MainWindowInstance2 { get; set; }
+        public static Window? HomeWindowInstance { get; set; }
+        public static Window? OceanDialogInstance { get; set; }
+        public static Window? VideoPlayerWindowInstance { get; set; }
         public static Window? CurrentActiveWindow { get; set; }
         public static ObservableCollection<VideoProgress> GlobalContinuePlaying { get; } = new();
 
         public App()
         {
             this.InitializeComponent();
+         
             RegisterOnce();
         }
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new HomeWindow();
-            MainWindowInstance = m_window;
-            CurrentActiveWindow = m_window;
-            m_window.Activate();
+             HomeWindow.ShowWindow();
+          //  OceanDialog dlg = new();
+            //dlg.Activate();
         }
         public static void SetCurrentMainWindow(Window window)
         {
+            MainWindowInstance = window;
             m_window = window;
         }
         private void RegisterOnce()

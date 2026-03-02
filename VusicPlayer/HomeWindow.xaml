@@ -6,22 +6,21 @@
     xmlns:local="using:VusicPlayer"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-     xmlns:lvs="using:LibVLCSharp.Platforms.Windows"
+    mc:Ignorable="d"     xmlns:winui="using:FlyleafLib.Controls.WinUI"
+
     Title="HomeWindow">
 
-    <Window.SystemBackdrop>
-        <DesktopAcrylicBackdrop />
-    </Window.SystemBackdrop>
-
-    <Grid Background="Transparent">
-        <Grid.ColumnDefinitions>
+ 
+    <Grid>
+        <Frame VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Mainframe"  Visibility="Visible"></Frame>
+        <Grid Background="Transparent" Name="rootgrid" Visibility="Collapsed" >
+            <Grid.ColumnDefinitions>
             <ColumnDefinition ></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <ProgressRing x:Name="loadingRing"
                   IsActive="True"
-                  Visibility="Visible"
+                  Visibility="Collapsed"
                   HorizontalAlignment="Center" 
                   VerticalAlignment="Center"
                   Width="60" Height="60"/>
@@ -59,8 +58,8 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <lvs:VideoView Grid.Row="0" Visibility="Visible" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="videoView"  />
-            <Image Name="imgThumbnailCover" Source="/Assets/Square150x150Logo.png" Width="150" Grid.Row="0"></Image>
+                <winui:FlyleafHost x:Name="mediaEngine"></winui:FlyleafHost>
+            <Image Name="imgThumbnailCover" Source="/Assets/appicon.png" Width="150" Grid.Row="0"></Image>
 
             <TextBlock Margin="0, 20" Width="200"  Name="txtSongName" Grid.Row="1" Text="Nothing playing" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" >
 
@@ -81,7 +80,7 @@
                 <Button Name="btnPrev" Background="Transparent" ToolTipService.ToolTip="Previous in queue or playlist" BorderBrush="Transparent" Click="btnPrev_Click">
                     <Image Name="imgPrev" Width="26" Source="/Assets/previous.png"/>
                 </Button>
-                <Button Name="btnPlayPause" IsEnabled="False" Background="Transparent" BorderBrush="Transparent" Click="btnPlayPause_Click">
+                <Button Name="btnPlayPause" IsEnabled="False" Background="Transparent" ToolTipService.ToolTip="" BorderBrush="Transparent" Click="btnPlayPause_Click">
                     <Image Name="imgPlayPause" Width="26" Source="/Assets/play.png"/>
                     <Button.KeyboardAccelerators>
                         <KeyboardAccelerator Key="F10"></KeyboardAccelerator>
@@ -125,14 +124,20 @@
                     <Image Name="imgSpeed" Width="24" Source="/Assets/speedicon.png"/>
                 </Button>
                 <TeachingTip Name="ttSpeedCustom" Target="{x:Bind btnSpeed}" IsOpen="True" PreferredPlacement="Bottom" Title="Custom Speed">
-                    <StackPanel Orientation="Horizontal" Padding="5">
+                    <StackPanel Orientation="Vertical" Padding="5">
                         <NumberBox SpinButtonPlacementMode="Inline" Name="nmbSpeedCustom" SmallChange="0.05" LargeChange="1" Maximum="4" Minimum="0.15"></NumberBox>
-                        <Button Margin="5, 0" ToolTipService.ToolTip="Set Speed" Background="Transparent" BorderBrush="Transparent"  Name="btnSetCustomSpeed" Click="btnSetCustomSpeed_Click">
+                        <Button Margin="5, 10" ToolTipService.ToolTip="Set Speed" Background="Transparent" BorderBrush="Transparent"  Name="btnSetCustomSpeed" Click="btnSetCustomSpeed_Click">
                             <Image  Width="24" Source="/Assets/tickicon.png"/>
                         </Button>
                     </StackPanel>
                 </TeachingTip>
-                <ContentDialog Name="dlgFileInfo" Title="Information" CloseButtonText="OK" DefaultButton="Close">
+                <TeachingTip Title="File Missing" Name="ttFileMissing" IsOpen="False" PreferredPlacement="Bottom">
+                    <InfoBar IsClosable="False" Severity="Error" Name="iBFileMissing" IsOpen="True" Title="The following file is missing">
+                        <Button Content="Click to relocate" Click="Button_Click_2"></Button>
+                    </InfoBar>
+                </TeachingTip>
+                <ContentDialog Title="Error" Name="dlgError"></ContentDialog>
+                <ContentDialog Name="dlgFileInfo" Title="Information" CloseButtonText="OK" PrimaryButtonText="Save" DefaultButton="Close">
                     <Grid RowSpacing="12" ColumnSpacing="24">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -155,7 +160,7 @@
 
                         <TextBlock Text="File Name" Grid.Row="0" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoFileName" Grid.Row="0" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
-
+        
                         <TextBlock Text="File Path" Grid.Row="0" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <HyperlinkButton x:Name="hypGoToLocation" 
                  Grid.Row="0" Grid.Column="3"
@@ -166,6 +171,7 @@
                Style="{StaticResource CaptionTextBlockStyle}" 
                TextTrimming="CharacterEllipsis" 
                MaxWidth="300"/>
+
                             <HyperlinkButton.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuFlyoutItem  Click="MenuFlyoutItem_Click" Text="Copy">
@@ -176,18 +182,39 @@
                                 </MenuFlyout>
                             </HyperlinkButton.ContextFlyout>
                         </HyperlinkButton>
-
+                        <TeachingTip Title="Edit Info" Name="ttEditInfo" IsOpen="False">
+                            <StackPanel Orientation="Vertical">
+                                <TextBox TextChanged="txtEditTT_TextChanged" PlaceholderText="Type here..." Name="txtEditTT"></TextBox>
+                                
+                            </StackPanel>
+                        </TeachingTip>
                         <TextBlock  Text="Artist" Grid.Row="1" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoArtist" Grid.Row="1" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <Button Click="Button_Click_1" Grid.Row="1" Grid.Column="1" Padding="2, 2" Background="Transparent" BorderBrush="Transparent">   <TextBlock Tag="Artist" x:Name="txtInfoArtist"  Style="{StaticResource CaptionTextBlockStyle}"/>
+                            <Button.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem  Click="mnftEditProperty_Click" Icon="Edit" Text="Edit"></MenuFlyoutItem>
+                                    <MenuFlyoutItem  Click="mnftCopyProperty_Click" Icon="Copy" Text="Copy"></MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Button.ContextFlyout>
+                        </Button>
 
                         <TextBlock Text="Album" Grid.Row="1" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoAlbum" Grid.Row="1" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <Button Click="Button_Click_1" Grid.Row="1" Grid.Column="3" Padding="2, 2" Background="Transparent" BorderBrush="Transparent">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem  Click="mnftEditProperty_Click" Icon="Edit" Text="Edit"></MenuFlyoutItem>
+                                    <MenuFlyoutItem  Click="mnftCopyProperty_Click" Icon="Copy" Text="Copy"></MenuFlyoutItem>
+                                    <MenuFlyoutItem></MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                            <TextBlock Tag="Artist" x:Name="txtInfoAlbum"  Style="{StaticResource CaptionTextBlockStyle}"/>
+                        </Button>
 
                         <TextBlock Text="Contributing Artists" Grid.Row="2" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoContributingArtists" Grid.Row="2" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <TextBlock Tag="Contributing Artists" PointerPressed="txtInfoAlbum_PointerPressed" IsTextSelectionEnabled="True" x:Name="txtInfoContributingArtists" Grid.Row="2" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
                         <TextBlock Text="Track" Grid.Row="2" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoTrack" Grid.Row="2" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <TextBlock Tag="Track" PointerPressed="txtInfoAlbum_PointerPressed" IsTextSelectionEnabled="True" x:Name="txtInfoTrack" Grid.Row="2" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
                         <TextBlock Text="Duration" Grid.Row="3" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoDuration" Grid.Row="3" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
@@ -238,10 +265,11 @@
                 <Button ToolTipService.ToolTip="File Info" Background="Transparent" BorderBrush="Transparent"  Name="btnInfo" Click="btnInfo_Click">
                     <Image  Width="24" Source="/Assets/infoicon.png"/>
                 </Button>
-                <Button Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Mini Player"  Name="btnMiniPlayer" Click="btnMiniPlayer_Click">
+                <Button Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Mini Player"  Name="btnMiniPlayer" IsEnabled="False" Click="btnMiniPlayer_Click">
                     <Image  Width="26" Source="/Assets/miniplayer.png"/>
                 </Button>
             </StackPanel>
+        </Grid>
         </Grid>
     </Grid>
 </Window>

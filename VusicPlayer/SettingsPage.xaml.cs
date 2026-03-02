@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -68,7 +70,7 @@ namespace VusicPlayer
         }
         public static void ApplyTheme(string theme)
         {
-            var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
+            if (App.MainWindowInstance?.Content is FrameworkElement rootElement)
             {
                 switch (theme)
                 {
@@ -90,46 +92,48 @@ namespace VusicPlayer
         {
             if (ThemeRadioButtons.SelectedItem is string selected)
             {
-                var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
-                string themee = "default";
-                if (selected == "Light")
+                if (App.MainWindowInstance?.Content is FrameworkElement rootElement)
                 {
-                    rootElement.RequestedTheme = ElementTheme.Light;
-                    themee = "Light";
+                    string themee = "default";
+                    if (selected == "Light")
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Light;
+                        themee = "Light";
+                    }
+
+                    else if (selected == "Dark")
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Dark;
+                        themee = "Dark";
+                    }
+
+                    else
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Default;
+                        themee = "System Default";
+                    }
+
+                    var currentSettings = await SettingsHelper.LoadSettingsAsync();
+
+                    AppPersonalization personalization;
+
+                    if (currentSettings.UserSettings.Count == 0)
+                    {
+                        personalization = new AppPersonalization();
+                        currentSettings.UserSettings.Add(personalization);
+                    }
+                    else
+                    {
+                        personalization = currentSettings.UserSettings[0];
+                    }
+
+                    // Update theme
+                    personalization.Theme = themee;
+
+                    await SettingsHelper.SaveSettingsAsync(currentSettings);
                 }
 
-                else if (selected == "Dark")
-                {
-                    rootElement.RequestedTheme = ElementTheme.Dark;
-                    themee = "Dark";
-                }
-
-                else
-                {
-                    rootElement.RequestedTheme = ElementTheme.Default;
-                    themee = "System Default";
-                }
-            
-                var currentSettings = await SettingsHelper.LoadSettingsAsync();
-
-                AppPersonalization personalization;
-
-                if (currentSettings.UserSettings.Count == 0)
-                {
-                    personalization = new AppPersonalization();
-                    currentSettings.UserSettings.Add(personalization);
-                }
-                else
-                {
-                    personalization = currentSettings.UserSettings[0];
-                }
-
-                // Update theme
-                personalization.Theme = themee;
-
-                await SettingsHelper.SaveSettingsAsync(currentSettings);
             }
-          
         }
         ObservableCollection<AppPersonalization> theme = new();
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -239,29 +243,38 @@ namespace VusicPlayer
         {
             OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyVideos));
         }
+        private void HandleRemoveClick(object sender)
+        {
+            if (sender is Button button &&
+                button.Parent is StackPanel panel)
+            {
+                RemoveFolderFromUI(panel);
+            }
+        }
         private void RemoveDocuments_Click(object sender, RoutedEventArgs e)
         {
-            RemoveFolderFromUI((sender as Button)?.Parent as StackPanel);
+            HandleRemoveClick(sender);
+          
         }
 
         private void RemoveMusic_Click(object sender, RoutedEventArgs e)
         {
-            RemoveFolderFromUI((sender as Button)?.Parent as StackPanel);
+            HandleRemoveClick(sender);
         }
 
         private void RemoveDownloads_Click(object sender, RoutedEventArgs e)
         {
-            RemoveFolderFromUI((sender as Button)?.Parent as StackPanel);
+            HandleRemoveClick(sender);
         }
 
         private void RemoveVideos_Click(object sender, RoutedEventArgs e)
         {
-            RemoveFolderFromUI((sender as Button)?.Parent as StackPanel);
+            HandleRemoveClick(sender);
         }
 
         private void RemovePictures_Click(object sender, RoutedEventArgs e)
         {
-            RemoveFolderFromUI((sender as Button)?.Parent as StackPanel);
+            HandleRemoveClick(sender);
         }
         private void OpenPictures_Click(object sender, RoutedEventArgs e)
         {
@@ -287,6 +300,83 @@ namespace VusicPlayer
             await Task.Delay(4000);
             ttClearedStuff.IsOpen = false;
             await SettingsHelper.SaveSettingsAsync(currentSettings);
+        }
+        string Logsource = "Settings Page";
+        private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            await dlgUpdateChecker.ShowAsync();
+            await Task.Delay(2000);
+            Version currentVersion = new Version("1.0.0.4");
+            try
+            {
+                using var client = new HttpClient();
+                hypNew.Visibility = Visibility.Collapsed;
+                // 2. Replace with your actual Pastebin RAW URL
+                string pastebinContent = await client.GetStringAsync("https://pastebin.com/raw/YjGbNMpc");
+                string pastebinContentNew = await client.GetStringAsync("https://pastebin.com/raw/ebPBtgmr");
+
+                var parts = pastebinContent.Split('|');
+                if (parts.Length < 2) return;
+
+                Version latestVersion = Version.Parse(parts[0]);
+                Logger.Log("Latest Version Check" + latestVersion.ToString() + ": (user initiated)", Logsource, Logger.LogLevelType.Information);
+                // 3. Compare versions
+                if (latestVersion > currentVersion)
+                {
+                    imgUpdater.Source = new BitmapImage(new Uri("ms-appx:///Assets/required.png"));
+                    txtUpdater.Text = "A new version of the app is available! Version: " + latestVersion.ToString() + Environment.NewLine + "The app will update the next time it is opened.";
+                    hypNew.Visibility = Visibility.Visible;
+                    if (pastebinContentNew != string.Empty)
+                        hypNew.NavigateUri = new Uri(pastebinContentNew);
+
+                    string root = AppContext.BaseDirectory;
+
+                    string stagingFolder = Path.Combine(root, "UpdateStaging");
+                    string? stagingZip = Directory.GetFiles(stagingFolder, "*.zip").FirstOrDefault();
+                    if(stagingZip!= null)
+                    {
+                        txtUpdateDownloadReady.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        txtUpdateDownloadReady.Visibility = Visibility.Collapsed;
+                    }
+
+                }
+                else if (latestVersion == currentVersion)
+                {
+                    imgUpdater.Source = new BitmapImage(new Uri("ms-appx:///Assets/success.png"));
+                    txtUpdater.Text = "Your app is up to date! Version: " + latestVersion.ToString();
+                }
+                else
+                {
+                    imgUpdater.Source = new BitmapImage(new Uri("ms-appx:///Assets/error.png"));
+                    txtUpdater.Text = "Error checking for updates. Please try again later";
+                }
+                
+                prgCheckforUpdates.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+               
+                imgUpdater.Source = new BitmapImage(new Uri("ms-appx:///Assets/error.png"));
+                txtUpdater.Text = "Error checking for updates. Please try again later";
+                Logger.Log("Error checking for updates:  (user initiated)"  + ex.Message, "Settings Page", Logger.LogLevelType.Error);
+            }
+        }
+      
+        private async void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+         this.Frame.Navigate(typeof(LogPage));
+        }
+
+        private async void dlgLogFileClear_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            Logger.ClearLog();
+            ttClearedStuff.Title = "Cleared App Log";
+            ttClearedStuff.IsOpen = true;
+            await Task.Delay(4000);
+            ttClearedStuff.IsOpen = false;
         }
     }
 }
