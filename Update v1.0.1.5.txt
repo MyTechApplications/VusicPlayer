@@ -1,0 +1,59 @@
+🎵 VusicPlayer – Version 1.0.1.5
+✨ Update Notes
+
+This update includes important bug fixes and introduces experimental UI changes that are currently under testing.
+
+⚠️ Please Note:
+This version contains new experimental UI elements that are not fully functional. Occasional crashes may occur due to ongoing framework transitions.
+
+🚀 Improvements
+
+Improved overall navigation speed
+
+New Home Button in the Video Player with glow effect options
+
+New Logs Page to view application logs
+
+Added a “What’s New” link in Settings
+
+Space bar now works correctly in the Video Player
+
+New frost effect applied across the app
+
+Rounded corners for Playlist Cover Images
+
+🛠 Fixes
+
+Fixed issue where Home Page failed to load after renaming a folder
+
+Previously caused by path changes preventing thumbnail loading
+
+Now includes a preventive check for path existence before loading thumbnails
+
+Opening inaccessible folders no longer crashes the app
+
+Now shows an Access Denied dialog instead
+
+🎮 Player Changes
+
+Subtitles (S), Video (V), and Audio (A) buttons now:
+
+Show tooltips
+
+Have keyboard shortcuts for accessibility
+
+⚠️ Functionality currently broken due to migration to new media engine framework
+
+Aspect ratio:
+
+Can be set only from the Video Options menu flyout
+
+Cannot be set via the New Options Dialog when selecting custom aspect ratio
+
+Light theme is disabled for the Player window by design
+
+⏸ Temporarily Disabled
+
+Continue Playing feature
+
+Disabled during migration to the new media engine framework
