@@ -265,7 +265,7 @@
                 <Button ToolTipService.ToolTip="File Info" Background="Transparent" BorderBrush="Transparent"  Name="btnInfo" Click="btnInfo_Click">
                     <Image  Width="24" Source="/Assets/infoicon.png"/>
                 </Button>
-                <Button Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Mini Player"  Name="btnMiniPlayer" IsEnabled="False" Click="btnMiniPlayer_Click">
+                <Button Visibility="Collapsed" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Mini Player"  Name="btnMiniPlayer" IsEnabled="False" Click="btnMiniPlayer_Click">
                     <Image  Width="26" Source="/Assets/miniplayer.png"/>
                 </Button>
             </StackPanel>

@@ -90,7 +90,7 @@ namespace VusicPlayer
             }
             this.DispatcherQueue.TryEnqueue(async () =>
             {
-                await CheckAndDownloadUpdate();
+         //       await CheckAndDownloadUpdate();
 
                 await ScanAllFoldersAsync();
             });
@@ -112,6 +112,7 @@ namespace VusicPlayer
 
             });
             SplashComplete();
+            CheckForFileArguments();
             this.Closed += (s, e) =>
             {
                 if (player != null)
@@ -407,98 +408,6 @@ namespace VusicPlayer
                 sldVolume.Value = player.Audio.Volume;
                 maintimer.Start();
             }
-            /*     if (!_isLibVLCReady)
-                 {
-                     _originalOrder.Clear();
-                     _originalOrder = path.ToList();
-                     currentVideoIndex = 0;
-                     queuepaths = path;
-                     _pendingPath = path[currentVideoIndex];
-                     if (File.Exists(_pendingPath))
-                     {
-                         currentVideoPath = _pendingPath;
-                         PlaybackState.CurrentlyPlayingPath = _pendingPath;
-                         if (frmMain.Content is IUpdateableMusicPage activePage)
-                         {
-                             // C# now treats 'activePage' as something that definitely has the method
-                             activePage.UpdateCurrentListhere(_pendingPath);
-                         }
-                         Logger.Log("Loaded File From Path: "+ _pendingPath, "HomeWindow", Logger.LogLevelType.Information);
-                         if (_libVLC == null)
-                             return;
-                         using var media = new Media(_libVLC, _pendingPath, FromType.FromPath);
-                         // Force 16-bit high-quality output (prevents floating-point artifacts)
-                         media.AddOption(":avcodec-hw=none");
-                         media.AddOption(":audio-resampler=soxr");
-                         media.AddOption(":no-audio-time-stretch");
-                         media.AddOption(":stereo-mode=1");
-                         media.AddOption(":file-caching=3000");
-                         media.AddOption(":audio-channels=1");
-                         if (_mediaPlayer == null) return;
-                         _mediaPlayer.Media = media;
-                         _mediaPlayer?.Play(media);
-                         stateofplay = "playing";
-                         // In your initialization
-
-                         imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
-                         imgThumbnailCover.Source = await GetFileThumbnailAsync(_pendingPath);
-                         txtSongName.Text = Path.GetFileName(_pendingPath);
-                         txtRunningDuration.Text = "00:00:00";
-                         sldMain.Value = 0;
-                         ToolTipService.SetToolTip(txtSongName, txtSongName.Text);
-                         btnPlayPause.IsEnabled = true;
-                         sldMain.IsEnabled = true;
-                         maintimer = new DispatcherTimer();
-                         maintimer.Interval = TimeSpan.FromMilliseconds(250);
-                         maintimer.Tick += Maintimer_Tick;
-                         if (_mediaPlayer == null)
-                             return;
-                         StorageFile file = await StorageFile.GetFileFromPathAsync(_pendingPath);
-                         var musicProps = await file.Properties.GetMusicPropertiesAsync();
-
-                         TimeSpan duration = musicProps.Duration;
-
-                         // Set slider max from metadata
-                         sldMain.Maximum = duration.TotalSeconds;
-
-                         // Set total duration label
-                         txtTotalDuration.Text = duration.ToString(@"hh\:mm\:ss");
-
-                         sldVolume.Value = _mediaPlayer.Volume;
-                         maintimer.Start();
-
-                         _mediaPlayer.EndReached += (sender, e) =>
-                         {
-                             DispatcherQueue.TryEnqueue(() =>
-                             {
-                                 PlayNext();
-                             });
-                         };
-                         string TeachingTipContent = "Media '" + Path.GetFileName(_pendingPath) + "' Opened" + Environment.NewLine + _pendingPath;
-                         ttMediaOpened.Content = TeachingTipContent;
-                         ttMediaOpened.IsOpen = true;
-                         await Task.Delay(4000);
-                         ttMediaOpened.IsOpen = false;
-
-                         SaveRecents();
-                     }
-                     else
-                     {
-                         ttFileMissing.IsOpen = true;
-                         iBFileMissing.Message = _pendingPath;
-                         oldpath = _pendingPath;
-                         iBFileMissing.Severity = InfoBarSeverity.Error;
-                         iBFileMissing.Title = "The following file is missing";
-                         imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
-                         imgThumbnailCover.Source = new BitmapImage(new Uri("ms-appx:///Assets/sourceerror.png"));
-                         btnPlayPause.IsEnabled = false;
-                         txtSongName.Text = "File not found!";
-                         sldMain.IsEnabled = false;
-                         txtTotalDuration.Text = "00:00:00";
-                         txtRunningDuration.Text = "00:00:00";
-                     }
-
-                 }*/
         }
 
         private void PlayNext()
@@ -1037,52 +946,6 @@ namespace VusicPlayer
 
         private void btnMiniPlayer_Click(object sender, RoutedEventArgs e)
         {
-            var miniplayer = new MiniPlayerWind();
-            if (_mediaPlayer == null)
-                return;
-
-            PlaybackState.CurrentPosition = _mediaPlayer.Position;
-            PlaybackState.CurrentSliderPosition = _mediaPlayer.Time / 1000;
-            PlaybackState.TotalDuration = _mediaPlayer.Length / 1000;
-            maintimer.Stop();
-
-            if (stateofplay == "paused")
-            {
-                PlaybackState.CurrentState = false;
-            }
-            else
-            {
-                _mediaPlayer?.Pause();
-                PlaybackState.CurrentState = true;
-            }
-            App.SetCurrentMainWindow(miniplayer);
-            miniplayer.Closed += (s, args) =>
-            {
-
-                this.AppWindow.Show();
-                if (_mediaPlayer == null)
-                    return;
-
-                _mediaPlayer.Position = PlaybackState.CurrentPosition;
-                if (PlaybackState.CurrentState == true)
-                {
-                    _mediaPlayer.Play();
-                    maintimer.Start();
-                    stateofplay = "playing";
-                    long currentTimeMs = _mediaPlayer.Time;
-                    sldMain.Value = currentTimeMs / 1000.0;
-                    imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
-                }
-                else
-                {
-                    imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
-                    stateofplay = "paused";
-                    maintimer.Stop(); long currentTimeMs = _mediaPlayer.Time;
-                    sldMain.Value = currentTimeMs / 1000.0;
-                }
-            };
-            miniplayer.Activate();
-            this.AppWindow.Hide();
         }
         private ObservableCollection<SongModel> AllAvailableSongs = new ObservableCollection<SongModel>();
 
@@ -1096,7 +959,6 @@ namespace VusicPlayer
         UserDataPaths.GetDefault().Downloads,
         UserDataPaths.GetDefault().Pictures,
         UserDataPaths.GetDefault().Videos,
-        @"C:\Users\bnara\OneDrive\Documents\"
     };
 
             var extensions = new[] { ".mp3", ".flac", ".m4a" };
