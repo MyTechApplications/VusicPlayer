@@ -50,159 +50,162 @@
                 <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
             </StackPanel>
         </DataTemplate>
-        <StackPanel   x:Key="panEmptyRecents" Grid.Row="2" Spacing="10" Orientation="Horizontal">
+    </Page.Resources>
+    <ScrollViewer>
+        <Grid>
+        <StackPanel   x:Name="panEmptyRecents" Grid.Row="2" Spacing="10" Orientation="Horizontal">
             <Image Name="imgEmptyStuff" Width="120" Source="/Assets/recentsicon.png"></Image>
             <TextBlock Name="txtEmptyStuff" Text="You have no recents. Watch videos to show them here."></TextBlock>
             <Button Content="Open Video" Name="btnOpenVid" Click="btnOpenVid_Click" Style="{StaticResource AccentButtonStyle}"></Button>
         </StackPanel>
 
-            <Grid Grid.Row="0" Margin="0,0,0,40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Margin="0,0,0,40">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="0,0,40,0">
-                    <TextBlock Text="Continue Playing" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,20" />
+            <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="0,0,40,0">
+                <TextBlock Text="Continue Playing" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,20" />
 
-                    <Border x:Name="ShadowTarget" />
-                    <Grid x:Name="grdHeroContent" 
+                <Border x:Name="ShadowTarget" />
+                <Grid x:Name="grdHeroContent" 
                   PointerEntered="grdHeroContent_PointerEntered" 
                   PointerExited="grdHeroContent_PointerExited" 
                   Width="400" Height="280" 
                   RenderTransformOrigin="0.5,0.5">
 
-                        <ui:Effects.Shadow>
-                            <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget}" CornerRadius="12" Offset="6,6" />
-                        </ui:Effects.Shadow>
+                    <ui:Effects.Shadow>
+                        <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget}" CornerRadius="12" Offset="6,6" />
+                    </ui:Effects.Shadow>
 
-                        <Grid.RenderTransform>
-                            <ScaleTransform x:Name="GridScale" ScaleX="1" ScaleY="1" />
-                        </Grid.RenderTransform>
+                    <Grid.RenderTransform>
+                        <ScaleTransform x:Name="GridScale" ScaleX="1" ScaleY="1" />
+                    </Grid.RenderTransform>
 
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="HoverStates">
-                                <VisualState x:Name="Normal">
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.2" />
-                                        <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.2" />
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="PointerOver">
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleX" To="1.05" Duration="0:0:0.2">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleY" To="1.05" Duration="0:0:0.2">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <Grid.ContextFlyout>
-                            <StaticResource ResourceKey="vidMenu"></StaticResource>
-                        </Grid.ContextFlyout>
-                        <Border CornerRadius="12">
-                            <Grid>
-                                <Border CornerRadius="12">
-                                    <Border.Background>
-                                        <ImageBrush ImageSource="/Assets/sampleimage.jpg" Stretch="UniformToFill"/>
-                                    </Border.Background>
-                                </Border>
-                                <Border VerticalAlignment="Bottom" Height="160" CornerRadius="0,0,12,12">
-                                    <Border.Background>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                            <GradientStop Color="#00000000" Offset="0.0" />
-                                            <GradientStop Color="#BF000000" Offset="0.6" />
-                                            <GradientStop Color="#F2000000" Offset="1.0" />
-                                        </LinearGradientBrush>
-                                    </Border.Background>
-                                </Border>
-                            </Grid>
-                        </Border>
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="HoverStates">
+                            <VisualState x:Name="Normal">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.2" />
+                                    <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.2" />
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="PointerOver">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleX" To="1.05" Duration="0:0:0.2">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"/>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                    <DoubleAnimation Storyboard.TargetName="GridScale" Storyboard.TargetProperty="ScaleY" To="1.05" Duration="0:0:0.2">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"/>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                    <Grid.ContextFlyout>
+                        <StaticResource ResourceKey="vidMenu"></StaticResource>
+                    </Grid.ContextFlyout>
+                    <Border CornerRadius="12">
+                        <Grid>
+                            <Border CornerRadius="12">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="/Assets/sampleimage.jpg" Stretch="UniformToFill"/>
+                                </Border.Background>
+                            </Border>
+                            <Border VerticalAlignment="Bottom" Height="160" CornerRadius="0,0,12,12">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#00000000" Offset="0.0" />
+                                        <GradientStop Color="#BF000000" Offset="0.6" />
+                                        <GradientStop Color="#F2000000" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </Grid>
+                    </Border>
 
-                        <StackPanel VerticalAlignment="Bottom" Padding="20" Spacing="16">
-                            <ProgressBar Value="60" Height="4" Foreground="Cyan" Background="#33FFFFFF" HorizontalAlignment="Stretch"/>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Bottom" Padding="20" Spacing="16">
+                        <ProgressBar Value="60" Height="4" Foreground="Cyan" Background="#33FFFFFF" HorizontalAlignment="Stretch"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                                <Button Grid.Column="0" Background="#00B2B2" Foreground="White" CornerRadius="8" Height="44">
-                                    <Button.Resources>
-                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#00D1D1" />
-                                        <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="White" />
-                                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#008080" />
-                                    </Button.Resources>
+                            <Button Grid.Column="0" Background="#00B2B2" Foreground="White" CornerRadius="8" Height="44">
+                                <Button.Resources>
+                                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#00D1D1" />
+                                    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="White" />
+                                    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#008080" />
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal" Spacing="8" Padding="12,0">
+                                    <FontIcon Foreground="Black" Glyph="&#xE768;" />
+                                    <TextBlock Foreground="Black" Text="Resume" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Button>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                                <Button Background="#44FFFFFF" Foreground="White" CornerRadius="8" Height="44">
                                     <StackPanel Orientation="Horizontal" Spacing="8" Padding="12,0">
-                                        <FontIcon Foreground="Black" Glyph="&#xE768;" />
-                                        <TextBlock Foreground="Black" Text="Resume" FontWeight="SemiBold"/>
+                                        <FontIcon Glyph="&#xE710;" />
+                                        <TextBlock Text="Add to Queue"/>
                                     </StackPanel>
                                 </Button>
+                                <Button ToolTipService.ToolTip="Options" Background="#44FFFFFF" Foreground="White" CornerRadius="8" Width="44" Height="44">
+                                    <FontIcon Glyph="&#xE712;" />
+                                    <Button.Flyout>
+                                        <StaticResource ResourceKey="vidMenu" />
+                                    </Button.Flyout>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
 
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                                    <Button Background="#44FFFFFF" Foreground="White" CornerRadius="8" Height="44">
-                                        <StackPanel Orientation="Horizontal" Spacing="8" Padding="12,0">
-                                            <FontIcon Glyph="&#xE710;" />
-                                            <TextBlock Text="Add to Queue"/>
-                                        </StackPanel>
-                                    </Button>
-                                    <Button ToolTipService.ToolTip="Options" Background="#44FFFFFF" Foreground="White" CornerRadius="8" Width="44" Height="44">
-                                        <FontIcon Glyph="&#xE712;" />
-                                        <Button.Flyout>
-                                            <StaticResource ResourceKey="vidMenu" />
-                                        </Button.Flyout>
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,0,0,20">
+                    <Button Style="{StaticResource AccentButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE838;"/>
+                            <TextBlock Text="Open Folder"/>
                         </StackPanel>
-                    </Grid>
+                    </Button>
+                    <Button>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xEC15;"/>
+                            <TextBlock Text="Cast"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                <TextBlock Text="Recents" Grid.Row="1" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,10"/>
+                <GridView  Name="grdViewRecents" Grid.Row="2" Height="50" Margin="0,0,0,20" ItemTemplate="{StaticResource vidGridView}">
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,0,0,20">
-                        <Button Style="{StaticResource AccentButtonStyle}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE838;"/>
-                                <TextBlock Text="Open Folder"/>
-                            </StackPanel>
-                        </Button>
-                        <Button>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xEC15;"/>
-                                <TextBlock Text="Cast"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-
-                    <TextBlock Text="Recents" Grid.Row="1" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,10"/>
-                    <GridView  Name="grdViewRecents" Grid.Row="2" Height="50" Margin="0,0,0,20" ItemTemplate="{StaticResource vidGridView}">
-                   
-                    </GridView>
-                    <ContentControl Name="cntctrlEmptyRecents" Visibility="Collapsed" Grid.Row="2" Content="{StaticResource panEmptyRecents}" 
+                </GridView>
+                <ContentControl Name="cntctrlEmptyRecents" Visibility="Collapsed" Grid.Row="2" Content="{StaticResource panEmptyRecents}" 
                    ></ContentControl>
-                    <TextBlock Text="Favourites" Grid.Row="3" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,10" />
-                    <GridView Name="grdViewFav" Grid.Row="4" ItemTemplate="{StaticResource vidGridView}"/>
-                    <ContentControl Name="cntctrlEmptyFav" Grid.Row="4" Visibility="Collapsed" Content="{StaticResource panEmptyRecents}" 
+                <TextBlock Text="Favourites" Grid.Row="3" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,10" />
+                <GridView Name="grdViewFav" Grid.Row="4" ItemTemplate="{StaticResource vidGridView}"/>
+                <ContentControl Name="cntctrlEmptyFav" Grid.Row="4" Visibility="Collapsed" Content="{StaticResource panEmptyRecents}" 
    ></ContentControl>
-                </Grid>
             </Grid>
+        </Grid>
 
-            <Border Grid.Row="1" 
+        <Border Grid.Row="1" 
             Padding="20,16" 
             VerticalAlignment="Top" 
             HorizontalAlignment="Left"
@@ -210,36 +213,34 @@
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
             BorderThickness="1" 
             CornerRadius="16">
-                <Border.ContextFlyout>
-                    <MenuFlyout>
-                    
-                        <MenuFlyoutItem Name="mnftSourceFiles" Text="View Video Files">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="d"></FontIcon>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Name="mnftViewDetailSpace" Text="Storage Overview">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="d"></FontIcon>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Name="mnftChangeFolderPaths" Text="Change Folder Paths">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="d"></FontIcon>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                    </MenuFlyout>
-                </Border.ContextFlyout>
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Used Video Space" Style="{StaticResource BaseTextBlockStyle}"/>
-                    <ProgressBar Maximum="100" Value="70" Name="prgUsedSpace" Width="200" HorizontalAlignment="Left"/>
-                    <TextBlock Text="100 GB out of 300 GB used" Name="txtUsedSpace" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-    </ScrollViewer>
-    </Page.Resources>
-    <ScrollViewer>
+            <Border.ContextFlyout>
+                <MenuFlyout>
+
+                    <MenuFlyoutItem Name="mnftSourceFiles" Text="View Video Files">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon Glyph="d"></FontIcon>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                    <MenuFlyoutItem Name="mnftViewDetailSpace" Text="Storage Overview">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon Glyph="d"></FontIcon>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                    <MenuFlyoutItem Name="mnftChangeFolderPaths" Text="Change Folder Paths">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon Glyph="d"></FontIcon>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                </MenuFlyout>
+            </Border.ContextFlyout>
+            <StackPanel Spacing="8">
+                <TextBlock Text="Used Video Space" Style="{StaticResource BaseTextBlockStyle}"/>
+                <ProgressBar Maximum="100" Value="70" Name="prgUsedSpace" Width="200" HorizontalAlignment="Left"/>
+                <TextBlock Text="100 GB out of 300 GB used" Name="txtUsedSpace" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
+            </StackPanel>
+        </Border>
+ 
+
         <Grid Margin="50" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -430,6 +431,7 @@
                     <TextBlock Text="100 GB out of 300 GB used" Name="txtUsedSpace" Style="{StaticResource CaptionTextBlockStyle}" Opacity="0.8"/>
                 </StackPanel>
             </Border>
+            </Grid>
         </Grid>
     </ScrollViewer>
 </Page>
