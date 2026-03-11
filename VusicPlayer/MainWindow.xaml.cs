@@ -42,6 +42,7 @@ namespace VusicPlayer
             });
             this.Title = "Vusic Player - "+Path.GetFileName(selectedVideoPath);
             this.ExtendsContentIntoTitleBar = true;
+            
             var hwnd = WindowNative.GetWindowHandle(this);
             var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
@@ -58,7 +59,7 @@ namespace VusicPlayer
                 playerPage.CleanupPlayer();
             }
 
-            // BROADCAST: Tell whoever is listening that we are done
+          
             PlayerClosed?.Invoke(this, EventArgs.Empty);
         }
     }

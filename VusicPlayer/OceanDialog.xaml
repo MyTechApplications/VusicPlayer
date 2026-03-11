@@ -102,10 +102,14 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap" Name="txtTitle" Text="Title" HorizontalAlignment="Left" Grid.Row="0"></TextBlock>
-            <Grid Margin="0, 10" Name="Contents" Grid.Row="1">
-                    <TextBlock Text="Lorem ipsum dolor sit amet, adipisicing elit." FontSize="24" TextWrapping="Wrap"></TextBlock>
-            </Grid>
-                <Grid Grid.Row="2" Name="smokegrid" Background="Black" Opacity="0">
+                   
+                        <Grid Margin="0, 10" Name="Contents" Grid.Row="1">
+                        
+                            <TextBlock Text="Lorem ipsum dolor sit amet, adipisicing elit." FontSize="24" TextWrapping="Wrap"></TextBlock>
+
+                        </Grid>
+
+                    <Grid Grid.Row="2" Name="smokegrid" Background="Black" Opacity="0">
 
                     
                 </Grid>

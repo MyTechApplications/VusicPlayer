@@ -33,6 +33,8 @@ namespace VusicPlayer
         public SettingsPage()
         {
             InitializeComponent();
+            txtVersion.Text = $"Version {VersionStringApp.VersionText}";
+            txtUpdatetype.Text = "(Patch Fixes)";
             loadstuff();
         }
         private async void loadstuff()
@@ -306,7 +308,7 @@ namespace VusicPlayer
         {
             await dlgUpdateChecker.ShowAsync();
             await Task.Delay(2000);
-            Version currentVersion = new Version("1.0.0.4");
+            Version currentVersion = new Version(VersionStringApp.VersionText );
             try
             {
                 using var client = new HttpClient();
@@ -377,6 +379,15 @@ namespace VusicPlayer
             ttClearedStuff.IsOpen = true;
             await Task.Delay(4000);
             ttClearedStuff.IsOpen = false;
+        }
+        public async void ShowWhatNew(XamlRoot rot)
+        {
+            if (App.HomeWindowInstance == null) return;
+            OceanContentDialog.Show($"What's New in Version {VersionStringApp.VersionText}","", "", "OK", OceanContentDialogDefault.Close, grdNewUpdates, rot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+        }
+        private void HyperlinkButton_Click_1(object sender, RoutedEventArgs e)
+        {
+            ShowWhatNew(this.XamlRoot);
         }
     }
 }

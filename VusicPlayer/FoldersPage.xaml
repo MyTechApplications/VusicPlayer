@@ -14,7 +14,7 @@
             <ColumnDefinition ></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Text="This Folder Is Empty" Name="txtEmptyFolder" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock Text="This folder is empty." Name="txtEmptyFolder" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
         <Grid Name="PreviewGrid" Grid.Column="0" Visibility="Collapsed" Padding="10" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

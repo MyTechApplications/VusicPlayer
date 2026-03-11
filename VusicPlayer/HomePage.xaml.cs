@@ -34,21 +34,38 @@ namespace VusicPlayer
     {
         public HomePage()
         {
-            InitializeComponent();
-            GridContinuePlaying.ItemsSource = MyItems;
-            CallValue();
-            CallFolderValue();
-            MyItems.CollectionChanged += MyItems_CollectionChanged;
-            folders2.CollectionChanged += Folders2_CollectionChanged;
-            if(FolderGrid.Items.Count == 0)
+            try
             {
-                txtEmptyFolders.Visibility = Visibility.Visible;
-                txtFoldersHeader.Visibility = Visibility.Collapsed;
+                InitializeComponent();
+            
+                string root = AppContext.BaseDirectory;
+                string filePath = Path.Combine(root, "freeupdate.txt");
+                Logger.Log(filePath, "source", Logger.LogLevelType.Information);
+                if (File.Exists(filePath))
+                {
+                    ttUpdated.Visibility = Visibility.Visible;
+                    Logger.Log(filePath + "23", "source", Logger.LogLevelType.Information);
+
+                }
+                GridContinuePlaying.ItemsSource = MyItems;
+                CallValue();
+                CallFolderValue();
+                MyItems.CollectionChanged += MyItems_CollectionChanged;
+                folders2.CollectionChanged += Folders2_CollectionChanged;
+                if (FolderGrid.Items.Count == 0)
+                {
+                    txtEmptyFolders.Visibility = Visibility.Visible;
+                    txtFoldersHeader.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    txtEmptyFolders.Visibility = Visibility.Collapsed;
+                    txtFoldersHeader.Visibility = Visibility.Visible;
+                }
             }
-            else
+            catch(Exception ex)
             {
-                txtEmptyFolders.Visibility = Visibility.Collapsed;
-                txtFoldersHeader.Visibility = Visibility.Visible;
+                Logger.Log(ex.Message, "HomePage", Logger.LogLevelType.Error);
             }
         }
 
@@ -486,6 +503,26 @@ namespace VusicPlayer
                 await cldg.ShowAsync();
                 folders2.Remove(data);
             }
+        }
+
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            string root = AppContext.BaseDirectory;
+            string filePath = Path.Combine(root, "freeupdate.txt");
+
+            OceanContentDialog.Show("What's New in Version 1.0.1.5", "", "", "OK", OceanContentDialogDefault.Primary, grdNewUpdates, this.XamlRoot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "HomeWindow", Logger.LogLevelType.Error);
+            }
+
         }
     }
 }

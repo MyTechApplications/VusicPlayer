@@ -45,6 +45,7 @@ using RoutedEventArgs = Microsoft.UI.Xaml.RoutedEventArgs;
 using Window = Microsoft.UI.Xaml.Window;
 using WindowActivatedEventArgs = Microsoft.UI.Xaml.WindowActivatedEventArgs;
 using WindowEventArgs = Microsoft.UI.Xaml.WindowEventArgs;
+using XamlRoot = Microsoft.UI.Xaml.XamlRoot;
 
 //Vusic Player Version 1.1.0.0 Build 27.02.2026
 //Development Reset  - 27/02/2026
@@ -65,7 +66,10 @@ namespace VusicPlayer
         public HomeWindow()
         {
             InitializeComponent();
+          
+
             LoadTheme();
+
             TrySetAcrylicBackdrop(true); DispatcherQueue.EnsureSystemDispatcherQueue();
             Mainframe.Navigate(typeof(SplashScreen));
             this.ExtendsContentIntoTitleBar = true;
@@ -77,6 +81,7 @@ namespace VusicPlayer
             appWindow.SetTitleBarIcon("Assets/appicon.ico");
             this.Title = "Vusic Player";
             loadingRing.IsActive = true;
+
             loadingRing.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
             frmMain.Navigated += FrmMain_Navigated;
 
@@ -84,10 +89,7 @@ namespace VusicPlayer
             sldMain.DragStarted += SldMain_DragStarted;
 
             sldMain.DragCompleted += SldMain_DragCompleted;
-            if (nvgMain.MenuItems.Count > 0)
-            {
-                nvgMain.SelectedItem = nvgMain.MenuItems[0];
-            }
+        
             this.DispatcherQueue.TryEnqueue(async () =>
             {
          //       await CheckAndDownloadUpdate();
@@ -104,22 +106,14 @@ namespace VusicPlayer
 
                 UIRefresh = false, // For Activity Mode usage
                                    //   PluginsPath = ":Plugins",
-                FFmpegPath = @"C:\Users\bnara\Pictures\TestApp\FFmpeg"
+                FFmpegPath = Path.Combine(AppContext.BaseDirectory, "FFmpegDLLs")
             });
-            Task.Run(async () =>
+            if (nvgMain.MenuItems.Count > 0)
             {
-
-
-            });
+                nvgMain.SelectedItem = nvgMain.MenuItems[0];
+            }
             SplashComplete();
-            CheckForFileArguments();
-            this.Closed += (s, e) =>
-            {
-                if (player != null)
-                {
-                    player.Dispose();
-                }
-            };
+     
         }
         Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController? acrylicController;
         Microsoft.UI.Composition.SystemBackdrops.SystemBackdropConfiguration? configurationSource;
@@ -139,13 +133,18 @@ namespace VusicPlayer
         private void Window_Closed(object sender, WindowEventArgs args)
         {
             // Make sure any Mica/Acrylic controller is disposed
-            /*  if (acrylicController != null)
+              if (acrylicController != null)
               {
                   acrylicController.Dispose();
                   acrylicController = null;
               }
               Activated -= Window_Activated;
-              configurationSource = null;*/
+              configurationSource = null;
+            if (player != null)
+            {
+                player.Stop();
+                player.Dispose();
+            }
         }
 
         private void Window_ThemeChanged(FrameworkElement sender, object args)
@@ -200,23 +199,31 @@ namespace VusicPlayer
         #endregion
         private async void LoadTheme()
         {
-            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            try
+            {
+                var currentSettings = await SettingsHelper.LoadSettingsAsync();
 
-            if (App.MainWindowInstance != null){
-                var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
-                var personalization = currentSettings.UserSettings[0];
-                if (personalization.Theme == "Light")
+                if (App.MainWindowInstance != null)
                 {
-                    rootElement.RequestedTheme = ElementTheme.Light;
+                    var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
+                    var personalization = currentSettings.UserSettings[0];
+                    if (personalization.Theme == "Light")
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Light;
+                    }
+                    else if (personalization.Theme == "Dark")
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Dark;
+                    }
+                    else
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Default;
+                    }
                 }
-                else if (personalization.Theme == "Dark")
-                {
-                    rootElement.RequestedTheme = ElementTheme.Dark;
-                }
-                else
-                {
-                    rootElement.RequestedTheme = ElementTheme.Default;
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "HomeWindowLoadTheme", Logger.LogLevelType.Error);
             }
         }
         private async void SplashComplete()
@@ -235,7 +242,7 @@ namespace VusicPlayer
         private async Task CheckAndDownloadUpdate()
         {
             // 1. DEFINE YOUR CURRENT VERSION
-            Version currentVersion = new Version("1.0.0.4");
+            Version currentVersion = new Version(VersionStringApp.VersionText);
 
             try
             {
@@ -407,6 +414,7 @@ namespace VusicPlayer
 
                 sldVolume.Value = player.Audio.Volume;
                 maintimer.Start();
+  
             }
         }
 
@@ -508,7 +516,7 @@ namespace VusicPlayer
             if (instance == null)
             {
                 instance = new HomeWindow();
-                instance.Closed += (_, __) => instance = null; // Reset when closed
+         //       instance.Closed += (_, __) => instance = null; // Reset when closed
                 instance.Activate();
             }
             else

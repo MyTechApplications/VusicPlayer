@@ -11,6 +11,7 @@
     <UseWinUI>true</UseWinUI>
     <WinUISDKReferences>false</WinUISDKReferences>
 	  <WindowsPackageType>None</WindowsPackageType>
+	  <PublishTrimmed>false</PublishTrimmed>
 	  <UseRidGraph>true</UseRidGraph>
 	  <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <EnableMsixTooling>true</EnableMsixTooling>

@@ -188,10 +188,14 @@
                         <TextBlock Text="Vusic Player"
                                    Style="{StaticResource BodyStrongTextBlockStyle}" />
 
-                        <TextBlock Text="Version 1.1.0.0 Preview"
+                        <TextBlock Name="txtVersion" Text=""
                                    Style="{StaticResource BodyTextBlockStyle}" />
-
-                        <TextBlock Text="Build 2026.02.26"
+                        <TextBlock Name="txtUpdatetype" Text=""
+              Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="Version 1.1.0.0 Simultaneous Evaulation"
+             Style="{StaticResource BodyTextBlockStyle}" />
+                        <HyperlinkButton Content="What's New?" Click="HyperlinkButton_Click_1"></HyperlinkButton>
+                        <TextBlock Text="Build 2026.03.02"
                                    Style="{StaticResource CaptionTextBlockStyle}" />
                     </StackPanel>
 
@@ -205,12 +209,66 @@
 
                 <Button Background="Transparent" BorderBrush="Transparent"  Content="View Log Entries"
                 Click="Button_Click_4"/>
+                <ContentDialog>
+                
+                        <Grid Name="grdNewUpdates" MaxHeight="200">
+                        <ScrollViewer MaxHeight="200"
+VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="16">
+
+                                <StackPanel Orientation="Horizontal" Spacing="20">
+                                    <Image Source="/Assets/appicon.png" Width="100"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Vusic Player Patch Version 1.0.1.5"
+                               FontWeight="SemiBold"/>
+                                        <TextBlock Text="Build 2026.03.02"/>
+                                        <TextBlock Text="Evaluation copy of upcoming version 1.1.0.0"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <TextBlock Text="✨ Update Notes"
+                       FontSize="18"
+                       FontWeight="SemiBold"/>
+
+                                <TextBlock TextWrapping="Wrap">
+                This update includes important bug fixes and introduces experimental UI changes currently under testing.
+                                </TextBlock>
+
+                                <TextBlock Text="🚀 Improvements"
+                       FontWeight="SemiBold"/>
+
+                                <TextBlock Text="• Improved navigation speed" TextWrapping="Wrap"/>
+                                <TextBlock Text="• New Home Button with glow options" TextWrapping="Wrap"/>
+                                <TextBlock Text="• New Logs page" TextWrapping="Wrap"/>
+                                <TextBlock Text="• Added What's New link in Settings" TextWrapping="Wrap"/>
+                                <TextBlock Text="• Space bar now works properly" TextWrapping="Wrap"/>
+                                <TextBlock Text="• Frost effect across the app" TextWrapping="Wrap"/>
+                                <TextBlock Text="• Rounded playlist cover corners" TextWrapping="Wrap"/>
+
+                                <TextBlock Text="🛠 Fixes"
+                       FontWeight="SemiBold"/>
+
+                                <TextBlock Text="• Fixed Home Page loading after folder rename" TextWrapping="Wrap"/>
+                                <TextBlock Text="• Preventive path existence check added" TextWrapping="Wrap"/>
+                                <TextBlock Text="• Access Denied dialog replaces crash on restricted folders" TextWrapping="Wrap"/>
+
+                                <TextBlock Text="⏸ Temporarily Disabled"
+                       FontWeight="SemiBold"/>
+
+                                <TextBlock Text="• Continue Playing (migration to new media engine)" TextWrapping="Wrap"/>
+
+                            </StackPanel>
+            
+
+                        </ScrollViewer>
+                    </Grid>
+                </ContentDialog>
                 <ContentDialog Name="dlgUpdateChecker" Title="Updates" CloseButtonText="OK" DefaultButton="Close">
                     <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <ProgressRing IsIndeterminate="True" Name="prgCheckforUpdates"></ProgressRing>
-                        <Image Name="imgUpdater" Source="/Assets/addicon.png" Margin="20, 0"></Image>
-                        <TextBlock Text="Checking for Updates..." Name="txtUpdater"></TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <ProgressRing IsIndeterminate="True" Name="prgCheckforUpdates"></ProgressRing>
+                            <Image Name="imgUpdater" Source="/Assets/addicon.png" Margin="20, 0"></Image>
+                            <TextBlock Text="Checking for Updates..." Name="txtUpdater"></TextBlock>
                         </StackPanel>
                         <HyperlinkButton NavigateUri="https://github.com/MyTechApplications/VusicPlayer" Content="What's New?" Name="hypNew" Visibility="Collapsed"></HyperlinkButton>
                         <TextBlock Text="Updates have been downloaded and are ready!" Name="txtUpdateDownloadReady" Visibility="Collapsed"></TextBlock>

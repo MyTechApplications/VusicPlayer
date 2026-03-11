@@ -124,7 +124,7 @@ namespace VusicPlayer
         #endregion
         #endregion
         #region Initialization
-        private void LoadComponents(VideoPlayerPageParams parameter)
+        private async void LoadComponents(VideoPlayerPageParams parameter)
         {
             this.RequestedTheme = ElementTheme.Dark; //Dark theme always true
             //Slider events
@@ -141,9 +141,19 @@ namespace VusicPlayer
             LoadFlyLeafEngine();
             if (currentVideoPath != null)
             {
-                Debug.WriteLine(currentVideoPath);
                 PlayMedia(currentVideoPath);
                 Load.Visibility = Visibility.Collapsed;
+                var settings = await SettingsHelper.LoadSettingsAsync();
+                var item = settings.SavedItems.FirstOrDefault(x => x.FilePath == currentVideoPath);
+             if(item != null && player != null)
+                {
+                    player.CurTime = (long)item.CurrentDuration;
+                    UpdatePlayPauseUI("play");
+                    var curTime = TimeSpan.FromTicks(player.CurTime);
+                    txtRunningDuration.Text = curTime.ToString(@"hh\:mm\:ss");
+                    sldMain.Value = curTime.TotalSeconds;
+                    txtLoaded.Text = $"Loaded playback of {txtFileName.Text} at {txtRunningDuration.Text}";
+                }   
             }
         }
         private void LoadFlyLeafEngine()
@@ -156,7 +166,7 @@ namespace VusicPlayer
                 FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warn,
 
 
-                FFmpegPath = @"C:\Users\bnara\Pictures\TestApp\FFmpeg"
+                FFmpegPath = Path.Combine(AppContext.BaseDirectory, "FFmpegDLLs")
             });
             mediaPlayerMain.Player = player;
         }
@@ -305,11 +315,14 @@ namespace VusicPlayer
             if (stateofplay == "playing")
             {
                 player.Pause();
+               
+                _saveTimer?.Stop();
                 UpdatePlayPauseUI("pause");
             }
             else
             {
                 player.Play();
+                _saveTimer?.Start();
                 UpdatePlayPauseUI("play");
             }
 
@@ -372,7 +385,6 @@ namespace VusicPlayer
             mediaPlayerMain.Player = player;
             player.Open(path);
             player.Play();
-
             UpdatePlayPauseUI("play");
             sldMain.Value = 0;
             MainTimer = new DispatcherTimer();
@@ -385,7 +397,6 @@ namespace VusicPlayer
             txtLoaded.Text = $"Loaded media '{txtFileName.Text}'";
             StorageFile file = await StorageFile.GetFileFromPathAsync(currentVideoPath);
             var props = await file.Properties.GetMusicPropertiesAsync();
-
             double totalSeconds = props.Duration.TotalSeconds;
             txtTotalDuration.Text = props.Duration.ToString(@"hh\:mm\:ss");
             sldMain.Maximum = totalSeconds;
@@ -393,6 +404,9 @@ namespace VusicPlayer
             _hideTimer.Interval = TimeSpan.FromSeconds(1);
             _hideTimer.Tick += _hideTimer_Tick; ;
             _hideTimer.Start();
+            DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
+            StartAutoSave();
             seektimer = new DispatcherTimer();
             seektimer.Interval = TimeSpan.FromSeconds(2);
             seektimer.Tick += Seektimer_Tick;
@@ -407,7 +421,10 @@ namespace VusicPlayer
             btnFullScreen.IsEnabled = true;
             sldVol.IsEnabled = true;
             if (player != null)
-                sldVol.Value = player.Audio.Volume;
+            {
+                sldVol.Value = player.Audio.Volume; 
+                txtVolumepercent.Text = player.Audio.Volume.ToString();
+            }
         }
         public void CleanupPlayer()
         {
@@ -541,7 +558,6 @@ namespace VusicPlayer
         {
             if (player == null) return;
 
-            // Stop existing timer to prevent duplicates
             _saveTimer?.Stop();
 
             _saveTimer = this.DispatcherQueue.CreateTimer();
@@ -549,7 +565,6 @@ namespace VusicPlayer
 
             _saveTimer.Tick += async (s, e) =>
             {
-                // Don't save if the path is empty or player is invalid
                 if (string.IsNullOrEmpty(currentVideoPath) || player == null) return;
 
                 var settings = await SettingsHelper.LoadSettingsAsync();
@@ -956,10 +971,7 @@ namespace VusicPlayer
 
         private void numFontSize_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
         {
-            if (sender.Value is double v)
-                sender.Value = Math.Round(v);
 
-            txtSample.FontSize = sender.Value;
         }
 
         private void clrPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
@@ -1327,8 +1339,8 @@ namespace VusicPlayer
             txtRotationValue.Text = $"{RotationAngle}°";
             sldRotation.Value = RotationAngle;
         }
-    
-    private void BtnRotateMinus_Click(object sender, RoutedEventArgs e)
+
+        private void BtnRotateMinus_Click(object sender, RoutedEventArgs e)
         {
             double newAngle = RotationAngle - 1;
             if (newAngle < 0) newAngle = 359;
@@ -1358,7 +1370,7 @@ namespace VusicPlayer
             SelectorBarItem selectedItem = sender.SelectedItem;
             int currentSelectedIndex = sender.Items.IndexOf(selectedItem);
             grdSubTracks.Visibility = Visibility.Collapsed;
-           grdSubtitlesCustomize.Visibility = Visibility.Collapsed;
+            grdSubtitlesCustomize.Visibility = Visibility.Collapsed;
             switch (currentSelectedIndex)
             {
                 case 0:
@@ -1369,7 +1381,13 @@ namespace VusicPlayer
                     grdSubtitlesCustomize.Visibility = Visibility.Visible;
                     break;
 
-       
+
             }
         }
-    } }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
+}

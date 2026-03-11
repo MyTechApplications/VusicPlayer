@@ -12,6 +12,7 @@
 
  
     <Grid>
+        <TextBlock Text="VusicPlayer Version 1.1.0.0 Evaulation Preview" VerticalAlignment="Bottom" HorizontalAlignment="Right"></TextBlock>
         <Frame VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Mainframe"  Visibility="Visible"></Frame>
         <Grid Background="Transparent" Name="rootgrid" Visibility="Collapsed" >
             <Grid.ColumnDefinitions>
@@ -271,5 +272,6 @@
             </StackPanel>
         </Grid>
         </Grid>
+
     </Grid>
 </Window>
