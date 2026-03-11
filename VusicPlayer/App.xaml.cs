@@ -27,9 +27,17 @@ namespace VusicPlayer
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
              HomeWindow.ShowWindow();
+            this.UnhandledException += App_UnhandledException;
           //  OceanDialog dlg = new();
             //dlg.Activate();
         }
+
+        private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+            Logger.Log(e.Message, "App", Logger.LogLevelType.Error):
+        }
+
         public static void SetCurrentMainWindow(Window window)
         {
             MainWindowInstance = window;

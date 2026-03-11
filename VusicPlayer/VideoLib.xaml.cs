@@ -43,6 +43,7 @@ using Windows.UI.WindowManagement;
 using WinRT.Interop;
 using AppWindow = Microsoft.UI.Windowing.AppWindow;
 using Path = System.IO.Path;
+using WindowId = Microsoft.UI.WindowId;
 #endregion
 
 
