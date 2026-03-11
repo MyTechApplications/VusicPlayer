@@ -36,6 +36,8 @@ namespace VusicPlayer
             txtVersion.Text = $"Version {VersionStringApp.VersionText}";
             txtUpdatetype.Text = "(Patch Fixes)";
             loadstuff();
+            txtBuild.Text = $"Build {Appversionstrings.BuildNumber}";
+            txtVersion.Text = $"Version {Appversionstrings.AppVersion} {Appversionstrings.VersionType}";
         }
         private async void loadstuff()
         {
@@ -302,6 +304,11 @@ namespace VusicPlayer
             await Task.Delay(4000);
             ttClearedStuff.IsOpen = false;
             await SettingsHelper.SaveSettingsAsync(currentSettings);
+            if (sender is FrameworkElement element)
+            {
+                // 3. Get the flyout associated with this button's parent context
+                FlyoutBase.GetAttachedFlyout(element)?.Hide();
+            }
         }
         string Logsource = "Settings Page";
         private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
@@ -326,7 +333,7 @@ namespace VusicPlayer
                 if (latestVersion > currentVersion)
                 {
                     imgUpdater.Source = new BitmapImage(new Uri("ms-appx:///Assets/required.png"));
-                    txtUpdater.Text = "A new version of the app is available! Version: " + latestVersion.ToString() + Environment.NewLine + "The app will update the next time it is opened.";
+                    txtUpdater.Text = "A new version of the app is available! Version: " + latestVersion.ToString() + Environment.NewLine + "You can manually update the app in Microsoft Store if it doesn't update automatically";
                     hypNew.Visibility = Visibility.Visible;
                     if (pastebinContentNew != string.Empty)
                         hypNew.NavigateUri = new Uri(pastebinContentNew);

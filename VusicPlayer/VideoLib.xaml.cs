@@ -193,7 +193,7 @@ namespace VusicPlayer
         }
         #endregion
 
-        //Vusic Player Version 1.1.0.0 Build 27.02.2026
+        //Vusic Player Version 1.1.0.0 Build 06.03.2026
         //Development Reset  - 27/02/2026
         //Switch to FlyLeaf Media Engine from LibVLCsharp due to failures with rendering of playbacks and audio output
         //Code Cleanup Initiated
@@ -1387,6 +1387,11 @@ namespace VusicPlayer
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
         {
 
         }

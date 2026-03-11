@@ -237,5 +237,10 @@ namespace VusicPlayer
             // from the Grid the Flyout is attached to.
             return (sender as MenuFlyoutItem)?.DataContext as SongModel;
         }
+
+        private void btnCloseSearch_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.GoBack();
+        }
     }
 }

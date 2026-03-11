@@ -91,8 +91,8 @@ namespace VusicPlayer
                     VideoRecents.Add(item);
                 }
             }
-            UpdateUIState(grdViewRecents, VideoRecents, cntctrlEmptyRecents, "You have no recents. Watch videos to show them here.", "/Assets/recentsicon.png");
-            UpdateUIState(grdViewFav, VideoFavourites, cntctrlEmptyFav, "You have no favourites. Heart videos to show them here.", "/Assets/favicon.png");
+     //       UpdateUIState(grdViewRecents, VideoRecents, cntctrlEmptyRecents, "You have no recents. Watch videos to show them here.", "/Assets/recentsicon.png");
+        //    UpdateUIState(grdViewFav, VideoFavourites, cntctrlEmptyFav, "You have no favourites. Heart videos to show them here.", "/Assets/favicon.png");
             //Load Favourites
 
         }

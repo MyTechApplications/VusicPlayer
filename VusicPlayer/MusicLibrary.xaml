@@ -41,7 +41,7 @@
         <StackPanel Margin="0, 20" Orientation="Horizontal" Grid.Row="3">
             <TextBlock Text="Recent Music" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Margin="0, 10"></TextBlock>
             <CheckBox Unchecked="chckmultiplerecent_Unchecked" Name="chckmultiplerecent" Checked="chckmultiplerecent_Checked" Content="Select" Margin="10, 0"></CheckBox>
-            <Button Visibility="Collapsed" Name="btnDeleteRecents" ToolTipService.ToolTip="Remove Selected Recents">
+            <Button Background="Transparent"  Visibility="Collapsed" Name="btnDeleteRecents" ToolTipService.ToolTip="Remove Selected Recents">
                 <Button.Flyout>
                     <Flyout>
                         <StackPanel Orientation="Vertical">
@@ -70,7 +70,12 @@
                                             <FontIcon Glyph="&#xE8DA;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                            </MenuFlyout>
+                                    <MenuFlyoutItem Text="View File Info" Click="MenuFlyoutItem_Click_3" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="D"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
                         </StackPanel.ContextFlyout>
                         <Image Source="{Binding Thumbnail}" Width="70" Height="70" Stretch="UniformToFill"/>
 

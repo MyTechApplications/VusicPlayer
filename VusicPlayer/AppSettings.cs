@@ -17,6 +17,7 @@ namespace VusicPlayer
         public ObservableCollection<PlaylistProperties> SavedPlaylists { get; set; } = new();
         public ObservableCollection<AppPersonalization> UserSettings { get; set; } = new();
         public ObservableCollection<RecentMusic> RecentMusic { get; set; } = new();
+        public ObservableCollection<QueueList> QueueSave { get; set; } = new();
 
     }
 }

@@ -35,6 +35,7 @@ using Windows.Storage;
 using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using Windows.Storage.Search;
+using Windows.UI;
 using WinRT;
 using WinRT.Interop;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -47,7 +48,7 @@ using WindowActivatedEventArgs = Microsoft.UI.Xaml.WindowActivatedEventArgs;
 using WindowEventArgs = Microsoft.UI.Xaml.WindowEventArgs;
 using XamlRoot = Microsoft.UI.Xaml.XamlRoot;
 
-//Vusic Player Version 1.1.0.0 Build 27.02.2026
+//Vusic Player Version 1.1.0.0 Build 06.03.2026
 //Development Reset  - 27/02/2026
 //Switch to FlyLeaf Media Engine from LibVLCsharp due to failures with rendering of playbacks and audio output
 //Code Cleanup Initiated
@@ -92,7 +93,7 @@ namespace VusicPlayer
         
             this.DispatcherQueue.TryEnqueue(async () =>
             {
-         //       await CheckAndDownloadUpdate();
+              //  await CheckAndDownloadUpdate();
 
                 await ScanAllFoldersAsync();
             });
@@ -133,8 +134,13 @@ namespace VusicPlayer
         private void Window_Closed(object sender, WindowEventArgs args)
         {
             // Make sure any Mica/Acrylic controller is disposed
-              if (acrylicController != null)
-              {
+              configurationSource = null;
+            if (player != null)
+            {
+                player.Stop();
+                player.Dispose();
+            }
+        }
                   acrylicController.Dispose();
                   acrylicController = null;
               }
@@ -236,13 +242,13 @@ namespace VusicPlayer
         #region Fields
 
         ObservableCollection<string> queuepaths = new();
-        bool _isDragging = false;
+            Version currentVersion = new Version(VersionStringApp.VersionText);
         #endregion
 
         private async Task CheckAndDownloadUpdate()
         {
             // 1. DEFINE YOUR CURRENT VERSION
-            Version currentVersion = new Version(VersionStringApp.VersionText);
+            Version currentVersion = new Version("1.0.1.5");
 
             try
             {
@@ -384,9 +390,11 @@ namespace VusicPlayer
                 currentVideoPath = _pendingPath;
                 PlaybackState.CurrentlyPlayingPath = _pendingPath;
 
-                player = new Player(new Config());
-                mediaEngine.Player = player;
-
+                if (player == null)
+                {
+                    player = new Player(new Config());
+                    mediaEngine.Player = player;
+                }
                 player.Open(path[currentVideoIndex]);
                 player.Play();
                 stateofplay = "playing";
@@ -413,9 +421,15 @@ namespace VusicPlayer
                 txtTotalDuration.Text = duration.ToString(@"hh\:mm\:ss");
 
                 sldVolume.Value = player.Audio.Volume;
+                originalvolume = player.Audio.Volume;
+                if (originalvolume.HasValue)
+                {
+                    currentvol = originalvolume.Value.ToString();
+                }
                 maintimer.Start();
-  
+                _ = SaveRecents();
             }
+            CheckForFileArguments();
         }
 
         private void PlayNext()
@@ -426,7 +440,7 @@ namespace VusicPlayer
             }
             player.Stop();
             maintimer.Stop();
-            _mediaPlayer.Position = 0;
+        //    _mediaPlayer.Position = 0;
             sldMain.Value = 0;
             txtRunningDuration.Text = "00:00:00";
 
@@ -708,6 +722,7 @@ namespace VusicPlayer
             NavigationView sender,
             NavigationViewSelectionChangedEventArgs args)
         {
+            MusicPlayerMaster.Visibility = Visibility.Visible;
             if (args.IsSettingsSelected)
             {
                 frmMain.Navigate(typeof(SettingsPage));
@@ -729,7 +744,11 @@ namespace VusicPlayer
                 pageType = typeof(VideoLibrary);
 
             else if (args.SelectedItemContainer == nvgitQueue)
-                pageType = typeof(QueuePage);
+            {
+                TransposeMediaDetails mediaDetails = new TransposeMediaDetails{ MediaPath = currentVideoPath, CurrentDur = txtRunningDuration.Text };
+                frmMain.Navigate(typeof(QueuePage), mediaDetails, new DrillInNavigationTransitionInfo());
+                MusicPlayerMaster.Visibility = Visibility.Collapsed;
+            }
 
             if (pageType != null && frmMain.CurrentSourcePageType != pageType)
             {
@@ -883,16 +902,45 @@ namespace VusicPlayer
                 frmMain.GoBack();
             }
         }
-
-        private void sldVolume_ValueChanged(double obj)
+        private void VolumeChange(double obj)
         {
-            if (_mediaPlayer == null)
-                return;
+            if (player == null) return;
 
             int vol = (int)obj;
+            if(vol != 0)
+            {
+                originalvolume = vol;
+            }
+            currentvol = vol.ToString();
+            txtVolume.Text = currentvol + "%";
+            player.Audio.Volume = vol;
 
-            _mediaPlayer.Volume = vol;
-            txtVolume.Text = vol.ToString() + "%";
+            // 1. Determine the Glyph
+            VolumeIcon.Glyph = vol switch
+            {
+                0 => "\uE74F", // Mute
+                < 10 => "\uE992", // Low
+                < 40 => "\uE993", // Med-Low
+                < 80 => "\uE994", // Med
+                _ => "\uE995"  // High / Max
+            };
+
+            // 2. Determine the Color (Defaults to White)
+            Color iconColor = vol switch
+            {
+                >= 115 => Colors.Orange,
+                > 100 => Colors.Yellow,
+                _ => Colors.White
+            };
+
+            VolumeIcon.Foreground = new SolidColorBrush(iconColor);
+        }
+        private string currentvol = "0";
+        private string volumestate = "1";
+        private int? originalvolume;
+        private void sldVolume_ValueChanged(double obj)
+        {
+            VolumeChange(obj);
         }
 
         private void btnSkipForward_Click(object sender, RoutedEventArgs e)
@@ -916,20 +964,19 @@ namespace VusicPlayer
 
             string speed = menuflyoutitem.Text;
             videospeed = speed;
-            if (_mediaPlayer != null && maintimer != null)
+            if (player != null && maintimer != null)
             {
-                _mediaPlayer?.Pause();
-                maintimer.Stop();
+         //       player.Speed = 1.5;
+              //  player?.Pause();
+             //   maintimer.Stop();
                 if (menuflyoutitem != null)
                 {
 
-                    if (float.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out float speedfloat))
+                    if (double.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out double speedfloat))
                     {
-                        _mediaPlayer?.SetRate(speedfloat);
-                        _mediaPlayer?.Play();
-                        maintimer.Start();
-                    }
-                }
+                        player.Speed = speedfloat;
+                    }}
+              
             }
         }
 
@@ -1024,20 +1071,17 @@ namespace VusicPlayer
         }
         private void btnSetCustomSpeed_Click(object sender, RoutedEventArgs e)
         {
-            if (_mediaPlayer != null && maintimer != null)
+            if (player != null && maintimer != null)
             {
-                _mediaPlayer?.Pause();
-                maintimer.Stop();
+                
 
                 if (!double.IsNaN(nmbSpeedCustom.Value))
                 {
                     string speed = nmbSpeedCustom.Value.ToString();
                     videospeed = speed;
-                    if (float.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out float speedfloat))
+                    if (double.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out double speedfloat))
                     {
-                        _mediaPlayer?.SetRate(speedfloat);
-                        _mediaPlayer?.Play();
-                        maintimer.Start();
+                        player.Speed = speedfloat;
                     }
                 }
             }
@@ -1178,25 +1222,20 @@ namespace VusicPlayer
         private double _lastVolume = 100;
         private void btnVolume_Click(object sender, RoutedEventArgs e)
         {
-            if (sldVolume.Value > 0)
+            if (currentvol == "0")
             {
-                // --- STATE: MUTING ---
-                _lastVolume = sldVolume.Value; // Save current volume
-                sldVolume.Value = 0;           // Set slider to 0
-                txtVolume.Text = "0%";
-                VolumeIcon.Glyph = "\uE74F";      // Mute glyph
+                double orig = Convert.ToDouble(originalvolume);
+                sldVolume.Value = orig;
+                    VolumeChange(orig);
+                
             }
             else
             {
-                // --- STATE: UNMUTING ---
-                // If the last saved volume was 0 (e.g. app started muted), 
-                // default to a audible level like 50.
-                sldVolume.Value = _lastVolume > 0 ? _lastVolume : 50;
-                int vollast = Convert.ToInt32(sldVolume.Value);
-                txtVolume.Text = vollast.ToString() + "%";
-                VolumeIcon.Glyph = "\uE767";      // Sound glyph
+                sldVolume.Value = 0;
+                VolumeChange(0);
             }
         }
+        
 
         private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {

@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -157,38 +158,48 @@ namespace VusicPlayer
             missingFiles.Clear();
             iBMissingFiles.IsOpen = false;
         }
-        private async void SongCollection_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private async void SongCollection_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             var currentSettings = await SettingsHelper.LoadSettingsAsync();
+
             if (_currentPlaylist != null)
             {
                 var playlistInMasterList = currentSettings.SavedPlaylists
-               .FirstOrDefault(p => p.PlaylistName == _currentPlaylist.PlaylistName);
+                    .FirstOrDefault(p => p.PlaylistName == _currentPlaylist.PlaylistName);
 
                 if (playlistInMasterList != null)
                 {
                     List<string> SongPathsModified = new();
                     TimeSpan ts = TimeSpan.Zero;
-                    foreach (var item in SongCollection)
+
+                    var songsSnapshot = SongCollection.ToList();
+
+                    foreach (var item in songsSnapshot)
                     {
                         if (item.FilePath != null)
                         {
-
                             SongPathsModified.Add(item.FilePath);
+
+                            StorageFile file = await StorageFile.GetFileFromPathAsync(item.FilePath);
+                            MusicProperties properties = await file.Properties.GetMusicPropertiesAsync();
+                            ts += properties.Duration;
                         }
-                        StorageFile file = await StorageFile.GetFileFromPathAsync(item.FilePath);
-                        MusicProperties properties = await file.Properties.GetMusicPropertiesAsync();
-                        ts += properties.Duration;
                     }
-                    string formatted = ts.TotalHours >= 1 ? ts.ToString(@"h\:mm\:ss") : ts.ToString(@"m\:ss");
+
+                    string formatted = ts.TotalHours >= 1
+                        ? ts.ToString(@"h\:mm\:ss")
+                        : ts.ToString(@"m\:ss");
+
                     txtTotalDuration.Text = formatted;
 
-                    int cplount = SongCollection.Count;
+                    int cplount = songsSnapshot.Count;
                     playlistInMasterList.PlaylistCount = $"{cplount} {(cplount == 1 ? "item" : "items")}";
                     playlistInMasterList.SongsPaths = SongPathsModified;
+
                     await SettingsHelper.SaveSettingsAsync(currentSettings);
                 }
             }
+
             if (SongCollection.Count == 0)
             {
                 panelEmptyplaylists.Visibility = Visibility.Visible;
@@ -201,10 +212,10 @@ namespace VusicPlayer
                 txtPlaylistContentHeader.Visibility = Visibility.Visible;
                 ListPanel.Visibility = Visibility.Visible;
             }
+
             int count = SongCollection.Count;
             txtItemCount.Text = $"{count} {(count == 1 ? "item" : "items")}";
         }
-
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (txtRename.Text == "")
@@ -550,8 +561,8 @@ namespace VusicPlayer
             this.DispatcherQueue.TryEnqueue(() =>
             {
                 // Get the system's standard text color for the current theme
-                var normalBrush = (Color)Application.Current.Resources["TextFillColorPrimary"];
-                var highlightBrush = Microsoft.UI.Colors.Cyan;
+                var normalBrush = Application.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
+                var highlightBrush = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
                 var Playing = "\uE769";
                 foreach (var item in lstViewPlaylist.Items)
                 {

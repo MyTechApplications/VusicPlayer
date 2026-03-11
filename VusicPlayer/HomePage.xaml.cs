@@ -40,11 +40,11 @@ namespace VusicPlayer
             
                 string root = AppContext.BaseDirectory;
                 string filePath = Path.Combine(root, "freeupdate.txt");
-                Logger.Log(filePath, "source", Logger.LogLevelType.Information);
+        //        Logger.Log(filePath, "source", Logger.LogLevelType.Information);
                 if (File.Exists(filePath))
                 {
-                    ttUpdated.Visibility = Visibility.Visible;
-                    Logger.Log(filePath + "23", "source", Logger.LogLevelType.Information);
+                    //ttUpdated.Visibility = Visibility.Visible;
+        //            Logger.Log(filePath + "23", "source", Logger.LogLevelType.Information);
 
                 }
                 GridContinuePlaying.ItemsSource = MyItems;
@@ -372,7 +372,6 @@ namespace VusicPlayer
                     playerWindow.Activate();
                     App.VideoPlayerWindowInstance = playerWindow;
 
-                    App.SetCurrentMainWindow(playerWindow);
 
                 }
             }
@@ -522,6 +521,16 @@ namespace VusicPlayer
             {
                 Logger.Log(ex.Message, "HomeWindow", Logger.LogLevelType.Error);
             }
+
+        }
+
+        private void MenuFlyoutItem_Click_6(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuFlyoutItem_Click_7(object sender, RoutedEventArgs e)
+        {
 
         }
     }

@@ -583,7 +583,7 @@ Offset="0,0,0"/>
                                                     </ComboBox>
 
                                                     <TextBox Grid.Row="1" Grid.Column="0" Header="External Subtitle File" PlaceholderText="C:\Users\Video\subtitles.srt" IsReadOnly="True"/>
-                                                    <Button Grid.Row="1" Grid.Column="1" Content="Browse..." VerticalAlignment="Bottom" Click="Button_Click_1"/>
+                                                    <Button Grid.Row="1" Grid.Column="1" Content="Browse..." VerticalAlignment="Bottom" />
                                                 </Grid>
                                             </StackPanel>
                                         </Grid>

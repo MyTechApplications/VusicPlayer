@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
             <ContentDialog>
                 <ScrollViewer >
-                    <Grid Name="grdNewUpdates" MaxHeight="200">
+                    <Grid x:Name="grdNewUpdates" MaxHeight="200">
                         <ScrollViewer MaxHeight="200"
 VerticalScrollBarVisibility="Auto">
                             <StackPanel Spacing="16">
@@ -104,7 +104,17 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
                         <StackPanel.ContextFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem Text="Remove from Continue Playing" Click="MenuFlyoutItem_Click_3" Icon="Remove"></MenuFlyoutItem>
-                            </MenuFlyout>
+                                    <MenuFlyoutItem Text="Go to File Location" Click="MenuFlyoutItem_Click_6" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE8DA;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="View File Info" Click="MenuFlyoutItem_Click_7" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="D"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
                         </StackPanel.ContextFlyout>
                         <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
 

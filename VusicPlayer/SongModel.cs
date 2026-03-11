@@ -34,9 +34,9 @@ namespace VusicPlayer
             get => _albumName;
             set { _albumName = value; OnPropertyChanged(); }
         }
-        private Color _titleColor = Microsoft.UI.Colors.White; // Safe for any thread!
+        private Brush _titleColor = new SolidColorBrush(Microsoft.UI.Colors.White); // Safe for any thread!
 
-        public Color TitleColor
+        public Brush TitleColor
         {
             get => _titleColor;
             set

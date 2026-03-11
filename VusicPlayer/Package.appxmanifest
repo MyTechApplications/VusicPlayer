@@ -8,15 +8,15 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="3be368e1-bd53-4661-840c-8e0756f1c423"
-    Publisher="CN=bnara"
-    Version="1.0.0.0" />
+    Name="OceanCyanTech.2212247558119"
+    Publisher="CN=4A4A5EC3-CCA3-4E98-9B45-924241BDB4F6"
+    Version="1.0.2.0" />
 
-  <mp:PhoneIdentity PhoneProductId="3be368e1-bd53-4661-840c-8e0756f1c423" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="7e2bcd16-7f46-4e2e-bb7e-699cd5459ec7" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>VusicPlayer</DisplayName>
-    <PublisherDisplayName>bnara</PublisherDisplayName>
+    <DisplayName>Vusic Player</DisplayName>
+    <PublisherDisplayName>OceanCyan Tech</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -34,7 +34,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="VusicPlayer"
+        DisplayName="Vusic Player"
         Description="VusicPlayer"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"

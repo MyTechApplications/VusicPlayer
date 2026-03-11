@@ -7,13 +7,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"     xmlns:winui="using:FlyleafLib.Controls.WinUI"
-
+   xmlns:media="using:CommunityToolkit.WinUI.Media"
+xmlns:ui="using:CommunityToolkit.WinUI"
     Title="HomeWindow">
 
  
     <Grid>
-        <TextBlock Text="VusicPlayer Version 1.1.0.0 Evaulation Preview" VerticalAlignment="Bottom" HorizontalAlignment="Right"></TextBlock>
-        <Frame VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Mainframe"  Visibility="Visible"></Frame>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/oceanglow.png" 
+Stretch="UniformToFill"/>
+        </Grid.Background>
+        <Border CornerRadius="20">
+            <Border.Background>
+                <media:BackdropBlurBrush Amount="10.0" />
+            </Border.Background>
+            <Grid>
+            <Frame VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Mainframe"  Visibility="Visible"></Frame>
         <Grid Background="Transparent" Name="rootgrid" Visibility="Collapsed" >
             <Grid.ColumnDefinitions>
             <ColumnDefinition ></ColumnDefinition>
@@ -46,10 +55,14 @@
                     </AutoSuggestBox.ItemTemplate>
                 </AutoSuggestBox>
             </NavigationView.AutoSuggestBox>
-
-            <Frame Name="frmMain" Background="Transparent"></Frame>
-        </NavigationView>
-        <Grid Background="Transparent" VerticalAlignment="Center" Margin="20, 0" Name="MusicPlayerMaster" Grid.Column="1">
+                <Grid>
+                   
+                    <Frame Name="frmMain" Background="Transparent">
+                
+                    </Frame>
+                </Grid>
+            </NavigationView>
+        <Grid Visibility="Visible" Background="Transparent" VerticalAlignment="Center" Margin="20, 0" Name="MusicPlayerMaster" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -98,7 +111,7 @@
                 <Button Background="Transparent" BorderThickness="0" Name="btnVolume" Click="btnVolume_Click" ToolTipService.ToolTip="Volume">
                     <FontIcon Name="VolumeIcon" FontSize="15" Glyph="&#xE767;"></FontIcon>
                 </Button>
-                <local:SliderReuse x:Name="sldVolume" Width="100" ValueChanged="sldVolume_ValueChanged" IsTooltipEnabled="False" HorizontalAlignment="Stretch" Maximum="140" Value="10"></local:SliderReuse>
+                <local:SliderReuse x:Name="sldVolume" Width="100" ValueChanged="sldVolume_ValueChanged" IsTooltipEnabled="False" HorizontalAlignment="Stretch" Maximum="130" Value="100"></local:SliderReuse>
 
                 <TextBlock FontSize="12" Name="txtVolume" Text="100%" Margin="5, 7"></TextBlock>
             </StackPanel>
@@ -125,9 +138,9 @@
                     <Image Name="imgSpeed" Width="24" Source="/Assets/speedicon.png"/>
                 </Button>
                 <TeachingTip Name="ttSpeedCustom" Target="{x:Bind btnSpeed}" IsOpen="True" PreferredPlacement="Bottom" Title="Custom Speed">
-                    <StackPanel Orientation="Vertical" Padding="5">
+                    <StackPanel Margin="0, 5" Orientation="Vertical" Padding="5" Spacing="5">
                         <NumberBox SpinButtonPlacementMode="Inline" Name="nmbSpeedCustom" SmallChange="0.05" LargeChange="1" Maximum="4" Minimum="0.15"></NumberBox>
-                        <Button Margin="5, 10" ToolTipService.ToolTip="Set Speed" Background="Transparent" BorderBrush="Transparent"  Name="btnSetCustomSpeed" Click="btnSetCustomSpeed_Click">
+                        <Button HorizontalAlignment="Stretch" Margin="5, 0" ToolTipService.ToolTip="Set Speed" Background="Transparent" BorderBrush="Transparent"  Name="btnSetCustomSpeed" Click="btnSetCustomSpeed_Click">
                             <Image  Width="24" Source="/Assets/tickicon.png"/>
                         </Button>
                     </StackPanel>
@@ -271,7 +284,8 @@
                 </Button>
             </StackPanel>
         </Grid>
-        </Grid>
-
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

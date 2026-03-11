@@ -237,8 +237,8 @@ public sealed partial class Album : Page, IUpdateableMusicPage
         this.DispatcherQueue.TryEnqueue(() =>
         {
             // Get the system's standard text color for the current theme
-            var normalBrush = (Color)Application.Current.Resources["TextFillColorPrimaryBrush"];
-            var highlightBrush = Microsoft.UI.Colors.Cyan;
+            var normalBrush = Application.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
+            var highlightBrush = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
             var Playing = "\uE769";
             foreach (var item in lstViewPlaylist.Items)
             {

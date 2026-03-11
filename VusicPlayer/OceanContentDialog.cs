@@ -31,12 +31,26 @@ namespace VusicPlayer
         public static event Action? PrimaryRequested;
         public static event Action? SecondaryRequested;
         public static event Action? CloseRequested;
+        public static event Action? HideRequested;
         static OceanPopup? populs;
+        private static OceanDialog? currentDialog;
+        public static void HideDlg()
+        {
+            if (populs == null)
+            {
+                populs = new();
+            }
+            if (currentDialog == null) return;
+            CloseRequested?.Invoke();
+            currentDialog.HideDialog();
+            HomeWindow.ShowWindow();
+            populs.Hide();
+        }
         public static void Show(string Title, string PrimaryButtonText, string SecondaryButtonText, string CloseButtonText, OceanContentDialogDefault DefaultButton, Microsoft.UI.Xaml.Controls.Grid Contents, XamlRoot root, int Width, int Height, OceanContentDialogType DialogType, Window ParentWindow)
         {
             bool secondaryvisible = !string.IsNullOrEmpty(SecondaryButtonText);
           
-            var dlg = OceanDialog.ShowDialog(
+            currentDialog= OceanDialog.ShowDialog(
     Title,
     secondaryvisible,
     Contents,
@@ -48,33 +62,34 @@ namespace VusicPlayer
             }
             //     dlg.CloseButtonText = CloseButtonText;
             populs.Hide();
-            CenterDialog.CenterDialogRec(dlg, ParentWindow);
-            dlg.Activate();
-            dlg.PrimaryRequested += () =>
+            CenterDialog.CenterDialogRec(currentDialog, ParentWindow);
+            currentDialog.Activate();
+            currentDialog.PrimaryRequested += () =>
             {
                 PrimaryRequested?.Invoke();
             };
-            dlg.SecondaryRequested += () =>
+            currentDialog.SecondaryRequested += () =>
             {
                 SecondaryRequested?.Invoke();
             };
+       
             if (DialogType == OceanContentDialogType.Movable || DialogType == OceanContentDialogType.Elevated)
             {
                 
                 populs.Show(root, "");
 
-                dlg.CloseRequested += () =>
+                currentDialog.CloseRequested += () =>
                 {
                     CloseRequested?.Invoke();
-                    dlg.HideDialog();
+                    currentDialog.HideDialog();
                     HomeWindow.ShowWindow();
                     populs.Hide();
                 };
             }
-            dlg.CloseRequested += () =>
+            currentDialog.CloseRequested += () =>
             {
                 CloseRequested?.Invoke();
-                dlg.HideDialog();
+                currentDialog.HideDialog();
                 HomeWindow.ShowWindow();
             };
         }

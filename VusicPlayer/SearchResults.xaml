@@ -9,12 +9,19 @@
     mc:Ignorable="d">
 
     <Grid>
-        <StackPanel Name="txtEmptySearchResults" VerticalAlignment="Center" Visibility="Collapsed" Grid.Row="4" Orientation="Vertical" HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Button Name="btnCloseSearch" Background="Transparent" BorderBrush="Transparent" Click="btnCloseSearch_Click" ToolTipService.ToolTip="Close Search Results" HorizontalAlignment="Right" Margin="20, 0">
+            <FontIcon Glyph="&#xE711;" FontSize="40"></FontIcon>
+        </Button>
+        <StackPanel Name="txtEmptySearchResults" VerticalAlignment="Center" Visibility="Collapsed" Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Assets/searchicon.png" Width="200" HorizontalAlignment="Center"></Image>
-            <TextBlock HorizontalAlignment="Center"  Text="No search results" Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
+            <TextBlock HorizontalAlignment="Center"  Text="No search results! Try searching for something else." Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
          
         </StackPanel>
-        <ListView Name="lstSearchResults">
+        <ListView Name="lstSearchResults" Grid.Row="1">
             <ListView.ItemTemplate>
 
                 <DataTemplate >

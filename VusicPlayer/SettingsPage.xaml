@@ -155,7 +155,7 @@
                 <!-- Delete All Playlists -->
                 <Button Content="Delete All Playlists">
                     <Button.Flyout>
-                        <Flyout>
+                        <Flyout x:Name="flyoutDeletePlaylists">
                             <StackPanel Spacing="12" Padding="12" Width="250">
                                 <TextBlock Text="This will permanently delete all playlists. Continue?"
                            TextWrapping="Wrap"/>
@@ -197,6 +197,9 @@
                         <HyperlinkButton Content="What's New?" Click="HyperlinkButton_Click_1"></HyperlinkButton>
                         <TextBlock Text="Build 2026.03.02"
                                    Style="{StaticResource CaptionTextBlockStyle}" />
+
+                        <HyperlinkButton Content="Using FlyLeafLib .NET Library" NavigateUri="https://github.com/SuRGeoNix/Flyleaf"
+                />
                     </StackPanel>
 
                 </StackPanel>
@@ -265,10 +268,10 @@ VerticalScrollBarVisibility="Auto">
                 </ContentDialog>
                 <ContentDialog Name="dlgUpdateChecker" Title="Updates" CloseButtonText="OK" DefaultButton="Close">
                     <StackPanel Orientation="Vertical">
-                        <StackPanel Orientation="Horizontal">
-                            <ProgressRing IsIndeterminate="True" Name="prgCheckforUpdates"></ProgressRing>
-                            <Image Name="imgUpdater" Source="/Assets/addicon.png" Margin="20, 0"></Image>
-                            <TextBlock Text="Checking for Updates..." Name="txtUpdater"></TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <ProgressRing IsIndeterminate="True" Name="prgCheckforUpdates"></ProgressRing>
+                        <Image Name="imgUpdater" Source="/Assets/reseticon.png" Margin="20, 0"></Image>
+                        <TextBlock Text="Checking for Updates..." Name="txtUpdater" TextWrapping="Wrap"></TextBlock>
                         </StackPanel>
                         <HyperlinkButton NavigateUri="https://github.com/MyTechApplications/VusicPlayer" Content="What's New?" Name="hypNew" Visibility="Collapsed"></HyperlinkButton>
                         <TextBlock Text="Updates have been downloaded and are ready!" Name="txtUpdateDownloadReady" Visibility="Collapsed"></TextBlock>

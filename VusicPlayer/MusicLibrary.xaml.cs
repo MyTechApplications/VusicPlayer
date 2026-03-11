@@ -157,6 +157,7 @@ namespace VusicPlayer
             // If everything fails, return the app icon
             return new BitmapImage(fallbackUri);
         }
+        private bool _isCreatingPlaylist = false;
         private async void btnNewPlaylist_Click(object sender, RoutedEventArgs e)
         {
             if (App.HomeWindowInstance == null) return;
@@ -172,64 +173,81 @@ namespace VusicPlayer
         OceanPopup oceanPopup;
         private async void Dlg_PrimaryRequested()
         {
-            dlg2.Close();
-            HomeWindow.ShowWindow();
-            oceanPopup.Hide();
-            var currentSettings = await SettingsHelper.LoadSettingsAsync();
-            string baseName = txtPlaylistName.Text.Trim();
-            if (string.IsNullOrEmpty(baseName)) baseName = "New Playlist";
+            if (_isCreatingPlaylist)
+                return;
 
-            string finalName = baseName;
-            int counter = 1;
-
-            // 2. Check for duplicates in your SavedPlaylists collection
-            // Use LINQ's Any() to check if a playlist with the same name exists
-            while (currentSettings.SavedPlaylists.Any(p => p.PlaylistName.Equals(finalName, StringComparison.OrdinalIgnoreCase)))
+            _isCreatingPlaylist = true;
+            try
             {
-                finalName = $"{baseName} ({counter++})";
+                OceanContentDialog.HideDlg();
+                HomeWindow.ShowWindow();
+                //          oceanPopup.Hide();
+                var currentSettings = await SettingsHelper.LoadSettingsAsync();
+                string baseName = txtPlaylistName.Text.Trim();
+                if (string.IsNullOrEmpty(baseName)) baseName = "New Playlist";
+
+                string finalName = baseName;
+                int counter = 1;
+
+                // 2. Check for duplicates in your SavedPlaylists collection
+                // Use LINQ's Any() to check if a playlist with the same name exists
+                while (currentSettings.SavedPlaylists.Any(p => p.PlaylistName.Equals(finalName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    finalName = $"{baseName} ({counter++})";
+                }
+                string baseDirectory = AppContext.BaseDirectory;
+                string defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultdark.png");
+                if (!isdarkmode)
+                {
+
+                    defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultlight.png");
+                }
+
+                if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
+                {
+                    defaultPath = bitmap.UriSource.ToString();
+                }
+
+                // 3. Create the new playlist object
+                var newPlaylist = new PlaylistProperties
+                {
+                    PlaylistName = finalName,
+
+                    PlaylistCount = $"{loadedSongs.Count} {(loadedSongs.Count == 1 ? "item" : "items")}",
+                    PlaylistNowPlaying = "",
+                    PlaylistGenre = txtGenre.Text,
+                    SongsPaths = loadedSongs.Select(s => s.SongPath).ToList(),
+                    Thumbnail = defaultPath,
+                    DateCreation = DateTime.Now.Date,
+                };
+
+                // 4. Add to the collection and save
+                currentSettings.SavedPlaylists.Add(newPlaylist);
+                MyItems.Add(newPlaylist);
+                if (GrdViewPlaylists.Items.Count == 0)
+                {
+                    chckmultiple.Visibility = Visibility.Collapsed;
+                    txtEmptyPlaylists.Visibility = Visibility.Visible;
+                    GrdViewPlaylists.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    chckmultiple.Visibility = Visibility.Visible;
+                    txtEmptyPlaylists.Visibility = Visibility.Collapsed;
+                    GrdViewPlaylists.Visibility = Visibility.Visible;
+                }
+                await SettingsHelper.SaveSettingsAsync(currentSettings);
+                ttPlaylistDeleted.Title = $"New Playlist '{finalName}' created!";
+
+                ttPlaylistDeleted.IsOpen = true;
+                await Task.Delay(5000);
+                ttPlaylistDeleted.IsOpen = false;
             }
-            string baseDirectory = AppContext.BaseDirectory;
-            string defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultdark.png");
-            if (!isdarkmode)
+            finally
             {
 
-                defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultlight.png");
+                _isCreatingPlaylist = false;
             }
-
-            if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
-            {
-                defaultPath = bitmap.UriSource.ToString();
-            }
-
-            // 3. Create the new playlist object
-            var newPlaylist = new PlaylistProperties
-            {
-                PlaylistName = finalName,
-
-                PlaylistCount = $"{loadedSongs.Count} {(loadedSongs.Count == 1 ? "item" : "items")}",
-                PlaylistNowPlaying = "",
-                PlaylistGenre = txtGenre.Text,
-                SongsPaths = loadedSongs.Select(s => s.SongPath).ToList(),
-                Thumbnail = defaultPath,
-                DateCreation = DateTime.Now.Date,
-            };
-
-            // 4. Add to the collection and save
-            currentSettings.SavedPlaylists.Add(newPlaylist);
-            MyItems.Add(newPlaylist);
-            if (GrdViewPlaylists.Items.Count == 0)
-            {
-                chckmultiple.Visibility = Visibility.Collapsed;
-                txtEmptyPlaylists.Visibility = Visibility.Visible;
-                GrdViewPlaylists.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                chckmultiple.Visibility = Visibility.Visible;
-                txtEmptyPlaylists.Visibility = Visibility.Collapsed;
-                GrdViewPlaylists.Visibility = Visibility.Visible;
-            }
-            await SettingsHelper.SaveSettingsAsync(currentSettings);
         }
 
         private async void btnOpenMusic_Click(object sender, RoutedEventArgs e)
@@ -452,11 +470,14 @@ namespace VusicPlayer
 
         private async void GrdViewPlaylists_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var clickedPlaylist = e.ClickedItem as PlaylistProperties;
-            PlaybackState.currentPlaylist = clickedPlaylist;
-            if (clickedPlaylist != null)
+            if (chckmultiple.IsChecked == false)
             {
-                this.Frame.Navigate(typeof(Playlist), clickedPlaylist);
+                var clickedPlaylist = e.ClickedItem as PlaylistProperties;
+                PlaybackState.currentPlaylist = clickedPlaylist;
+                if (clickedPlaylist != null)
+                {
+                    this.Frame.Navigate(typeof(Playlist), clickedPlaylist);
+                }
             }
         }
 
@@ -506,7 +527,7 @@ namespace VusicPlayer
 
         private void chckmultiplerecent_Checked(object sender, RoutedEventArgs e)
         {
-            if (chckmultiple.IsChecked == true)
+            if (chckmultiplerecent.IsChecked == true)
             {
                 grdViewRecentMusic.SelectionMode = ListViewSelectionMode.Multiple;
                 btnDeleteRecents.Visibility = Visibility.Visible;
@@ -520,7 +541,7 @@ namespace VusicPlayer
 
         private void chckmultiplerecent_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (chckmultiple.IsChecked == true)
+            if (chckmultiplerecent.IsChecked == true)
             {
                 grdViewRecentMusic.SelectionMode = ListViewSelectionMode.Multiple;
                 btnDeleteRecents.Visibility = Visibility.Visible;
@@ -561,13 +582,16 @@ namespace VusicPlayer
 
         private void RecentMusic_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var clickedRecent = e.ClickedItem as RecentMusic;
-            if (clickedRecent == null) return;
-            if (App.MainWindowInstance is HomeWindow wind)
+            if (chckmultiplerecent.IsChecked == false)
             {
-                ObservableCollection<string> pt = new();
-                pt.Add(clickedRecent.SongPath);
-                wind.LoadFileFromPath(pt);
+                var clickedRecent = e.ClickedItem as RecentMusic;
+                if (clickedRecent == null) return;
+                if (App.MainWindowInstance is HomeWindow wind)
+                {
+                    ObservableCollection<string> pt = new();
+                    pt.Add(clickedRecent.SongPath);
+                    wind.LoadFileFromPath(pt);
+                }
             }
         }
         public async void UpdatePath(string oldpath, string newpath)
@@ -617,6 +641,11 @@ namespace VusicPlayer
         }
 
         private void txtPlaylistName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void MenuFlyoutItem_Click_3(object sender, RoutedEventArgs e)
         {
 
         }
