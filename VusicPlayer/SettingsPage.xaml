@@ -190,12 +190,8 @@
 
                         <TextBlock Name="txtVersion" Text=""
                                    Style="{StaticResource BodyTextBlockStyle}" />
-                        <TextBlock Name="txtUpdatetype" Text=""
-              Style="{StaticResource BodyTextBlockStyle}" />
-                        <TextBlock Text="Version 1.1.0.0 Simultaneous Evaulation"
-             Style="{StaticResource BodyTextBlockStyle}" />
-                        <HyperlinkButton Content="What's New?" Click="HyperlinkButton_Click_1"></HyperlinkButton>
-                        <TextBlock Text="Build 2026.03.02"
+
+                        <TextBlock Text="Build 2026.02.26"
                                    Style="{StaticResource CaptionTextBlockStyle}" />
 
                         <HyperlinkButton Content="Using FlyLeafLib .NET Library" NavigateUri="https://github.com/SuRGeoNix/Flyleaf"
