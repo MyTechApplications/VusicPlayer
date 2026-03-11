@@ -8,142 +8,142 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <ScrollViewer>
-    <Grid Margin="50, 20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
+        <Grid Margin="50, 20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
             <TeachingTip Name="ttPlaylistDeleted" Title="Playlist Deleted" IsOpen="False"></TeachingTip>
-        <ContentDialog PrimaryButtonClick="dlgConfirmDeletePlaylist_PrimaryButtonClick" Name="dlgConfirmDeletePlaylist" Content="Are you sure you want to delete this playlist?" Title="Delete Playlist" PrimaryButtonText="Delete" DefaultButton="Primary" CloseButtonText="Cancel"></ContentDialog>
-        <Grid Grid.Row="2">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Button Grid.Column="0" Name="btnNewPlaylist" Click="btnNewPlaylist_Click">
-            <StackPanel Orientation="Horizontal">
-                <Image Width="20" Source="/Assets/addicon.png"></Image>
-                <TextBlock Margin="5, 0" Text="New Playlist" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+            <ContentDialog PrimaryButtonClick="dlgConfirmDeletePlaylist_PrimaryButtonClick" Name="dlgConfirmDeletePlaylist" Content="Are you sure you want to delete this playlist?" Title="Delete Playlist" PrimaryButtonText="Delete" DefaultButton="Primary" CloseButtonText="Cancel"></ContentDialog>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Name="btnNewPlaylist" Click="btnNewPlaylist_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Source="/Assets/addicon.png"></Image>
+                        <TextBlock Margin="5, 0" Text="New Playlist" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="1" Margin="10, 0" Name="btnOpenMusic" Click="btnOpenMusic_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Source="/Assets/importicon.png"></Image>
+                        <TextBlock Margin="5,0" Text="Open Music" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
+            <StackPanel Margin="0, 20" Orientation="Horizontal" Grid.Row="3">
+                <TextBlock Text="Recent Music" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Margin="0, 10"></TextBlock>
+                <CheckBox Unchecked="chckmultiplerecent_Unchecked" Name="chckmultiplerecent" Checked="chckmultiplerecent_Checked" Content="Select" Margin="10, 0"></CheckBox>
+                <Button Background="Transparent"  Visibility="Collapsed" Name="btnDeleteRecents" ToolTipService.ToolTip="Remove Selected Recents">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Are you sure you want to remove the selected recents?"></TextBlock>
+                                <Button Content="Yes remove" Click="Button_Click_1"></Button>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                    <FontIcon Glyph="&#xE74D;"></FontIcon>
+                </Button>
             </StackPanel>
-            </Button>
-            <Button Grid.Column="1" Margin="10, 0" Name="btnOpenMusic" Click="btnOpenMusic_Click">
-                <StackPanel Orientation="Horizontal">
-                    <Image Width="20" Source="/Assets/importicon.png"></Image>
-                    <TextBlock Margin="5,0" Text="Open Music" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
-                </StackPanel>
-            </Button>
-        </Grid>
-        <StackPanel Margin="0, 20" Orientation="Horizontal" Grid.Row="3">
-            <TextBlock Text="Recent Music" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Margin="0, 10"></TextBlock>
-            <CheckBox Unchecked="chckmultiplerecent_Unchecked" Name="chckmultiplerecent" Checked="chckmultiplerecent_Checked" Content="Select" Margin="10, 0"></CheckBox>
-            <Button Background="Transparent"  Visibility="Collapsed" Name="btnDeleteRecents" ToolTipService.ToolTip="Remove Selected Recents">
-                <Button.Flyout>
-                    <Flyout>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Are you sure you want to remove the selected recents?"></TextBlock>
-                            <Button Content="Yes remove" Click="Button_Click_1"></Button>
-                        </StackPanel>
-                    </Flyout>
-                </Button.Flyout>
-                <FontIcon Glyph="&#xE74D;"></FontIcon>
-            </Button>
-        </StackPanel>
-        <StackPanel Name="txtEmptyRecents" Visibility="Collapsed" Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Image Source="/Assets/musicnoteicon.png" Width="30" HorizontalAlignment="Center"></Image>
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10" Text="Listen to any music to show them here!" Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
-        </StackPanel>
+            <StackPanel Name="txtEmptyRecents" Visibility="Collapsed" Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image Source="/Assets/musicnoteicon.png" Width="30" HorizontalAlignment="Center"></Image>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10" Text="Listen to any music to show them here!" Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
+            </StackPanel>
 
-        <GridView SelectionMode="Single" Name="grdViewRecentMusic" IsItemClickEnabled="True" Grid.Row="4" CanReorderItems="True"  AllowDrop="True" CanDragItems="True" DragItemsCompleted="RecentMusic_DragItemsCompleted" ItemClick="RecentMusic_ItemClick">
-            <GridView.ItemTemplate>
-                <DataTemplate >
-                    <StackPanel Width="150">
-                        <StackPanel.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Remove from Recents" Click="MenuFlyoutItem_Click_1" Icon="Remove"></MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Go to File Location" Click="MenuFlyoutItem_Click_2" >
+            <GridView SelectionMode="Single" Name="grdViewRecentMusic" IsItemClickEnabled="True" Grid.Row="4" CanReorderItems="True"  AllowDrop="True" CanDragItems="True" DragItemsCompleted="RecentMusic_DragItemsCompleted" ItemClick="RecentMusic_ItemClick">
+                <GridView.ItemTemplate>
+                    <DataTemplate >
+                        <StackPanel Width="150">
+                            <StackPanel.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Remove from Recents" Click="MenuFlyoutItem_Click_1" Icon="Remove"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Go to File Location" Click="MenuFlyoutItem_Click_2" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE8DA;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
+                                    </MenuFlyoutItem>
                                     <MenuFlyoutItem Text="View File Info" Click="MenuFlyoutItem_Click_3" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="D"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                 </MenuFlyout>
-                        </StackPanel.ContextFlyout>
-                        <Image Source="{Binding Thumbnail}" Width="70" Height="70" Stretch="UniformToFill"/>
+                            </StackPanel.ContextFlyout>
+                            <Image Source="{Binding Thumbnail}" Width="70" Height="70" Stretch="UniformToFill"/>
 
-                        <TextBlock Text="{Binding SongName}" Visibility="Visible" TextWrapping="Wrap" />
-                        <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding FolderName}" Visibility="Visible" TextWrapping="Wrap" />
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
-        <StackPanel Margin="0, 20" Orientation="Horizontal" Grid.Row="5">
-            <TextBlock Text="Playlists" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Margin="0, 10"></TextBlock>
-            <CheckBox Unchecked="chckmultiple_Unchecked" Name="chckmultiple" Checked="CheckBox_Checked" Content="Select playlist(s)" Margin="10, 0"></CheckBox>
-            <Button Visibility="Collapsed" Name="btnDeletePlaylists" ToolTipService.ToolTip="Delete Selected Playlists">
-                <Button.Flyout>
-                    <Flyout>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Are you sure you want to delete the selected playlists?"></TextBlock>
-                            <Button Content="Yes delete" Click="Button_Click"></Button>
+                            <TextBlock Text="{Binding SongName}" Visibility="Visible" TextWrapping="Wrap" />
+                            <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding FolderName}" Visibility="Visible" TextWrapping="Wrap" />
                         </StackPanel>
-                    </Flyout>
-                </Button.Flyout>
-                <FontIcon Glyph="&#xE74D;"></FontIcon>
-            </Button>
-        </StackPanel>
-        <StackPanel Name="txtEmptyPlaylists" Visibility="Collapsed" Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Image Source="/Assets/musicfolder.png" Width="200" HorizontalAlignment="Center"></Image>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <StackPanel Margin="0, 20" Orientation="Horizontal" Grid.Row="5">
+                <TextBlock Text="Playlists" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Margin="0, 10"></TextBlock>
+                <CheckBox Unchecked="chckmultiple_Unchecked" Name="chckmultiple" Checked="CheckBox_Checked" Content="Select playlist(s)" Margin="10, 0"></CheckBox>
+                <Button Visibility="Collapsed" Name="btnDeletePlaylists" ToolTipService.ToolTip="Delete Selected Playlists">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Are you sure you want to delete the selected playlists?"></TextBlock>
+                                <Button Content="Yes delete" Click="Button_Click"></Button>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                    <FontIcon Glyph="&#xE74D;"></FontIcon>
+                </Button>
+            </StackPanel>
+            <StackPanel Name="txtEmptyPlaylists" Visibility="Collapsed" Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image Source="/Assets/musicfolder.png" Width="200" HorizontalAlignment="Center"></Image>
                 <StackPanel Margin="20, 0" Orientation="Vertical" VerticalAlignment="Center">
-            <TextBlock HorizontalAlignment="Center"  Text="You have no playlists created!" Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
-            <Button Style="{StaticResource AccentButtonStyle}" Margin="0, 20" Name="btnAdd" HorizontalAlignment="Center" Click="btnNewPlaylist_Click" >
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon FontFamily="Segoe Fluent Icons" 
+                    <TextBlock HorizontalAlignment="Center"  Text="You have no playlists created!" Visibility="Visible" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
+                    <Button Style="{StaticResource AccentButtonStyle}" Margin="0, 20" Name="btnAdd" HorizontalAlignment="Center" Click="btnNewPlaylist_Click" >
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="Segoe Fluent Icons" 
 Glyph="&#xE710;" 
 FontSize="16"
 VerticalAlignment="Center"/>
 
-                    <TextBlock Text="New Playlist" 
+                            <TextBlock Text="New Playlist" 
  Margin="8,0,0,0" 
  VerticalAlignment="Center"/>
-                </StackPanel>
-            </Button>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </StackPanel>
             <GridView CanReorderItems="True"  AllowDrop="True" CanDragItems="True"  DragItemsCompleted="GrdViewPlaylists_DragItemsCompleted"  ItemClick="GrdViewPlaylists_ItemClick"      SelectionMode="Single" IsItemClickEnabled="True" Name="GrdViewPlaylists" Grid.Row="6">
-            <GridView.ItemTemplate>
-                <DataTemplate >
-                    <StackPanel Width="150">
-                        <StackPanel.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Delete Playlist" Click="MenuFlyoutItem_Click" Icon="Delete"></MenuFlyoutItem>
-                            </MenuFlyout>
-                        </StackPanel.ContextFlyout>
-                        <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
+                <GridView.ItemTemplate>
+                    <DataTemplate >
+                        <StackPanel Width="150">
+                            <StackPanel.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Delete Playlist" Click="MenuFlyoutItem_Click" Icon="Delete"></MenuFlyoutItem>
+                                </MenuFlyout>
+                            </StackPanel.ContextFlyout>
+                            <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
 
-                        <TextBlock Text="{Binding PlaylistName}" Visibility="Visible" TextWrapping="Wrap" />
-                        <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding PlaylistCount}" Visibility="Visible" TextWrapping="Wrap" />
-                        <TextBlock Text="{Binding PlaylistNowPlaying}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" Visibility="Visible" TextWrapping="Wrap" />
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
-        <ContentDialog Name="dlgNewPlaylist" PrimaryButtonClick="dlgNewPlaylist_PrimaryButtonClick" Title="Create a new playlist" PrimaryButtonText="+ Create" DefaultButton="Primary" CloseButtonText="Cancel">
+                            <TextBlock Text="{Binding PlaylistName}" Visibility="Visible" TextWrapping="Wrap" />
+                            <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding PlaylistCount}" Visibility="Visible" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding PlaylistNowPlaying}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" Visibility="Visible" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <ContentDialog Name="dlgNewPlaylist" PrimaryButtonClick="dlgNewPlaylist_PrimaryButtonClick" Title="Create a new playlist" PrimaryButtonText="+ Create" DefaultButton="Primary" CloseButtonText="Cancel">
 
                 <Grid Name="contentsNewPlaylist">
                     <ScrollViewer>
                         <StackPanel Padding="24" Spacing="24" MaxWidth="1000" HorizontalAlignment="Stretch">
 
                             <Grid>
-                          
+
 
                                 <Button Name="btnReset" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                         Background="Transparent" BorderBrush="Transparent">
