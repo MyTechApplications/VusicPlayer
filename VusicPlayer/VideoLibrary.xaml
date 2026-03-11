@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
-    <Page.Resources>
+    <!--<Page.Resources>
         <MenuFlyout x:Key="vidMenu">
             <MenuFlyoutItem Name="mnftStartFirstCW" Text="Play from start">
                 <MenuFlyoutItem.Icon>
@@ -433,5 +433,5 @@
             </Border>
             </Grid>
         </Grid>
-    </ScrollViewer>
+    </ScrollViewer>-->
 </Page>

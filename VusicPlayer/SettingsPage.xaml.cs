@@ -34,7 +34,7 @@ namespace VusicPlayer
         {
             InitializeComponent();
             txtVersion.Text = $"Version {VersionStringApp.VersionText}";
-            txtUpdatetype.Text = "(Patch Fixes)";
+            //txtUpdatetype.Text = "(Patch Fixes)";
             loadstuff();
             txtBuild.Text = $"Build {Appversionstrings.BuildNumber}";
             txtVersion.Text = $"Version {Appversionstrings.AppVersion} {Appversionstrings.VersionType}";

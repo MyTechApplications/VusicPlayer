@@ -35,7 +35,7 @@ namespace VusicPlayer
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
-            Logger.Log(e.Message, "App", Logger.LogLevelType.Error):
+            Logger.Log(e.Message, "App", Logger.LogLevelType.Error);
         }
 
         public static void SetCurrentMainWindow(Window window)
