@@ -191,7 +191,7 @@
                         <TextBlock Name="txtVersion" Text=""
                                    Style="{StaticResource BodyTextBlockStyle}" />
 
-                        <TextBlock Text="Build 2026.02.26"
+                        <TextBlock Text="Build 2026.02.26" Name="txtBuild"
                                    Style="{StaticResource CaptionTextBlockStyle}" />
 
                         <HyperlinkButton Content="Using FlyLeafLib .NET Library" NavigateUri="https://github.com/SuRGeoNix/Flyleaf"
