@@ -116,9 +116,53 @@ namespace VusicPlayer
             SplashComplete();
      
         }
+       
+        private async void LoadTheme()
+        {
+            try
+            {
+                var currentSettings = await SettingsHelper.LoadSettingsAsync();
+
+                if (App.MainWindowInstance != null)
+                {
+                    var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
+                    var personalization = currentSettings.UserSettings[0];
+                    if (personalization.Theme == "Light")
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Light;
+                    }
+                    else if (personalization.Theme == "Dark")
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Dark;
+                    }
+                    else
+                    {
+                        rootElement.RequestedTheme = ElementTheme.Default;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "HomeWindowLoadTheme", Logger.LogLevelType.Error);
+            }
+        }
+
+        private async void SplashComplete()
+        {
+            await Task.Delay(2000);
+            Mainframe.Visibility = Visibility.Collapsed;
+            rootgrid.Visibility = Visibility.Visible;
+        }
+        public string TitleText;
+        private void Window_ThemeChanged(FrameworkElement sender, object args)
+        {
+            if (configurationSource != null)
+            {
+                SetConfigurationSourceTheme();
+            }
+        }
         Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController? acrylicController;
         Microsoft.UI.Composition.SystemBackdrops.SystemBackdropConfiguration? configurationSource;
-        #region Acrylic
         private void Window_Activated(object sender, WindowActivatedEventArgs args)
         {
             if (configurationSource != null)
@@ -134,30 +178,22 @@ namespace VusicPlayer
         private void Window_Closed(object sender, WindowEventArgs args)
         {
             // Make sure any Mica/Acrylic controller is disposed
-              configurationSource = null;
+            configurationSource = null;
             if (player != null)
             {
                 player.Stop();
                 player.Dispose();
             }
-        }
-                  acrylicController.Dispose();
+        
+        acrylicController.Dispose();
                   acrylicController = null;
-              }
-              Activated -= Window_Activated;
+              
+    Activated -= Window_Activated;
               configurationSource = null;
             if (player != null)
             {
                 player.Stop();
                 player.Dispose();
-            }
-        }
-
-        private void Window_ThemeChanged(FrameworkElement sender, object args)
-        {
-            if (configurationSource != null)
-            {
-                SetConfigurationSourceTheme();
             }
         }
         private void SetConfigurationSourceTheme()
@@ -200,44 +236,7 @@ namespace VusicPlayer
 
             return false; // Acrylic is not supported on this system.
         }
-        public string TitleText;
 
-        #endregion
-        private async void LoadTheme()
-        {
-            try
-            {
-                var currentSettings = await SettingsHelper.LoadSettingsAsync();
-
-                if (App.MainWindowInstance != null)
-                {
-                    var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
-                    var personalization = currentSettings.UserSettings[0];
-                    if (personalization.Theme == "Light")
-                    {
-                        rootElement.RequestedTheme = ElementTheme.Light;
-                    }
-                    else if (personalization.Theme == "Dark")
-                    {
-                        rootElement.RequestedTheme = ElementTheme.Dark;
-                    }
-                    else
-                    {
-                        rootElement.RequestedTheme = ElementTheme.Default;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex.Message, "HomeWindowLoadTheme", Logger.LogLevelType.Error);
-            }
-        }
-        private async void SplashComplete()
-        {
-            await Task.Delay(2000);
-            Mainframe.Visibility = Visibility.Collapsed;
-            rootgrid.Visibility = Visibility.Visible;
-        }
 
         #region Fields
 
@@ -338,7 +337,7 @@ namespace VusicPlayer
                 return string.Empty;
             }
         }
-
+        bool _isDragging = false;
         private void SldMain_DragCompleted()
         {
             double newPosition = sldMain.Value / sldMain.Maximum;
