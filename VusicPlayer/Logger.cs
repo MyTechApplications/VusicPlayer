@@ -6,13 +6,15 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage;
 using static VusicPlayer.Logger;
 namespace VusicPlayer
 {
     public static class Logger
     {
-        private static string logPath =
-            Path.Combine(AppContext.BaseDirectory, "vusicplayer_log.log");
+        private static string logPath = Path.Combine(
+    ApplicationData.Current.LocalFolder.Path,
+    "vusicplayer_log.log");
 
         public static void Log(string message, string source, LogLevelType logLevelType)
         {

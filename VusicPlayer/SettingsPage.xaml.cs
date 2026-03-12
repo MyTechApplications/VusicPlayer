@@ -15,10 +15,18 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage.Pickers;
+using Windows.System;
 using WinRT.Interop;
+using Button = Microsoft.UI.Xaml.Controls.Button;
+using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
+using SelectionChangedEventArgs = Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs;
+using StackPanel = Microsoft.UI.Xaml.Controls.StackPanel;
+using TextBlock = Microsoft.UI.Xaml.Controls.TextBlock;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,16 +36,41 @@ namespace VusicPlayer
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SettingsPage : Page
+    public sealed partial class SettingsPage : Microsoft.UI.Xaml.Controls.Page
     {
         public SettingsPage()
         {
             InitializeComponent();
-            txtVersion.Text = $"Version {VersionStringApp.VersionText}";
+            txtVersion.Text = $"Version {Appversionstrings.AppVersion}";
             //txtUpdatetype.Text = "(Patch Fixes)";
             loadstuff();
             txtBuild.Text = $"Build {Appversionstrings.BuildNumber}";
             txtVersion.Text = $"Version {Appversionstrings.AppVersion} {Appversionstrings.VersionType}";
+        }
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if(e.Parameter is string str)
+            {
+                if(str == "WinRelate")
+                {
+                    ScrollToElement(scrViewerMaster, defpanel);
+                }
+            }
+            base.OnNavigatedTo(e);
+        }
+        public void ScrollToElement(Microsoft.UI.Xaml.Controls.ScrollViewer scrollViewer, UIElement targetElement)
+        {
+            // Calculate the position of the target element relative to the ScrollViewer
+            var transform = targetElement.TransformToVisual(scrollViewer);
+            var position = transform.TransformPoint(new Point(0, 0));
+
+            // Calculate the target offset
+            // VerticalOffset + the relative position gives us the new position
+            double targetVerticalOffset = scrollViewer.VerticalOffset + position.Y;
+
+            // ChangeView(horizontalOffset, verticalOffset, zoomFactor, disableAnimation)
+            // Set 'disableAnimation' to false if you want it to slide smoothly
+            scrollViewer.ChangeView(null, targetVerticalOffset, null, false);
         }
         private async void loadstuff()
         {
@@ -328,7 +361,7 @@ namespace VusicPlayer
                 if (parts.Length < 2) return;
 
                 Version latestVersion = Version.Parse(parts[0]);
-                Logger.Log("Latest Version Check" + latestVersion.ToString() + ": (user initiated)", Logsource, Logger.LogLevelType.Information);
+                Logger.Log("Latest Version Check " + latestVersion.ToString() + ": (user initiated)", Logsource, Logger.LogLevelType.Information);
                 // 3. Compare versions
                 if (latestVersion > currentVersion)
                 {
@@ -338,18 +371,18 @@ namespace VusicPlayer
                     if (pastebinContentNew != string.Empty)
                         hypNew.NavigateUri = new Uri(pastebinContentNew);
 
-                    string root = AppContext.BaseDirectory;
+                //    string root = AppContext.BaseDirectory;
 
-                    string stagingFolder = Path.Combine(root, "UpdateStaging");
-                    string? stagingZip = Directory.GetFiles(stagingFolder, "*.zip").FirstOrDefault();
-                    if(stagingZip!= null)
-                    {
-                        txtUpdateDownloadReady.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        txtUpdateDownloadReady.Visibility = Visibility.Collapsed;
-                    }
+              //      string stagingFolder = Path.Combine(root, "UpdateStaging");
+            //        string? stagingZip = Directory.GetFiles(stagingFolder, "*.zip").FirstOrDefault();
+        //            if(stagingZip!= null)
+            //        {
+                   //     txtUpdateDownloadReady.Visibility = Visibility.Visible;
+               //     }
+                //    else
+                //    {
+                      //  txtUpdateDownloadReady.Visibility = Visibility.Collapsed;
+                 //   }
 
                 }
                 else if (latestVersion == currentVersion)
@@ -395,6 +428,15 @@ namespace VusicPlayer
         private void HyperlinkButton_Click_1(object sender, RoutedEventArgs e)
         {
             ShowWhatNew(this.XamlRoot);
+        }
+
+        private async void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            string pfn = Package.Current.Id.FamilyName;
+
+            await Launcher.LaunchUriAsync(
+                new Uri($"ms-settings:defaultapps?registeredAppUser={pfn}"));
+
         }
     }
 }

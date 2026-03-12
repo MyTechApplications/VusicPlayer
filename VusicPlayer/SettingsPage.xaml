@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ScrollViewer>
+    <ScrollViewer Name="scrViewerMaster">
         <StackPanel Spacing="32" Padding="24">
 
             <!-- ===================== -->
@@ -21,8 +21,8 @@
 
                 <TextBlock Text="Theme"
                            Style="{StaticResource BodyStrongTextBlockStyle}" />
-
-                <RadioButtons x:Name="ThemeRadioButtons"
+                <TextBlock Text="Themes will be available soon!" Style="{StaticResource BodyStrongTextBlockStyle}"></TextBlock>
+                <RadioButtons Visibility="Collapsed" x:Name="ThemeRadioButtons"
                               SelectionChanged="ThemeRadioButtons_SelectionChanged">
                     <x:String>System Default</x:String>
                     <x:String>Light</x:String>
@@ -40,7 +40,7 @@
                 <TextBlock Text="Video"
                            Style="{StaticResource TitleTextBlockStyle}" />
 
-                <ToggleSwitch x:Name="ToggleSubtitles"
+                <ToggleSwitch x:Name="ToggleSubtitles" IsEnabled="False"
                               Header="Always enable subtitles if available" Toggled="ToggleSubtitles_Toggled"/>
                 <Button Content="Clear Continue Watching">
                     <Button.Flyout>
@@ -167,6 +167,24 @@
                 </Button>
             </StackPanel>
 
+
+            <!-- ===================== -->
+            <!-- Windows Related Section -->
+            <!-- ===================== -->
+
+            <StackPanel Spacing="12" Name="defpanel">
+                <TextBlock Text="Windows Related"
+                           Style="{StaticResource TitleTextBlockStyle}" />
+
+                <TextBlock Text="Click below to set Vusic Player as default app for opening media files in Windows Settings"></TextBlock>
+                <!-- Set Default App -->
+                <Button Content="Set Vusic Player as Default App for Media" Click="Button_Click_5">
+
+                </Button>
+
+
+
+            </StackPanel>
 
 
 

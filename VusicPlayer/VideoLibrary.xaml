@@ -8,6 +8,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
+    <Grid >
+        <TextBlock Text="This page is under construction. It will be available in future updates." Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+    </Grid>
     <!--<Page.Resources>
         <MenuFlyout x:Key="vidMenu">
             <MenuFlyoutItem Name="mnftStartFirstCW" Text="Play from start">

@@ -14,6 +14,8 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Win32;
+using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,6 +28,8 @@ using System.Net.Http.Headers;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Contacts;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
@@ -35,6 +39,7 @@ using Windows.Storage;
 using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using Windows.Storage.Search;
+using Windows.System;
 using Windows.UI;
 using WinRT;
 using WinRT.Interop;
@@ -67,10 +72,14 @@ namespace VusicPlayer
         public HomeWindow()
         {
             InitializeComponent();
-          
 
-            LoadTheme();
-
+            txtPreviewBuild.Text = $"Vusic Player Version {Appversionstrings.AppVersion + Environment.NewLine} {Appversionstrings.VersionType} Build {Appversionstrings.BuildNumber}";
+            //  LoadTheme();
+            if (App.MainWindowInstance != null)
+            {
+                var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
+                rootElement.RequestedTheme = ElementTheme.Dark;
+            }
             TrySetAcrylicBackdrop(true); DispatcherQueue.EnsureSystemDispatcherQueue();
             Mainframe.Navigate(typeof(SplashScreen));
             this.ExtendsContentIntoTitleBar = true;
@@ -90,10 +99,10 @@ namespace VusicPlayer
             sldMain.DragStarted += SldMain_DragStarted;
 
             sldMain.DragCompleted += SldMain_DragCompleted;
-        
+
             this.DispatcherQueue.TryEnqueue(async () =>
             {
-              //  await CheckAndDownloadUpdate();
+                //  await CheckAndDownloadUpdate();
 
                 await ScanAllFoldersAsync();
             });
@@ -114,9 +123,60 @@ namespace VusicPlayer
                 nvgMain.SelectedItem = nvgMain.MenuItems[0];
             }
             SplashComplete();
-     
+            CheckForDefaultNess();
+         //  CheckForFileArguments();
         }
-       
+        public async Task<bool> IsAppDefault()
+        {
+            // This checks which app is currently the default for .mp3
+            var result = await Launcher.FindFileHandlersAsync(".mp3");
+
+            foreach (var handler in result)
+            {
+                // Check if the handler's Package Family Name matches yours
+                if (handler.PackageFamilyName == Windows.ApplicationModel.Package.Current.Id.FamilyName)
+                {
+                    // Note: This only tells you if your app IS an option. 
+                    // Finding if it is the SPECIFIC default is more complex due to privacy.
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool IsDefaultForMp4()
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp4\UserChoice");
+
+            if (key == null)
+                return false;
+
+            var progId = key.GetValue("ProgId")?.ToString();
+
+            if (progId == null)
+                return false;
+
+            string pfn = Package.Current.Id.FamilyName;
+
+            return progId.Contains(pfn);
+        }
+        private async void CheckForDefaultNess()
+        {
+            bool isRegistered = await IsAppDefault();
+            if (!isRegistered)
+            {
+                ttDefaultAppSet.IsOpen = true;
+            }
+            if (!IsDefaultForMp4())
+            {
+                ttDefaultAppSet.IsOpen = true;
+            }
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            if(currentSettings.ShowDefaultMessage == false)
+            {
+                ttDefaultAppSet.IsOpen = false;
+            }
+        }
         private async void LoadTheme()
         {
             try
@@ -143,7 +203,7 @@ namespace VusicPlayer
             }
             catch (Exception ex)
             {
-                Logger.Log(ex.Message, "HomeWindowLoadTheme", Logger.LogLevelType.Error);
+                Logger.Log(ex.Message, "HomeWindow.LoadTheme", Logger.LogLevelType.Error);
             }
         }
 
@@ -153,7 +213,6 @@ namespace VusicPlayer
             Mainframe.Visibility = Visibility.Collapsed;
             rootgrid.Visibility = Visibility.Visible;
         }
-        public string TitleText;
         private void Window_ThemeChanged(FrameworkElement sender, object args)
         {
             if (configurationSource != null)
@@ -184,12 +243,12 @@ namespace VusicPlayer
                 player.Stop();
                 player.Dispose();
             }
-        
-        acrylicController.Dispose();
-                  acrylicController = null;
-              
-    Activated -= Window_Activated;
-              configurationSource = null;
+
+            acrylicController?.Dispose();
+            acrylicController = null;
+
+            Activated -= Window_Activated;
+            configurationSource = null;
             if (player != null)
             {
                 player.Stop();
@@ -199,6 +258,7 @@ namespace VusicPlayer
         private void SetConfigurationSourceTheme()
 
         {
+            if (configurationSource == null) return;
             switch (((FrameworkElement)this.Content).ActualTheme)
             {
                 case ElementTheme.Dark: configurationSource.Theme = SystemBackdropTheme.Dark; break;
@@ -241,7 +301,7 @@ namespace VusicPlayer
         #region Fields
 
         ObservableCollection<string> queuepaths = new();
-            Version currentVersion = new Version(VersionStringApp.VersionText);
+        Version currentVersion = new Version(VersionStringApp.VersionText);
         #endregion
 
         private async Task CheckAndDownloadUpdate()
@@ -340,6 +400,7 @@ namespace VusicPlayer
         bool _isDragging = false;
         private void SldMain_DragCompleted()
         {
+            if (player == null) return;
             double newPosition = sldMain.Value / sldMain.Maximum;
             player.CurTime = TimeSpan.FromSeconds(sldMain.Value).Ticks;
             var curTime = TimeSpan.FromTicks(player.CurTime);
@@ -380,7 +441,7 @@ namespace VusicPlayer
             _isDragging = true;
             maintimer.Stop();
         }
-        Player player;
+        Player? player;
         public async void LoadFileFromPath(ObservableCollection<string> path)
         {
             _pendingPath = path[currentVideoIndex];
@@ -419,7 +480,7 @@ namespace VusicPlayer
                 // Set total duration label
                 txtTotalDuration.Text = duration.ToString(@"hh\:mm\:ss");
 
-                sldVolume.Value = player.Audio.Volume;
+                player.Audio.Volume = (int)sldVolume.Value;
                 originalvolume = player.Audio.Volume;
                 if (originalvolume.HasValue)
                 {
@@ -428,7 +489,6 @@ namespace VusicPlayer
                 maintimer.Start();
                 _ = SaveRecents();
             }
-            CheckForFileArguments();
         }
 
         private void PlayNext()
@@ -437,9 +497,9 @@ namespace VusicPlayer
             {
                 PlayVideoAtIndex(currentVideoIndex + 1);
             }
-            player.Stop();
+            player?.Stop();
             maintimer.Stop();
-        //    _mediaPlayer.Position = 0;
+            //    _mediaPlayer.Position = 0;
             sldMain.Value = 0;
             txtRunningDuration.Text = "00:00:00";
 
@@ -475,61 +535,50 @@ namespace VusicPlayer
         bool mediaended;
         private async void CheckForFileArguments()
         {
-            string[] commandArgs = Environment.GetCommandLineArgs();
-            if (commandArgs != null && commandArgs.Length > 1)
+            var activatedArgs = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
+            if (activatedArgs.Kind == ExtendedActivationKind.File)
             {
-                string filePath = commandArgs[1].Trim('"');
+                var fileArgs = (FileActivatedEventArgs)activatedArgs.Data;
+                var file = fileArgs.Files.FirstOrDefault();
 
-                if (System.IO.File.Exists(filePath))
+                if (file != null)
                 {
+                    string filePath = file.Path;
+
                     string extension = Path.GetExtension(filePath).ToLower();
 
-                    // Common video and audio extensions
                     string[] videoExtensions = { ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm" };
                     string[] audioExtensions = { ".mp3", ".wav", ".aac", ".flac", ".m4a", ".ogg", ".wma" };
 
                     if (videoExtensions.Contains(extension))
                     {
-                        var settings = await SettingsHelper.LoadSettingsAsync();
-                        var savedProgress = settings.SavedItems
-                            .FirstOrDefault(i => i.FilePath == filePath);
+                        var videoItems = new ObservableCollection<VideoItem>();
+                        videoItems.Add(new VideoItem { FilePath = filePath });
 
-                        double startPosition = 0;
-                        bool isNewVideo = true;
-
-                        // 3. If found, override the 0 position with the saved progress
-                        if (savedProgress != null)
-                        {
-                            startPosition = savedProgress.CurrentDuration;
-                            isNewVideo = false; // It's not a fresh start anymore
-                        }
-                        ObservableCollection<VideoItem> videoItems2 = new ObservableCollection<VideoItem>();
-                        videoItems2.Add(new VideoItem { FilePath = filePath });
-                        var playerWindow = new MainWindow(videoItems2, filePath, startPosition, isNewVideo);
+                        var playerWindow = new MainWindow(videoItems, filePath, 0, true);
 
                         playerWindow.Activate();
                         App.SetCurrentMainWindow(playerWindow);
                         App.VideoPlayerWindowInstance = playerWindow;
-                        this.Close();
+                        return;
                     }
                     else if (audioExtensions.Contains(extension))
                     {
-                        this.LoadFileFromPath(new ObservableCollection<string> { filePath });
-                    }
-                    else
-                    {
-                        Logger.Log("Unsupported file type: " + extension, "HomeWindow", Logger.LogLevelType.Error);
+                        var home = HomeWindow.ShowWindow();
+                        home.LoadFileFromPath(new ObservableCollection<string> { filePath });
+                        return;
                     }
                 }
+
             }
         }
         private static HomeWindow? instance;
-        public static void ShowWindow()
+        public static HomeWindow ShowWindow()
         {
             if (instance == null)
             {
                 instance = new HomeWindow();
-         //       instance.Closed += (_, __) => instance = null; // Reset when closed
+                //       instance.Closed += (_, __) => instance = null; // Reset when closed
                 instance.Activate();
             }
             else
@@ -540,6 +589,8 @@ namespace VusicPlayer
             App.MainWindowInstance = instance;
             App.MainWindowInstance2 = instance;
             App.HomeWindowInstance = instance;
+          //  instance.CheckForFileArguments();
+            return instance;
         }
 
         private async void PlayVideoAtIndex(int index)
@@ -570,8 +621,8 @@ namespace VusicPlayer
             if (_mediaPlayer == null)
                 return;
 
-            _mediaPlayer.Media = media;
-            _mediaPlayer.Play();
+            //     _mediaPlayer.Media = media;
+            //       _mediaPlayer.Play();
             sldMain.Value = 0;
             txtRunningDuration.Text = "00:00:00";
             maintimer.Start();
@@ -662,32 +713,7 @@ namespace VusicPlayer
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_libVLC);
             });
         }
-        private async void VideoView_Initialized(object? sender, LibVLCSharp.Platforms.Windows.InitializedEventArgs e)
-        {
-            Core.Initialize();
 
-            await PreloadLibVLCAsync(e);
-
-            this.DispatcherQueue.TryEnqueue(() =>
-            {
-                // videoView.MediaPlayer = _mediaPlayer;
-
-
-                Logger.Log("VusicPlayer is fully loaded and ready!", "HomeWindow", Logger.LogLevelType.Success);
-
-                if (_libVLC != null && _pendingPath != "")
-                {
-                    using var media = new Media(_libVLC, _pendingPath, FromType.FromPath);
-                    _mediaPlayer.Play(media);
-                }
-
-                _mediaPlayer.AspectRatio = "16:9";
-                _mediaPlayer.Volume = 100;
-                CheckForFileArguments();
-            });
-
-
-        }
         private LibVLC? _libVLC;
         private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
         private async void FrmMain_Navigated(object sender, NavigationEventArgs e)
@@ -731,7 +757,7 @@ namespace VusicPlayer
             if (args.SelectedItemContainer == null)
                 return;
 
-            Type pageType = null;
+            Type? pageType = null;
 
             if (args.SelectedItemContainer == nvgitHome)
                 pageType = typeof(HomePage);
@@ -744,7 +770,7 @@ namespace VusicPlayer
 
             else if (args.SelectedItemContainer == nvgitQueue)
             {
-                TransposeMediaDetails mediaDetails = new TransposeMediaDetails{ MediaPath = currentVideoPath, CurrentDur = txtRunningDuration.Text };
+                TransposeMediaDetails mediaDetails = new TransposeMediaDetails { MediaPath = currentVideoPath, CurrentDur = txtRunningDuration.Text };
                 frmMain.Navigate(typeof(QueuePage), mediaDetails, new DrillInNavigationTransitionInfo());
                 MusicPlayerMaster.Visibility = Visibility.Collapsed;
             }
@@ -903,10 +929,11 @@ namespace VusicPlayer
         }
         private void VolumeChange(double obj)
         {
+            txtVolume.Text = ((int)obj).ToString() + "%";
             if (player == null) return;
 
             int vol = (int)obj;
-            if(vol != 0)
+            if (vol != 0)
             {
                 originalvolume = vol;
             }
@@ -965,17 +992,18 @@ namespace VusicPlayer
             videospeed = speed;
             if (player != null && maintimer != null)
             {
-         //       player.Speed = 1.5;
-              //  player?.Pause();
-             //   maintimer.Stop();
+                //       player.Speed = 1.5;
+                //  player?.Pause();
+                //   maintimer.Stop();
                 if (menuflyoutitem != null)
                 {
 
                     if (double.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out double speedfloat))
                     {
                         player.Speed = speedfloat;
-                    }}
-              
+                    }
+                }
+
             }
         }
 
@@ -1072,7 +1100,7 @@ namespace VusicPlayer
         {
             if (player != null && maintimer != null)
             {
-                
+
 
                 if (!double.IsNaN(nmbSpeedCustom.Value))
                 {
@@ -1225,8 +1253,8 @@ namespace VusicPlayer
             {
                 double orig = Convert.ToDouble(originalvolume);
                 sldVolume.Value = orig;
-                    VolumeChange(orig);
-                
+                VolumeChange(orig);
+
             }
             else
             {
@@ -1234,7 +1262,7 @@ namespace VusicPlayer
                 VolumeChange(0);
             }
         }
-        
+
 
         private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
@@ -1417,6 +1445,50 @@ namespace VusicPlayer
                 dt.SetText(button.Content as string);
                 Clipboard.SetContent(dt);
             }
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            string pfn = Package.Current.Id.FamilyName;
+
+            await Launcher.LaunchUriAsync(
+                new Uri($"ms-settings:defaultapps?registeredAppUser={pfn}"));
+        }
+
+        private void hypGoToSettings_Click(object sender, RoutedEventArgs e)
+        {
+            frmMain.Navigate(typeof(SettingsPage), "WinRelate");
+
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox chck && chck.IsChecked == true)
+            {
+                txtUserInfoDefaultApp.Visibility = Visibility.Visible;
+                hypGoToSettings.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void ttDefaultAppSet_CloseButtonClick(TeachingTip sender, object args)
+        {
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            if (chckShowDefault.IsChecked == true)
+            {
+                currentSettings.ShowDefaultMessage = true;
+            }
+            else
+            {
+                currentSettings.ShowDefaultMessage = false;
+            }
+            await SettingsHelper.SaveSettingsAsync(currentSettings);
+
         }
     }
 }

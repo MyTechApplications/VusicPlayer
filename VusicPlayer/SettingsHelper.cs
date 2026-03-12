@@ -66,7 +66,7 @@ namespace VusicPlayer
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading settings: {ex.Message}");
+                Logger.Log($"Error loading settings: {ex.Message}" , "SettingsHelper", Logger.LogLevelType.Error);
                 return new AppSettings();
             }
             finally

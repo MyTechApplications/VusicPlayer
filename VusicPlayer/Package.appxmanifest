@@ -9,8 +9,8 @@
 
   <Identity
     Name="OceanCyanTech.2212247558119"
-    Publisher="CN=4A4A5EC3-CCA3-4E98-9B45-924241BDB4F6"
-    Version="1.0.2.0" />
+    Publisher="CN=OceanCyan Tech"
+    Version="1.0.9.2" />
 
   <mp:PhoneIdentity PhoneProductId="7e2bcd16-7f46-4e2e-bb7e-699cd5459ec7" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -33,16 +33,40 @@
     <Application Id="App"
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
+		
       <uap:VisualElements
         DisplayName="Vusic Player"
         Description="VusicPlayer"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
-    </Application>
+		<Extensions>
+			<uap:Extension Category="windows.fileTypeAssociation">
+				<uap:FileTypeAssociation Name="video">
+					<uap:DisplayName>VusicPlayer Video</uap:DisplayName>
+					<uap:SupportedFileTypes>
+						<uap:FileType>.mp4</uap:FileType>
+					</uap:SupportedFileTypes>
+				</uap:FileTypeAssociation>
+			</uap:Extension>
+			<uap:Extension Category="windows.fileTypeAssociation">
+				<uap:FileTypeAssociation Name="audio">
+					<uap:DisplayName>VusicPlayer Audio</uap:DisplayName>
+					<uap:SupportedFileTypes>
+						<uap:FileType>.mp3</uap:FileType>
+						<uap:FileType>.wav</uap:FileType>
+						<uap:FileType>.flac</uap:FileType>
+						<uap:FileType>.m4a</uap:FileType>
+						<uap:FileType>.ogg</uap:FileType>
+						<uap:FileType>.opus</uap:FileType>
+					</uap:SupportedFileTypes>
+				</uap:FileTypeAssociation>
+			</uap:Extension>
+		</Extensions>
+	</Application>
   </Applications>
 
   <Capabilities>

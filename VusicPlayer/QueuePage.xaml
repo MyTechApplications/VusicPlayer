@@ -11,9 +11,10 @@
     xmlns:ui="using:CommunityToolkit.WinUI">
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
- 
-        
-            <Grid Margin="50, 50">
+
+        <TextBlock Text="This page is under construction. It will be available in future updates." Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Top"></TextBlock>
+
+        <Grid Margin="50, 50">
 
 
                 <Grid.ColumnDefinitions>

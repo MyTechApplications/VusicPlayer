@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
+using Path = System.IO.Path;
 
 namespace VusicPlayer
 {
@@ -44,61 +45,43 @@ namespace VusicPlayer
 
             App.MainWindowInstance.DispatcherQueue.TryEnqueue(() =>
             {
-                string filePath = string.Empty;
+                if (args.Kind == ExtendedActivationKind.File)
+                {
+                    var fileArgs = (FileActivatedEventArgs)args.Data;
+                    var file = fileArgs.Files.FirstOrDefault();
 
-                // 1. Try the most likely cast for Unpackaged 'Launch' Kind
-                if (args.Data is Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs launchArgs)
-                {
-                    filePath = launchArgs.Arguments;
-                }
-                // 2. Fallback for Command Line (if Windows decides to use it)
-                else if (args.Data is Windows.ApplicationModel.Activation.ICommandLineActivatedEventArgs cmdArgs)
-                {
-                    filePath = cmdArgs.Operation.Arguments;
-                }
-
-                // 3. Process the file path
-                if (!string.IsNullOrEmpty(filePath))
-                {
-                    // Unpackaged apps often get the full string: "C:\Path\To\File.mp3"
-                    if (filePath.Contains(".exe", StringComparison.OrdinalIgnoreCase))
+                    if (file != null)
                     {
-                        // Split by the " " delimiter that separates the EXE from the File
-                        string[] parts = filePath.Split(new[] { "\" \"" }, StringSplitOptions.RemoveEmptyEntries);
+                        string filePath = file.Path;
 
-                        if (parts.Length > 1)
+                        string extension = Path.GetExtension(filePath).ToLower();
+
+                        string[] videoExtensions = { ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm" };
+                        string[] audioExtensions = { ".mp3", ".wav", ".aac", ".flac", ".m4a", ".ogg", ".wma" };
+
+                        if (videoExtensions.Contains(extension))
                         {
-                            // The second part is your actual file path
-                            filePath = parts[1].Trim('"');
+                            var videoItems = new ObservableCollection<VideoItem>();
+                            videoItems.Add(new VideoItem { FilePath = filePath });
+
+                            var playerWindow = new MainWindow(videoItems, filePath, 0, true);
+
+                            playerWindow.Activate();
+                            App.SetCurrentMainWindow(playerWindow);
+                            App.VideoPlayerWindowInstance = playerWindow;
+                            return;
                         }
-                        else
+                        else if (audioExtensions.Contains(extension))
                         {
-                            // If splitting failed, try to just take everything after the last .exe"
-                            int exeIndex = filePath.LastIndexOf(".exe\"", StringComparison.OrdinalIgnoreCase);
-                            if (exeIndex != -1)
-                            {
-                                filePath = filePath.Substring(exeIndex + 5).Trim().Trim('"');
-                            }
+                            var home = HomeWindow.ShowWindow();
+                            home.LoadFileFromPath(new ObservableCollection<string> { filePath });
+                            return;
                         }
                     }
-                    else
-                    {
-                        // If it's just the path alone
-                        filePath = filePath.Trim().Trim('"');
-                    }
-                    Debug.WriteLine("Path first: " + filePath);
-                    ObservableCollection<string> strings = new();
-                    strings.Add(filePath);
-                    if(App.MainWindowInstance is HomeWindow wind)
-                    {
-                        wind.LoadFileFromPath(strings);
-                    }
-
-                    // Call your app's opening logic
-                    // ((App)Application.Current).HandleFileOpening(filePath);
                 }
+             
 
-                // Always bring window to front
+                
                 App.MainWindowInstance.Activate();
             });
         }

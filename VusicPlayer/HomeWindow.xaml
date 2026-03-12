@@ -17,6 +17,7 @@ xmlns:ui="using:CommunityToolkit.WinUI"
             <ImageBrush ImageSource="/Assets/oceanglow.png" 
 Stretch="UniformToFill"/>
         </Grid.Background>
+
         <Border CornerRadius="20">
             <Border.Background>
                 <media:BackdropBlurBrush Amount="10.0" />
@@ -34,14 +35,13 @@ Stretch="UniformToFill"/>
                   HorizontalAlignment="Center" 
                   VerticalAlignment="Center"
                   Width="60" Height="60"/>
-        <TeachingTip HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsOpen="False" Title="Media Opened" PreferredPlacement="BottomLeft" Name="ttMediaOpened"></TeachingTip>
         <NavigationView IsBackButtonVisible="Auto" IsBackEnabled="True" BackRequested="nvgMain_BackRequested" Grid.Column="0" Background="Transparent" Name="nvgMain" PaneDisplayMode="Top" IsSettingsVisible="True" SelectionChanged="nvgMain_SelectionChanged">
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Name="nvgitHome" Content="Home" Tag="HomePage"></NavigationViewItem>
                 <NavigationViewItem Name="nvgitMusic" Content="Music Library" Tag="MusicLibrary"></NavigationViewItem>
                 <NavigationViewItem Name="nvgitVideo" Content="Video Library"></NavigationViewItem>
-                <NavigationViewItem Name="nvgitQueue" Content="Play Queue"></NavigationViewItem>
+                <NavigationViewItem Name="nvgitQueue" Content="Play Queue" Visibility="Collapsed"></NavigationViewItem>
             </NavigationView.MenuItems>
             <NavigationView.AutoSuggestBox>
                 <AutoSuggestBox TextChanged="AutoSuggestBox_TextChanged" QuerySubmitted="AutoSuggestBox_QuerySubmitted" SuggestionChosen="AutoSuggestBox_SuggestionChosen" QueryIcon="Find" PlaceholderText="Search for files across your libraries"  AutomationProperties.Name="Search" >
@@ -62,7 +62,22 @@ Stretch="UniformToFill"/>
                     </Frame>
                 </Grid>
             </NavigationView>
-        <Grid Visibility="Visible" Background="Transparent" VerticalAlignment="Center" Margin="20, 0" Name="MusicPlayerMaster" Grid.Column="1">
+                    <TextBlock Name="txtPreviewBuild" HorizontalAlignment="Right" VerticalAlignment="Bottom" Style="{StaticResource BaseTextBlockStyle}"></TextBlock>
+                    <TeachingTip HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsOpen="False" Title="Media Opened" PreferredPlacement="BottomLeft" Name="ttMediaOpened"></TeachingTip>
+                    <TeachingTip CloseButtonClick="ttDefaultAppSet_CloseButtonClick"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsOpen="False" Title="Set Vusic Player as Default Media App" PreferredPlacement="BottomLeft" Name="ttDefaultAppSet">
+
+                        <ScrollViewer>
+                            <StackPanel Orientation="Vertical" Spacing="10">
+                                <TextBlock Text="Set Vusic Player as default app for opening your media (videos and audios)."></TextBlock>
+                                <Button Style="{StaticResource AccentButtonStyle}" Content="Set Default in Settings" Click="Button_Click"></Button>
+                                <CheckBox Name="chckShowDefault" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Content="Do not show this message again" ></CheckBox>
+                                <TextBlock Name="txtUserInfoDefaultApp" Text="You can always set this app as Default in App Settings." Visibility="Collapsed"></TextBlock>
+                                <HyperlinkButton Name="hypGoToSettings" Visibility="Collapsed" Content="Go to App Settings" Click="hypGoToSettings_Click"></HyperlinkButton>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TeachingTip>
+
+                    <Grid Visibility="Visible" Background="Transparent" VerticalAlignment="Center" Margin="20, 0" Name="MusicPlayerMaster" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>

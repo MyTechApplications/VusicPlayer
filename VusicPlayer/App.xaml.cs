@@ -1,8 +1,12 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.Win32;
+using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using Windows.ApplicationModel.Activation;
 
 namespace VusicPlayer
 {
@@ -26,10 +30,45 @@ namespace VusicPlayer
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-             HomeWindow.ShowWindow();
-            this.UnhandledException += App_UnhandledException;
-          //  OceanDialog dlg = new();
-            //dlg.Activate();
+            var activatedArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
+            if (activatedArgs.Kind == ExtendedActivationKind.File)
+            {
+                var fileArgs = (FileActivatedEventArgs)activatedArgs.Data;
+                var file = fileArgs.Files.FirstOrDefault();
+
+                if (file != null)
+                {
+                    string filePath = file.Path;
+
+                    string extension = Path.GetExtension(filePath).ToLower();
+
+                    string[] videoExtensions = { ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm" };
+                    string[] audioExtensions = { ".mp3", ".wav", ".aac", ".flac", ".m4a", ".ogg", ".wma" };
+
+                    if (videoExtensions.Contains(extension))
+                    {
+                        var videoItems = new ObservableCollection<VideoItem>();
+                        videoItems.Add(new VideoItem { FilePath = filePath });
+
+                        var playerWindow = new MainWindow(videoItems, filePath, 0, true);
+
+                        playerWindow.Activate();
+                        App.SetCurrentMainWindow(playerWindow);
+                        App.VideoPlayerWindowInstance = playerWindow;
+                        return;
+                    }
+                    else if (audioExtensions.Contains(extension))
+                    {
+                        var home = HomeWindow.ShowWindow();
+                        home.LoadFileFromPath(new ObservableCollection<string> { filePath });
+                        return;
+                    }
+                }
+                this.UnhandledException += App_UnhandledException;
+
+            }
+                HomeWindow.ShowWindow();
+            
         }
 
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)

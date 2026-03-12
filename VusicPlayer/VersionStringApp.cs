@@ -9,6 +9,6 @@ namespace VusicPlayer
     public static class VersionStringApp
     {
         //CURRENT APP VERSION GLOBAL
-        public static string VersionText = "1.0.1.5";
+        public static string VersionText = "1.0.9.1";
     }
 }
