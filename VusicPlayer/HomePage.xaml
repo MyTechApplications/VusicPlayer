@@ -9,18 +9,18 @@
     mc:Ignorable="d">
 
     <ScrollViewer>
-    <Grid Margin="50, 20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
+        <Grid Margin="50, 20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
             <ContentDialog>
                 <ScrollViewer >
                     <Grid x:Name="grdNewUpdates" MaxHeight="200">
@@ -76,34 +76,42 @@ VerticalScrollBarVisibility="Auto">
                     </Grid>
                 </ScrollViewer>
             </ContentDialog>
-         
+
             <TextBlock Text="Welcome" Style="{StaticResource TitleLargeTextBlockStyle}" Grid.Row="0"></TextBlock>
-        <Button Margin="0, 10" Grid.Row="1" Click="Button_Click">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE838;"></TextBlock>
-                <TextBlock Margin="10, 0" Text="Open Folder"></TextBlock>
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0, 10" Spacing="10">
+                <Button Margin="0, 0"  Click="Button_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE838;"></TextBlock>
+                        <TextBlock Margin="10, 0" Text="Open Folder"></TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="btnOpenMedia" Click="btnOpenMedia_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Source="/Assets/importicon.png"></Image>
+                        <TextBlock Margin="5,0" Text="Open Media" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+                    </StackPanel>
+                </Button>
             </StackPanel>
-        </Button>
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-         
-        </Grid>
-        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Name="txtRecentHeading" Text="Continue Playing" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
-        <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtEmptyRecents" Grid.Row="4" Visibility="Collapsed" Text="Start watching videos to see them here!" Margin="0, 40"></TextBlock>
-        <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtFolderName" Grid.Row="5" Margin="0, 0"></TextBlock>
-        <GridView Visibility="Visible"  
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+            </Grid>
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Name="txtRecentHeading" Text="Continue Playing" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
+            <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtEmptyRecents" Grid.Row="4" Visibility="Collapsed" Text="Start watching videos to see them here!" Margin="0, 40"></TextBlock>
+            <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtFolderName" Grid.Row="5" Margin="0, 0"></TextBlock>
+            <GridView Visibility="Visible"  
  x:Name="GridContinuePlaying" SelectionMode="Single" IsItemClickEnabled="True"
 ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
-            <GridView.ItemTemplate>
-                <DataTemplate >
-                    <StackPanel Width="150">
-                        <StackPanel.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Remove from Continue Playing" Click="MenuFlyoutItem_Click_3" Icon="Remove"></MenuFlyoutItem>
+                <GridView.ItemTemplate>
+                    <DataTemplate >
+                        <StackPanel Width="150">
+                            <StackPanel.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Remove from Continue Playing" Click="MenuFlyoutItem_Click_3" Icon="Remove"></MenuFlyoutItem>
                                     <MenuFlyoutItem Text="Go to File Location" Click="MenuFlyoutItem_Click_6" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE8DA;"></FontIcon>
@@ -115,48 +123,48 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                 </MenuFlyout>
-                        </StackPanel.ContextFlyout>
-                        <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
+                            </StackPanel.ContextFlyout>
+                            <Image Source="{Binding Thumbnail}" Width="150" Height="100" Stretch="UniformToFill"/>
 
-                        <TextBlock Text="{Binding FilePath}" Visibility="Collapsed" TextWrapping="Wrap" />
-                        <ProgressBar Margin="0, 10" x:Name="prgContinuePlaying" Maximum="{Binding TotalDuration}" Value="{Binding CurrentDuration}" Width="200" IsIndeterminate="False"></ProgressBar>
-                        <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
-        <TextBlock Name="txtFoldersHeader" Text="Recent Folders" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
+                            <TextBlock Text="{Binding FilePath}" Visibility="Collapsed" TextWrapping="Wrap" />
+                            <ProgressBar Margin="0, 10" x:Name="prgContinuePlaying" Maximum="{Binding TotalDuration}" Value="{Binding CurrentDuration}" Width="200" IsIndeterminate="False"></ProgressBar>
+                            <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <TextBlock Name="txtFoldersHeader" Text="Recent Folders" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
             <TextBlock Name="txtEmptyFolders" Text="No folders opened yet!" Margin="0, 30" Style="{StaticResource BodyLargeTextBlockStyle}" Grid.Row="7" Visibility="Collapsed"></TextBlock>
             <GridView  CanDragItems="True"
       AllowDrop="True"
       CanReorderItems="True" x:Name="FolderGrid" SelectionMode="Single" IsItemClickEnabled="True"
       ItemClick="FolderGrid_ItemClick" DragItemsCompleted="FolderGrid_DragItemsCompleted" Grid.Row="7" Margin="0, 0">
-               
-            <GridView.ItemTemplate>
-                <DataTemplate >
-                    <StackPanel Width="150">
+
+                <GridView.ItemTemplate>
+                    <DataTemplate >
+                        <StackPanel Width="150">
                             <StackPanel.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuFlyoutItem Text="Open Folder" Click="MenuFlyoutItem_Click_5" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE838;"></FontIcon>
-                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem Text="Remove from Recent Folders" Click="MenuFlyoutItem_Click_4" Icon="Remove"></MenuFlyoutItem>
                                 </MenuFlyout>
                             </StackPanel.ContextFlyout>
-                        <Image Source="{Binding Thumbnail}" Width="100" Height="100" Stretch="UniformToFill"/>
-                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap" />
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
-        <ContentDialog Name="cldg">
-            <StackPanel Orientation="Horizontal">
-                <Image Width="30" Source="/Assets/sourceerror.png" ></Image>
-                <TextBlock Name="cldgContent" Margin="20, 0"></TextBlock>
-            </StackPanel>
-        </ContentDialog>
+                            <Image Source="{Binding Thumbnail}" Width="100" Height="100" Stretch="UniformToFill"/>
+                            <TextBlock Text="{Binding Name}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <ContentDialog Name="cldg">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="30" Source="/Assets/sourceerror.png" ></Image>
+                    <TextBlock Name="cldgContent" Margin="20, 0"></TextBlock>
+                </StackPanel>
+            </ContentDialog>
             <Grid   Name="ttUpdated" VerticalAlignment="Bottom" Grid.Row="8" Margin="0, 90" Visibility="Collapsed">
                 <StackPanel Orientation="Vertical">
                     <TextBlock Text="App has been updated to a newer version"></TextBlock>

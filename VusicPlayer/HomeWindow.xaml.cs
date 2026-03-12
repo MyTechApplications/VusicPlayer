@@ -560,6 +560,8 @@ namespace VusicPlayer
                         playerWindow.Activate();
                         App.SetCurrentMainWindow(playerWindow);
                         App.VideoPlayerWindowInstance = playerWindow;
+                        HomeWindow.HideWindow();
+
                         return;
                     }
                     else if (audioExtensions.Contains(extension))
@@ -572,7 +574,28 @@ namespace VusicPlayer
 
             }
         }
+        public void PausePlayer()
+        {
+            if (player == null) return;
+            if (stateofplay == "playing")
+            {
+                player.Pause();
+                stateofplay = "paused";
+                maintimer.Stop();
+                imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
+            }
+        }
         private static HomeWindow? instance;
+        public static HomeWindow? HideWindow()
+        {
+            if (instance != null)
+            {
+                instance.PausePlayer();
+                instance.AppWindow.Hide();
+            }
+            return instance;
+        }
+
         public static HomeWindow ShowWindow()
         {
             if (instance == null)

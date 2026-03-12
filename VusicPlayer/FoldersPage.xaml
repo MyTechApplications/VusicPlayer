@@ -106,8 +106,13 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <TextBlock Name="txtFolderName" Grid.Row="0" Margin="0, 0" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
-                
+                <BreadcrumbBar Name="brdcbFolderPath" ItemClicked="brdcbFolderPath_ItemClicked" >
+                    <BreadcrumbBar.ItemTemplate>
+                        <DataTemplate x:DataType="local:FolderNode">
+                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Label}" />
+                        </DataTemplate>
+                    </BreadcrumbBar.ItemTemplate>
+                </BreadcrumbBar>                
                 <Button Margin="10, 0" ToolTipService.ToolTip="Rename Folder" Name="btnRenameFolder" Click="Button_Click_1">
                     <Image Width="20" Source="/Assets/editicon.png"></Image>
                 </Button>

@@ -8,8 +8,8 @@ namespace VusicPlayer
 {
     public static class Appversionstrings
     {
-        public static string AppVersion = "1.0.9.2";
-        public static string BuildNumber = "031226.08";
+        public static string AppVersion = "1.0.9.3";
+        public static string BuildNumber = "031226.09";
         public static string VersionType = "Internal";
         
     }

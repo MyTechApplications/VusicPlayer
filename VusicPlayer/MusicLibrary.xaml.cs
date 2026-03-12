@@ -266,8 +266,29 @@ namespace VusicPlayer
             // 2. Initialize the picker with the handle
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
+            #region AudioFileTypes 
             picker.FileTypeFilter.Add(".mp3");
             picker.FileTypeFilter.Add(".wav");
+            picker.FileTypeFilter.Add(".ogg");
+            picker.FileTypeFilter.Add(".m4a");
+            picker.FileTypeFilter.Add(".aac");
+            picker.FileTypeFilter.Add(".wma");
+            picker.FileTypeFilter.Add(".flac");
+            picker.FileTypeFilter.Add(".ac3");
+            picker.FileTypeFilter.Add(".alac");
+            picker.FileTypeFilter.Add(".aiff");
+            picker.FileTypeFilter.Add(".opus");
+            picker.FileTypeFilter.Add(".ape");
+            picker.FileTypeFilter.Add(".wv");
+            picker.FileTypeFilter.Add(".tta");
+            picker.FileTypeFilter.Add(".dsf");
+            picker.FileTypeFilter.Add(".dff");
+            picker.FileTypeFilter.Add(".mp2");
+            picker.FileTypeFilter.Add(".amr");
+            picker.FileTypeFilter.Add(".au");
+            picker.FileTypeFilter.Add(".snd");
+            picker.FileTypeFilter.Add(".mka");
+            #endregion
 
             var files = await picker.PickSingleFileAsync();
 

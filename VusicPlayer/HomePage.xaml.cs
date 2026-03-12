@@ -37,14 +37,14 @@ namespace VusicPlayer
             try
             {
                 InitializeComponent();
-            
+
                 string root = AppContext.BaseDirectory;
                 string filePath = Path.Combine(root, "freeupdate.txt");
-        //        Logger.Log(filePath, "source", Logger.LogLevelType.Information);
+                //        Logger.Log(filePath, "source", Logger.LogLevelType.Information);
                 if (File.Exists(filePath))
                 {
                     //ttUpdated.Visibility = Visibility.Visible;
-        //            Logger.Log(filePath + "23", "source", Logger.LogLevelType.Information);
+                    //            Logger.Log(filePath + "23", "source", Logger.LogLevelType.Information);
 
                 }
                 GridContinuePlaying.ItemsSource = MyItems;
@@ -63,7 +63,7 @@ namespace VusicPlayer
                     txtFoldersHeader.Visibility = Visibility.Visible;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Log(ex.Message, "HomePage", Logger.LogLevelType.Error);
             }
@@ -103,7 +103,7 @@ namespace VusicPlayer
                 {
                     var thumbnail = await GetFileThumbnailAsync(item.FilePath);
 
-                   
+
 
                     item.Thumbnail = thumbnail;
                     MyItems.Add(item);
@@ -229,7 +229,7 @@ namespace VusicPlayer
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Log("Unexpected Error in loading folder thumbnail: " + ex.Message, "HomePage", Logger.LogLevelType.Error);
             }
@@ -346,10 +346,10 @@ namespace VusicPlayer
                 cldg.CloseButtonText = "OK";
                 await cldg.ShowAsync();
                 folders2.Remove(folderr);
-               
+
             }
         }
-       
+
         private void btnPlayAll_Click(object sender, RoutedEventArgs e)
         {
 
@@ -358,7 +358,7 @@ namespace VusicPlayer
         private void FolderGrid_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
         {
         }
-     
+
         private async void GridContinuePlaying_ItemClick(object sender, ItemClickEventArgs e)
         {
             var clickedVideo = (VideoProgress)e.ClickedItem;
@@ -371,7 +371,7 @@ namespace VusicPlayer
 
                     playerWindow.Activate();
                     App.VideoPlayerWindowInstance = playerWindow;
-
+                    HomeWindow.HideWindow();
 
                 }
             }
@@ -488,7 +488,7 @@ namespace VusicPlayer
             if (menuflyoutitme == null) return;
             var data = menuflyoutitme.DataContext as FolderModel;
             if (data == null) return;
-            if(Directory.Exists(data.Path))
+            if (Directory.Exists(data.Path))
             {
                 this.Frame.Navigate(typeof(FoldersPage), data);
             }
@@ -508,8 +508,8 @@ namespace VusicPlayer
         {
             string root = AppContext.BaseDirectory;
             string filePath = Path.Combine(root, "freeupdate.txt");
-
-            OceanContentDialog.Show("What's New in Version 1.0.1.5", "", "", "OK", OceanContentDialogDefault.Primary, grdNewUpdates, this.XamlRoot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+            if (App.HomeWindowInstance == null) return;
+            OceanContentDialog.Show($"What's New in Version {Appversionstrings.AppVersion}", "", "", "OK", OceanContentDialogDefault.Primary, grdNewUpdates, this.XamlRoot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance);
             try
             {
                 if (File.Exists(filePath))
@@ -532,6 +532,46 @@ namespace VusicPlayer
         private void MenuFlyoutItem_Click_7(object sender, RoutedEventArgs e)
         {
 
+        }
+        private static readonly string[] AudioExtensions = { ".mp3", ".wav", ".ogg", ".m4a", ".aac", ".wma", ".flac", ".ac3", ".alac", ".aiff", ".opus", ".ape", ".wv", ".tta", ".dsf", ".dff", ".mp2", ".amr", ".au", ".snd", ".mka" };
+        private static readonly string[] VideoExtensions = { ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".ts", ".m2ts", ".mts", ".3gp", ".3g2", ".f4v", ".mpg", ".mpeg", ".vob", ".asf", ".rm", ".rmvb", ".ogv" };
+        public async Task OpenFilePicker()
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance ?? App.CurrentActiveWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            // Add everything to the picker automatically
+            AudioExtensions.ToList().ForEach(picker.FileTypeFilter.Add);
+            VideoExtensions.ToList().ForEach(picker.FileTypeFilter.Add);
+
+            var file = await picker.PickSingleFileAsync();
+            if (file == null) return;
+
+            string ext = Path.GetExtension(file.Path).ToLower();
+
+            if (VideoExtensions.Contains(ext))
+            {
+                var playerWindow = new MainWindow(new ObservableCollection<VideoItem> { new VideoItem { FilePath = file.Path } }, file.Path, 0, true);
+                playerWindow.Activate(); 
+                App.SetCurrentMainWindow(playerWindow);
+
+                App.VideoPlayerWindowInstance = playerWindow;
+
+                HomeWindow.HideWindow();
+
+
+
+                return;
+            }
+            else if (AudioExtensions.Contains(ext))
+            {
+                HomeWindow.ShowWindow().LoadFileFromPath(new ObservableCollection<string> { file.Path });
+            }
+        }
+        private async void btnOpenMedia_Click(object sender, RoutedEventArgs e)
+        {
+            await OpenFilePicker();
         }
     }
 }

@@ -69,6 +69,8 @@ namespace VusicPlayer
                             playerWindow.Activate();
                             App.SetCurrentMainWindow(playerWindow);
                             App.VideoPlayerWindowInstance = playerWindow;
+                            HomeWindow.HideWindow();
+
                             return;
                         }
                         else if (audioExtensions.Contains(extension))

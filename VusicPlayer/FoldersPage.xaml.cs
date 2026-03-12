@@ -171,10 +171,11 @@ public sealed partial class FoldersPage : Page
     private async void VideoGrid_ItemClick(object sender, ItemClickEventArgs e)
     {
         var clickedItem = (VideoItem)e.ClickedItem;
+        if (clickedItem == null) return;
+        if (clickedItem.FilePath == null) return;
 
         if (clickedItem.IsFolder)
         {
-            // 📁 FOLDER LOGIC: Navigate to self with new path
             var newFolder = new FolderModel
             {
                 Path = clickedItem.FilePath,
@@ -193,13 +194,14 @@ public sealed partial class FoldersPage : Page
             var playerWindow = new MainWindow(loadedVideos, clickedItem.FilePath, startPosition, isNewVideo);
             playerWindow.Activate();
             App.VideoPlayerWindowInstance = playerWindow;
+            HomeWindow.HideWindow();
 
             App.SetCurrentMainWindow(playerWindow);
         }
     }
-    
 
- 
+
+
 
     private void MenuFlyoutItem_Click_4(object sender, RoutedEventArgs e)
     {
@@ -224,20 +226,20 @@ public sealed partial class FoldersPage : Page
     private void MenuFlyoutItem_Click_6(object sender, RoutedEventArgs e)
     {
         //Rename File
-        var Menufl = sender as MenuFlyoutItem;
-        var data = Menufl.DataContext as VideoItem;
-        if (data.IsFolder == true) return;
-        ttRenameFile.IsOpen = true;
-        var container = VideoGrid.ContainerFromItem(data) as GridViewItem;
-        if (container != null)
+        if (sender is MenuFlyoutItem { DataContext: VideoItem data } && !data.IsFolder)
         {
-            ttRenameFile.Target = container;
             ttRenameFile.IsOpen = true;
-            ttRenameFile.PreferredPlacement = TeachingTipPlacementMode.Bottom;
+            var container = VideoGrid.ContainerFromItem(data) as GridViewItem;
+            if (container != null)
+            {
+                ttRenameFile.Target = container;
+                ttRenameFile.IsOpen = true;
+                ttRenameFile.PreferredPlacement = TeachingTipPlacementMode.Bottom;
+            }
+            txtRenameFile.Text = Path.GetFileNameWithoutExtension(data.FilePath);
+            originalfilenamee = data.FileName;
+            txtRenameFile.Tag = data.FilePath;
         }
-        txtRenameFile.Text = Path.GetFileNameWithoutExtension(data.FilePath);
-         originalfilenamee = data.FileName;
-        txtRenameFile.Tag = data.FilePath;
     }
     string originalfilenamee = "";
     private void MenuFlyoutItem_Click_7(object sender, RoutedEventArgs e)
@@ -260,7 +262,20 @@ public sealed partial class FoldersPage : Page
 
     }
     public ObservableCollection<FolderModel> folderloaded = new();
-    string currentFolderPath = "";  
+    string currentFolderPath = "";
+    private List<FolderNode> GetCrumbsFromPath(string fullPath)
+    {
+        var crumbs = new List<FolderNode>();
+        var parts = fullPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+        string currentPath = "";
+        foreach (var part in parts)
+        {
+            currentPath = System.IO.Path.Combine(currentPath, part);
+            crumbs.Add(new FolderNode { Label = part, Path = currentPath });
+        }
+        return crumbs;
+    }
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
@@ -273,7 +288,7 @@ public sealed partial class FoldersPage : Page
             loadedVideos.Clear();
             loadedVideos = await LoadVideosAsync(loadedFolder.Path);
             currentFolderPath = loadedFolder.Path;
-            txtFolderName.Text = loadedFolder.Name;
+            brdcbFolderPath.ItemsSource = GetCrumbsFromPath(currentFolderPath);
             txtFolderPath.Text = currentFolderPath;
             hypPath.Tag = currentFolderPath;
             await SettingsHelper.LoadSettingsAsync();
@@ -318,7 +333,9 @@ public sealed partial class FoldersPage : Page
     {
         var items = new ObservableCollection<VideoItem>();
         if (!Directory.Exists(folderPath)) return items;
-        try { var folder = await StorageFolder.GetFolderFromPathAsync(folderPath);
+        try
+        {
+            var folder = await StorageFolder.GetFolderFromPathAsync(folderPath);
 
             // 1. Load Subfolders as Items
             var subFolders = await folder.GetFoldersAsync();
@@ -376,7 +393,7 @@ public sealed partial class FoldersPage : Page
                     DateModified = file.DateCreated
                 });
             }
-           
+
         }
         catch (UnauthorizedAccessException)
         {
@@ -498,7 +515,7 @@ public sealed partial class FoldersPage : Page
         if (chckSelectMultiple.IsChecked == true)
         {
             VideoGrid.SelectionMode = ListViewSelectionMode.Multiple;
-           
+
         }
     }
 
@@ -514,7 +531,7 @@ public sealed partial class FoldersPage : Page
     {
         //Rename Folder
         ttRenameFolder.IsOpen = true;
-        txtRenameFolder.Text = txtFolderName.Text;
+        //     txtRenameFolder.Text = txtFolderName.Text;
     }
     public async Task<StorageFolder> RenameFolderWithNumberAsync(string folderPath, string desiredName)
     {
@@ -522,13 +539,13 @@ public sealed partial class FoldersPage : Page
         string parentPath = Path.GetDirectoryName(folder.Path)!;
 
         string newName = desiredName;
-       int count = 1;
+        int count = 1;
         while (Directory.Exists(Path.Combine(parentPath, newName)))
         {
             newName = $"{desiredName} ({count})";
             count++;
         }
-     
+
         await folder.RenameAsync(newName, NameCollisionOption.FailIfExists);
         folderloadedpath = Path.Combine(parentPath, newName);
         await SettingsHelper.LoadSettingsAsync();
@@ -539,15 +556,15 @@ public sealed partial class FoldersPage : Page
             Path = folderloadedpath,
         };
         folders.FoldersRecent.Add(newfolder);
-        txtFolderName.Text = txtRenameFolder.Text;
-      
+        //  txtFolderName.Text = txtRenameFolder.Text;
+
         await SettingsHelper.SaveSettingsAsync(folders);
         return folder;
     }
     private async void Button_Click_2(object sender, RoutedEventArgs e)
     {
         //Set Folder Name
-        originalfoldername = txtFolderName.Text;
+        //       originalfoldername = txtFolderName.Text;
         if (txtRenameFolder.Text == "")
         {
             txtRenameFolder.Text = originalfoldername;
@@ -567,7 +584,7 @@ public sealed partial class FoldersPage : Page
                 prgFolderRenameComplete.Value = i;
                 await Task.Delay(delay);
             }
-            originalfoldername = txtFolderName.Text;
+            //         originalfoldername = txtFolderName.Text;
             ttFolderRenamedSuccess.IsOpen = false;
 
         }
@@ -598,11 +615,10 @@ public sealed partial class FoldersPage : Page
 
     private void PreviewFilePath_Click(object sender, RoutedEventArgs e)
     {
-        string filePath = PreviewFilePath.Content.ToString();
+        string filePath = PreviewFilePath.Content?.ToString() ?? string.Empty;
 
         if (File.Exists(filePath))
         {
-            // This opens explorer and HIGHLIGHTS the specific file
             Process.Start("explorer.exe", $"/select,\"{filePath}\"");
         }
     }
@@ -685,14 +701,14 @@ public sealed partial class FoldersPage : Page
     }
     private void SortItems()
     {
-        if(sortselection == "Name")
+        if (sortselection == "Name")
         {
             var sorted = loadedVideos.OrderBy(x => x.FileName).ToList();
             loadedVideos.Clear();
             foreach (var item in sorted)
                 loadedVideos.Add(item);
         }
-        else if(sortselection == "Date")
+        else if (sortselection == "Date")
         {
             var sorted = loadedVideos.OrderBy(x => File.GetCreationTime(x.FilePath)).ToList();
             loadedVideos.Clear();
@@ -723,11 +739,11 @@ public sealed partial class FoldersPage : Page
 
     private async void Button_Click_3(object sender, RoutedEventArgs e)
     {
-        if(txtRenameFile.Text == "")        
+        if (txtRenameFile.Text == "")
         {
             txtRenameFile.Text = originalfilenamee;
         }
-       
+
         Debug.WriteLine(txtRenameFile.Tag.ToString());
         if (string.IsNullOrEmpty(txtRenameFile.Tag.ToString()) || !File.Exists(txtRenameFile.Tag.ToString()))
         {
@@ -740,9 +756,9 @@ public sealed partial class FoldersPage : Page
         else
         {
             try
-            { 
+            {
                 string directory = Path.GetDirectoryName(txtRenameFile.Tag.ToString())!;
-                string extension =System.IO.Path.GetExtension(txtRenameFile.Tag.ToString());
+                string extension = System.IO.Path.GetExtension(txtRenameFile.Tag.ToString());
                 string newPath = Path.Combine(directory, txtRenameFile.Text + extension);
                 File.Move(txtRenameFile.Tag.ToString(), newPath);
                 var item = loadedVideos.FirstOrDefault(v => v.FilePath == txtRenameFile.Tag.ToString());
@@ -762,7 +778,7 @@ public sealed partial class FoldersPage : Page
                     SortItems();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 dlgFileNotExist.Title = "File In Use";
                 dlgFileNotExist.Content = $"The file path {txtRenameFile.Tag.ToString()} is being used by another process.";
@@ -792,6 +808,30 @@ public sealed partial class FoldersPage : Page
             // Path doesn't exist anymore
             dlgFileNotExist.Content = $"The path {path} could not be found.";
             _ = dlgFileNotExist.ShowAsync();
+        }
+    }
+
+    private void brdcbFolderPath_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
+    {
+        var clickedCrumb = (FolderNode)args.Item;
+        if (Directory.Exists(clickedCrumb.Path))
+        {
+            var newFolder = new FolderModel
+            {
+                Path = clickedCrumb.Path,
+                Name = Path.GetFileName(clickedCrumb.Path)
+            };
+            this.Frame.Navigate(typeof(FoldersPage), newFolder);
+        }
+        else
+        {
+            if (App.HomeWindowInstance == null) return;
+            TextBlock text = new();
+            Grid grd = new();
+            text.Text = $"The folder path {clickedCrumb.Path} doesn't exist.";
+            grd.Children.Add(text);
+            OceanContentDialog.Show("Create New Playlist", "", "", "OK", OceanContentDialogDefault.Close, grd, this.XamlRoot, 400, 260, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+
         }
     }
 }
