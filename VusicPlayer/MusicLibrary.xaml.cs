@@ -618,6 +618,58 @@ namespace VusicPlayer
                 }
             }
         }
+
+        private void chckSelectAllPlaylists_Checked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectAllPlaylists.IsChecked == true)
+            {
+                GrdViewPlaylists.SelectAll();
+            }
+
+            else
+            {
+                GrdViewPlaylists.SelectedItems.Clear();
+            }
+        }
+
+        private void chckSelectAllPlaylists_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectAllPlaylists.IsChecked == true)
+            {
+                GrdViewPlaylists.SelectAll();
+            }
+
+            else
+            {
+                GrdViewPlaylists.SelectedItems.Clear();
+            }
+        }
+
+        private void chckSelectAllRecents_Checked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectAllRecents.IsChecked == true)
+            {
+                grdViewRecentMusic.SelectAll();
+            }
+
+            else
+            {
+                grdViewRecentMusic.SelectedItems.Clear();
+            }
+        }
+
+        private void chckSelectAllRecents_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectAllRecents.IsChecked == true)
+            {
+                grdViewRecentMusic.SelectAll();
+            }
+
+            else
+            {
+                grdViewRecentMusic.SelectedItems.Clear();
+            }
+        }
     }
 
 }

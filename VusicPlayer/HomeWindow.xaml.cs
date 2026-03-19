@@ -1,8 +1,5 @@
 using ABI.Microsoft.UI.Xaml;
 using CommunityToolkit.WinUI;
-using CSCore.Codecs;
-using CSCore.Codecs.WAV;
-using CSCore.DMO.Effects;
 using FlyleafLib;
 using FlyleafLib.MediaFramework.MediaDecoder;
 using FlyleafLib.MediaPlayer;
@@ -459,6 +456,7 @@ namespace VusicPlayer
             imgThumbnailCover.Source = await GetFileThumbnailAsync(currentVideoPath);
             txtSongName.Text = Path.GetFileName(currentVideoPath);
 
+            PlaybackState.CurrentlyPlayingPath = path;
             ToolTipService.SetToolTip(txtSongName, txtSongName.Text);
             btnPlayPause.IsEnabled = true;
             if (player != null)
@@ -483,6 +481,10 @@ namespace VusicPlayer
             currentVideoPath = queuepaths[index];
 
             PlayVideoPath(currentVideoPath);
+            if(frmMain.Content is QueuePage queue)
+            {
+                queue.UpdateQueue(currentVideoPath);
+            }
         }
 
         private async Task SaveRecents()

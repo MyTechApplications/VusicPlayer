@@ -41,17 +41,21 @@
             <StackPanel Margin="0, 20" Orientation="Horizontal" Grid.Row="3">
                 <TextBlock Text="Recent Music" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Margin="0, 10"></TextBlock>
                 <CheckBox Unchecked="chckmultiplerecent_Unchecked" Name="chckmultiplerecent" Checked="chckmultiplerecent_Checked" Content="Select" Margin="10, 0"></CheckBox>
-                <Button Background="Transparent"  Visibility="Collapsed" Name="btnDeleteRecents" ToolTipService.ToolTip="Remove Selected Recents">
-                    <Button.Flyout>
-                        <Flyout>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="Are you sure you want to remove the selected recents?"></TextBlock>
-                                <Button Content="Yes remove" Click="Button_Click_1"></Button>
-                            </StackPanel>
-                        </Flyout>
-                    </Button.Flyout>
-                    <FontIcon Glyph="&#xE74D;"></FontIcon>
-                </Button>
+                <StackPanel Orientation="Horizontal"  Name="btnDeleteRecents" Spacing="6">
+                    <Button Background="Transparent"  Visibility="Collapsed" ToolTipService.ToolTip="Remove Selected Recents">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="Are you sure you want to remove the selected recents?"></TextBlock>
+                                    <Button Content="Yes remove" Click="Button_Click_1"></Button>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                        <FontIcon Glyph="&#xE74D;"></FontIcon>
+                    </Button>
+                    <CheckBox Name="chckSelectAllRecents" Content="Select all" Checked="chckSelectAllRecents_Checked" Unchecked="chckSelectAllRecents_Unchecked"></CheckBox>
+                </StackPanel>
+                
             </StackPanel>
             <StackPanel Name="txtEmptyRecents" Visibility="Collapsed" Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Image Source="/Assets/musicnoteicon.png" Width="30" HorizontalAlignment="Center"></Image>
@@ -101,7 +105,8 @@
             <StackPanel Margin="0, 20" Orientation="Horizontal" Grid.Row="5">
                 <TextBlock Text="Playlists" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Margin="0, 10"></TextBlock>
                 <CheckBox Unchecked="chckmultiple_Unchecked" Name="chckmultiple" Checked="CheckBox_Checked" Content="Select playlist(s)" Margin="10, 0"></CheckBox>
-                <Button Visibility="Collapsed" Name="btnDeletePlaylists" ToolTipService.ToolTip="Delete Selected Playlists">
+                <StackPanel Orientation="Horizontal"  Name="btnDeletePlaylists" Spacing="6">
+                <Button Visibility="Collapsed" Background="Transparent" ToolTipService.ToolTip="Delete Selected Playlists">
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel Orientation="Vertical">
@@ -111,8 +116,10 @@
                         </Flyout>
                     </Button.Flyout>
                     <FontIcon Glyph="&#xE74D;"></FontIcon>
-                </Button>
-                <Button Visibility="Collapsed" Name="btnSortPlaylists" ToolTipService.ToolTip="Sort Playlists">
+                    </Button>
+                    <CheckBox Name="chckSelectAllPlaylists" Content="Select all" Checked="chckSelectAllPlaylists_Checked" Unchecked="chckSelectAllPlaylists_Unchecked"></CheckBox>
+                </StackPanel>
+                <Button Visibility="Visible" Name="btnSortPlaylists" ToolTipService.ToolTip="Sort Playlists">
                     <Button.Flyout>
                         <MenuFlyout>
                             <MenuFlyoutItem Text="Sort by name" Tag="name" Click="MenuFlyoutItem_Click_4"></MenuFlyoutItem>

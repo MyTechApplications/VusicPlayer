@@ -171,4 +171,13 @@
   <data name="sc1x009.Text" xml:space="preserve">
     <value>View File Info</value>
   </data>
+  <data name="sc1x015.Content" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="sc1x017.Content" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="sc1x016.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove Selected Items</value>
+  </data>
 </root>

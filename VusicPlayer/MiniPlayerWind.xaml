@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:VusicPlayer"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:lvs="using:LibVLCSharp.Platforms.Windows"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     mc:Ignorable="d"
     Title="MiniPlayerWind"
    >
@@ -21,7 +21,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <lvs:VideoView Grid.Row="0" x:Name="videoView" Visibility="Visible" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         <Image Name="thumbnail" Grid.Row="0" Stretch="UniformToFill"/>
         <Border VerticalAlignment="Top" Background="Transparent" Padding="10,5">
             <TextBlock x:Name="txtTitle" 

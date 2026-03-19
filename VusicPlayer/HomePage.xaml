@@ -103,12 +103,21 @@ VerticalScrollBarVisibility="Auto">
                 </Grid.ColumnDefinitions>
 
             </Grid>
-            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Name="txtRecentHeading"  x:Uid="sc1x004" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
+            <StackPanel Name="txtRecentHeading"  Orientation="Horizontal" Spacing="5">
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"  x:Uid="sc1x004" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
+                <CheckBox x:Uid="sc1x017" Tag="Select" Name="chckSelectContinuePlaying" Checked="chckSelectContinuePlaying_Checked" Unchecked="chckSelectContinuePlaying_Unchecked"></CheckBox>
+                <CheckBox x:Uid="sc1x015" Tag="Selectallcontinuewatch" Name="chckSelectAllContinuePlaying" Visibility="Collapsed" Checked="chckSelectAllContinuePlaying_Checked" Unchecked="chckSelectAllContinuePlaying_Unchecked"></CheckBox>
+                <Button Background="Transparent" BorderBrush="Transparent" x:Uid="sc1x016" Visibility="Collapsed" Margin="0, 0"  Click="btnRemoveFromContinueWatchingSelected_Click"  Name="btnRemoveFromContinueWatchingSelected" >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Source="/Assets/removeicon.png"></Image>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
             <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtEmptyRecents" Grid.Row="4" Visibility="Collapsed"  x:Uid="sc1x003" Margin="0, 40"></TextBlock>
             <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtFolderName" Grid.Row="5" Margin="0, 0"></TextBlock>
             <GridView Visibility="Visible"  
  x:Name="GridContinuePlaying" SelectionMode="Single" IsItemClickEnabled="True"
-ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
+ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30" SelectionChanged="GridContinuePlaying_SelectionChanged">
                 <GridView.ItemTemplate>
                     <DataTemplate >
                         <StackPanel Width="150">
@@ -136,11 +145,21 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <TextBlock Name="txtFoldersHeader"  x:Uid="sc1x005" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
+            <StackPanel Name="txtFoldersHeader"  Orientation="Horizontal" Spacing="5">
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"  x:Uid="sc1x005" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
+                <CheckBox x:Uid="sc1x017" Tag="Selectfolder" Name="chckSelectFolders" Checked="chckSelectFolders_Checked" Unchecked="chckSelectFolders_Unchecked"></CheckBox>
+                <CheckBox x:Uid="sc1x015" Tag="Selectallfolders" Name="chckSelectAllFolders" Visibility="Collapsed" Checked="chckSelectAllFolders_Checked" Unchecked="chckSelectAllFolders_Unchecked"></CheckBox>
+                <Button Background="Transparent" BorderBrush="Transparent" x:Uid="sc1x016" Visibility="Collapsed" Margin="0, 0"  Click="btnRemoveFromRecentFoldersSelection_Click"  Name="btnRemoveFromRecentFoldersSelection" >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Source="/Assets/removeicon.png"></Image>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <TextBlock Name=""  x:Uid="sc1x005" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
             <TextBlock Name="txtEmptyFolders" x:Uid="sc1x006" Margin="0, 30" Style="{StaticResource BodyLargeTextBlockStyle}" Grid.Row="7" Visibility="Collapsed"></TextBlock>
             <GridView  CanDragItems="True"
       AllowDrop="True"
-      CanReorderItems="True" x:Name="FolderGrid" SelectionMode="Single" IsItemClickEnabled="True"
+      CanReorderItems="True" x:Name="FolderGrid" SelectionChanged="FolderGrid_SelectionChanged" SelectionMode="Single" IsItemClickEnabled="True"
       ItemClick="FolderGrid_ItemClick" DragItemsCompleted="FolderGrid_DragItemsCompleted" Grid.Row="7" Margin="0, 0">
 
                 <GridView.ItemTemplate>

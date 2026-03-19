@@ -58,6 +58,8 @@ namespace VusicPlayer
             if (App.HomeWindowInstance is HomeWindow wind)
             {
                 wind.LoadFileFromPath(ReceivedPaths);
+                var queuelist = new QueueList { MediaPaths = ReceivedPaths, CurrentMedia = PlaybackState.CurrentlyPlayingPath };
+                QueueService.queueList = queuelist;
             }
         }
         public static void UpdatePlayQueue(ObservableCollection<string> Paths)
@@ -65,6 +67,8 @@ namespace VusicPlayer
             if (App.HomeWindowInstance is HomeWindow wind)
             {
                 wind.UpdateQueuePath(Paths);
+                var queuelist = new QueueList { MediaPaths = Paths, CurrentMedia = PlaybackState.CurrentlyPlayingPath };
+                QueueService.queueList = queuelist;
             }
         }
         private static void SldMain_DragCompleted()

@@ -9,9 +9,11 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Vortice.Direct3D11;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -77,7 +79,24 @@ namespace VusicPlayer
                 {
                     imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
                 }
+                LoadQueue();
             }
+        }
+        public async void UpdateQueue(string CurrentMediaPath)
+        {
+            ChangeCurrent();
+        }
+        ObservableCollection<string> MainPaths = new();
+        private void LoadQueue()
+        {
+            var listnew = QueueService.queueList;
+            if (listnew.MediaPaths == null) return;
+            MainPaths = listnew.MediaPaths;
+            ChangeCurrent();
+        }
+        private void ChangeCurrent()
+        {
+
         }
         private void btnPrev_Click(object sender, RoutedEventArgs e)
         {

@@ -1,6 +1,5 @@
 using ABI.Microsoft.UI.Xaml;
 using FlyleafLib.MediaFramework.MediaPlaylist;
-using LibVLCSharp.Shared;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

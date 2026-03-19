@@ -171,4 +171,13 @@
   <data name="sc1x009.Text" xml:space="preserve">
     <value>फ़ाइल की जानकारी देखें</value>
   </data>
+  <data name="sc1x015.Content" xml:space="preserve">
+    <value>सभी चुनें</value>
+  </data>
+  <data name="sc1x017.Content" xml:space="preserve">
+    <value>चुनें</value>
+  </data>
+  <data name="sc1x016.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>चुने हुए आइटम हटाएँ</value>
+  </data>
 </root>

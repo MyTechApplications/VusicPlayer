@@ -3,7 +3,6 @@ using CommunityToolkit.WinUI;
 using CommunityToolkit.WinUI.Animations;
 using FlyleafLib;
 using FlyleafLib.MediaPlayer;
-using LibVLCSharp.Shared;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -572,6 +573,166 @@ namespace VusicPlayer
         private async void btnOpenMedia_Click(object sender, RoutedEventArgs e)
         {
             await OpenFilePicker();
+        }
+
+        private void GridContinuePlaying_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(GridContinuePlaying.SelectedItems.Count != 0)
+            {
+                btnRemoveFromContinueWatchingSelected.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                btnRemoveFromContinueWatchingSelected.Visibility = Visibility.Collapsed;
+
+            }
+        }
+
+        private void chckSelectAllContinuePlaying_Checked(object sender, RoutedEventArgs e)
+        {
+            if(chckSelectAllContinuePlaying.IsChecked == true)
+            {
+                GridContinuePlaying.SelectAll();
+            }
+
+            else
+            {
+                GridContinuePlaying.SelectedItems.Clear();
+            }
+        }
+
+        private void chckSelectAllContinuePlaying_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectAllContinuePlaying.IsChecked == true)
+            {
+                GridContinuePlaying.SelectAll();
+            }
+
+            else
+            {
+                GridContinuePlaying.SelectedItems.Clear();
+            }
+        }
+
+        private void chckSelectContinuePlaying_Checked(object sender, RoutedEventArgs e)
+        {
+            if(chckSelectContinuePlaying.IsChecked == true)
+            {
+                chckSelectAllContinuePlaying.Visibility = Visibility.Visible;
+                GridContinuePlaying.SelectionMode = ListViewSelectionMode.Multiple;
+            }
+            else
+            {
+                GridContinuePlaying.SelectionMode = ListViewSelectionMode.Single;
+                chckSelectAllContinuePlaying.Visibility = Visibility.Collapsed;
+
+            }
+        }
+
+        private void chckSelectContinuePlaying_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectContinuePlaying.IsChecked == true)
+            {
+                chckSelectAllContinuePlaying.Visibility = Visibility.Visible;
+                GridContinuePlaying.SelectionMode = ListViewSelectionMode.Multiple;
+            }
+            else
+            {
+                GridContinuePlaying.SelectionMode = ListViewSelectionMode.Single;
+                chckSelectAllContinuePlaying.Visibility = Visibility.Collapsed;
+
+            }
+        
+        }
+
+        private void btnRemoveFromContinueWatchingSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItems = GridContinuePlaying.SelectedItems.Cast<VideoProgress>().ToList();
+
+            foreach (var item in selectedItems)
+            {
+                MyItems.Remove(item);
+            }
+        }
+
+        private void FolderGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (GridContinuePlaying.SelectedItems.Count != 0)
+            {
+                btnRemoveFromRecentFoldersSelection.Visibility = Visibility.Visible;
+            }
+            else
+            {
+
+                btnRemoveFromRecentFoldersSelection.Visibility = Visibility.Collapsed;
+
+            }
+        }
+
+        private void chckSelectFolders_Checked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectFolders.IsChecked == true)
+            {
+                chckSelectAllFolders.Visibility = Visibility.Visible;
+                FolderGrid.SelectionMode = ListViewSelectionMode.Multiple;
+            }
+            else
+            {
+                FolderGrid.SelectionMode = ListViewSelectionMode.Single;
+                chckSelectAllFolders.Visibility = Visibility.Collapsed;
+
+            }
+        }
+
+        private void chckSelectFolders_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectFolders.IsChecked == true)
+            {
+                chckSelectAllFolders.Visibility = Visibility.Visible;
+                FolderGrid.SelectionMode = ListViewSelectionMode.Multiple;
+            }
+            else
+            {
+                FolderGrid.SelectionMode = ListViewSelectionMode.Single;
+                chckSelectAllFolders.Visibility = Visibility.Collapsed;
+
+            }
+        }
+
+        private void chckSelectAllFolders_Checked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectAllFolders.IsChecked == true)
+            {
+                FolderGrid.SelectAll();
+            }
+
+            else
+            {
+                FolderGrid.SelectedItems.Clear();
+            }
+        }
+
+        private void btnRemoveFromRecentFoldersSelection_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItems = FolderGrid.SelectedItems.Cast<FolderModel>().ToList();
+
+            foreach (var item in selectedItems)
+            {
+                folders2.Remove(item);
+            }
+        }
+
+        private void chckSelectAllFolders_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (chckSelectAllFolders.IsChecked == true)
+            {
+                FolderGrid.SelectAll();
+            }
+
+            else
+            {
+                FolderGrid.SelectedItems.Clear();
+            }
         }
     }
 }
