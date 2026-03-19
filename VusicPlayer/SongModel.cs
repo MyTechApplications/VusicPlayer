@@ -14,6 +14,7 @@ namespace VusicPlayer
     public class SongModel:INotifyPropertyChanged
     {
         private string? _title;
+        private int _year;
         private string? _artist;
         private string? _albumName;
 
@@ -21,6 +22,11 @@ namespace VusicPlayer
         {
             get => _title;
             set { _title = value; OnPropertyChanged(); }
+        }
+        public int Year
+        {
+            get => _year;
+            set { _year = value; OnPropertyChanged(); }
         }
 
         public string? Artist

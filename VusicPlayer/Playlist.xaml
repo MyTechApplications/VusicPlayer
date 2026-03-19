@@ -82,72 +82,10 @@
             </ScrollView>
         </ContentDialog>
         <ContentDialog Name="dlgEditPlaylist" PrimaryButtonClick="dlgEditPlaylist_PrimaryButtonClick" Title="Edit Playlist Info" PrimaryButtonText="Save" DefaultButton="Primary" CloseButtonText="Cancel">
-            <ScrollView>
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Margin="0, 20"  Orientation="Horizontal">
-                        <TextBlock Text="Playlist Name"></TextBlock>
-                        <TextBox Margin="10, 0" PlaceholderText="my playlist's name" Text="Playlist (1)" GotFocus="txtEditPlaylistName_GotFocus" Name="txtEditPlaylistName"></TextBox>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Genre"></TextBlock>
-                        <TextBox Margin="10, 0" PlaceholderText="my playlist's genre" Text=""  Name="txtEditGenre"></TextBox>
-                    </StackPanel>
-                    <Button Margin="0, 20"  Name="btnEditPlaylistCover" Click="btnEditPlaylistCover_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="/Assets/addimgicon.png" Width="20"></Image>
-                            <TextBlock Margin="5,0 " Text="Edit Playlist Cover" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
-                        </StackPanel>
-                    </Button>
-                    <Button  Style="{StaticResource AccentButtonStyle}" Name="btnEditAddSongs" Click="btnEditAddSongs_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="/Assets/addicon.png" Width="20"></Image>
-                            <TextBlock Margin="5,0 " Text="Add Songs" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
-                        </StackPanel>
-                    </Button>
-                    <Image Name="imgPlaylistCov" Margin="0, 20" Width="275"></Image>
-                    <StackPanel Name="CoverOptions" Visibility="Collapsed" Orientation="Horizontal">
-                        <Button Name="btnChangeCover" Click="btnEditPlaylistCover_Click">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Width="20" Source="/Assets/refreshimgicon.png"/>
-                                <TextBlock Margin="5, 0" Text="Change Cover"></TextBlock>
-                            </StackPanel>
-                        </Button>
-                        <Button Margin="10, 0" Name="btnRemovePlaylistCover" Click="btnRemovePlaylistCover_Click">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Width="20" Source="/Assets/removeicon.png"/>
-                                <TextBlock Margin="5, 0" Text="Remove Cover"></TextBlock>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0, 20" Text="Added Songs:" ></TextBlock>
-                    <TextBlock Name="txtNullAddedSongs" Text="No songs have been added yet!" Visibility="Collapsed" ></TextBlock>
-                    <ListView Name="lstViewPlaylistAddedSongs"  CanDragItems="True" CanReorderItems="True" AllowDrop="True"
-    SelectionMode="Single">
-                        <ListView.ItemTemplate>
+            <Grid Name="contentsNewPlaylist">
+                <local:PlaylistParameters x:Name="PlaylistDialog"></local:PlaylistParameters>
+            </Grid>
 
-                            <DataTemplate >
-                                <Grid Margin="0, 5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="0, 12" Grid.Column="0" Text="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Visibility="Visible" TextWrapping="Wrap" />
-                                    <HyperlinkButton Grid.Column="1" Click="HyperlinkButton_Click"  Visibility="Visible"  Margin="10, 0">
-                                        <TextBlock Text="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
-                                    </HyperlinkButton>
-
-                                    <TextBlock Grid.Column="2" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Artist}" Visibility="Visible" TextWrapping="Wrap" Margin="0,10"/>
-                                    <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="3" Text="{Binding AlbumName}" Visibility="Visible" TextWrapping="Wrap" Margin="10, 10"/>
-                                    <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 10"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </StackPanel>
-            </ScrollView>
         </ContentDialog>
         <Grid HorizontalAlignment="Stretch" Grid.Column="0" VerticalAlignment="Stretch" Margin="20">
             <Grid.RowDefinitions>
@@ -195,7 +133,7 @@
                    HorizontalAlignment="Center" />
                     <TextBlock Text="&#xE823;" FontFamily="Segoe Fluent Icons" 
 Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="25, 3" />
-                    <TextBlock Margin="-25, 0" Text="00:00" ToolTipService.ToolTip="Total Runtime of playlist" 
+                    <TextBlock Margin="-22, 0" Text="00:00" ToolTipService.ToolTip="Total Runtime of playlist" 
 Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 </StackPanel>
             </StackPanel>
@@ -239,7 +177,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     <Image Width="25" Source="/Assets/shuffleicon.png" />
                 </ToggleButton>
 
-                <Button Name="btnAddSongs" Margin="5"
+                <Button Name="btnAddSongs2" Margin="5"
                 ToolTipService.ToolTip="Add songs to this playlist" Click="btnAddSongs_Click">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="25" Source="/Assets/addicon.png" />
@@ -287,13 +225,14 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     <TextBlock Name="txtPlaylistContentHeader" Style="{StaticResource SubtitleTextBlockStyle}" Text="Playlist content"></TextBlock>
                     <TextBlock Margin="10,5" Style="{StaticResource BaseTextBlockStyle}" ToolTipService.ToolTip="Playlist will play shuffled" Text="shuffled" Name="txtShuffled" Visibility="Collapsed" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
                 </StackPanel>
-                <ListView   Margin="0, 10" CanDragItems="True" Visibility="Visible" CanReorderItems="True" AllowDrop="True"
+                <local:ListViewMedia x:Name="lstViewMaster"></local:ListViewMedia>
+                <ListView  Visibility="Collapsed" Margin="0, 10" CanDragItems="True" CanReorderItems="True" AllowDrop="True"
     SelectionMode="Multiple" ItemClick="lstViewPlaylist_ItemClick" Name="lstViewPlaylist" DragItemsCompleted="lstViewPlaylist_DragItemsCompleted">
                
                 <ListView.ItemTemplate>
                     
                     <DataTemplate >
-                        <Grid Margin="0, 5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid Margin="0, 5" VerticalAlignment="Stretch" Background="Transparent" HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
@@ -302,7 +241,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Grid.ContextFlyout>
-                                <MenuFlyout>
+                                <MenuFlyout Opened="MenuFlyout_Opened" x:Name="mnftContext">
                                     <MenuFlyoutItem Text="Play Song" Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
                                     <MenuFlyoutItem Text="Remove Song" Name="removesongfromplaylistcreation" Click="removesongfromplaylistcreation_Click" Icon="Delete"></MenuFlyoutItem>
                                     <MenuFlyoutItem Text="Song Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
@@ -310,11 +249,11 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                             <FontIcon Glyph="&#xE946;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Add to playlist"  Name="mnftAddtoPlaylist" Click="mnftSongDetails_Click" >
-                                        <MenuFlyoutItem.Icon>
+                                    <MenuFlyoutSubItem Text="Add to Playlist"  x:Name="mnftAddtoPlaylist" Loaded="mnftAddtoPlaylist_Loaded">
+                                        <MenuFlyoutSubItem.Icon>
                                             <FontIcon Glyph="&#xECC8;"></FontIcon>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
+                                        </MenuFlyoutSubItem.Icon>
+                                    </MenuFlyoutSubItem>
                                     <MenuFlyoutItem Text="Add to play queue"  Name="mnftAddtoQueue" Click="mnftSongDetails_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE81E;"></FontIcon>
@@ -325,7 +264,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                             <FontIcon Glyph="&#xE70F;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Go to artist"  Name="mnftGoToArtist" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem Text="Go to artist"  Name="mnftGoToArtist" Click="mnftGoToArtist_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE77B;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
@@ -335,34 +274,34 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                             <FontIcon Glyph="&#xE93C;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Add to Favourites"  Name="mnftAddToFavourites" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem Text="Add to Favourites"  Name="mnftAddToFavourites" Click="mnftAddToFavourites_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE735;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                                    <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftMoveup_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE70E;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Move down"  Name="mnftMovedown" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem Text="Move down"  Name="mnftMovedown" Click="mnftMovedown_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE70D;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Move to top"  Name="mnftMovetotop" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem Text="Move to top"  Name="mnftMovetotop" Click="mnftMovetotop_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE74A;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Move to bottom"  Name="mnftMovetobottom" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem Text="Move to bottom"  Name="mnftMovetobottom" Click="mnftMovetobottom_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE74B;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                                    <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftSongDetails_Click" >
+                                    <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftTools_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE713;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
@@ -390,5 +329,6 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 </ListView>
             </StackPanel>
         </ScrollView>
+        <TeachingTip Name="ttInfo" IsOpen="False" PreferredPlacement="Bottom"></TeachingTip>
     </Grid>
 </Page>

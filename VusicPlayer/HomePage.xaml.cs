@@ -509,7 +509,7 @@ namespace VusicPlayer
             string root = AppContext.BaseDirectory;
             string filePath = Path.Combine(root, "freeupdate.txt");
             if (App.HomeWindowInstance == null) return;
-            OceanContentDialog.Show($"What's New in Version {Appversionstrings.AppVersion}", "", "", "OK", OceanContentDialogDefault.Primary, grdNewUpdates, this.XamlRoot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+            OceanContentDialog.Show($"What's New in Version {Appversionstrings.AppVersion}", "", "", "OK", OceanContentDialogDefault.Primary, grdNewUpdates, this.XamlRoot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "");
             try
             {
                 if (File.Exists(filePath))

@@ -85,7 +85,7 @@ namespace VusicPlayer
                     //if playing, then pause 
                     if (App.MainWindowInstance is HomeWindow homeWindow)
                     {
-                        homeWindow.PlayPausePublic("playing");
+                    //    homeWindow.PlayPausePublic("playing");
                     }
                     selectedsong.Glyph = "\uE768";
                 }
@@ -93,7 +93,7 @@ namespace VusicPlayer
                 {
                     if (App.MainWindowInstance is HomeWindow homeWindow)
                     {
-                        homeWindow.PlayPausePublic("paused");
+                 //       homeWindow.PlayPausePublic("paused");
                     }
                     //if paused, then play
                     selectedsong.Glyph = "\uE769";

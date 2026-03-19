@@ -1,8 +1,8 @@
 ﻿#region Namespaces 
 using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Animations;
 using FlyleafLib;
 using FlyleafLib.MediaPlayer;
-using CommunityToolkit.WinUI.Animations;
 using LibVLCSharp.Shared;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI;
@@ -30,6 +30,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -146,7 +147,7 @@ namespace VusicPlayer
                 Load.Visibility = Visibility.Collapsed;
                 var settings = await SettingsHelper.LoadSettingsAsync();
                 var item = settings.SavedItems.FirstOrDefault(x => x.FilePath == currentVideoPath);
-             if(item != null && player != null)
+                if (item != null && player != null)
                 {
                     player.CurTime = (long)item.CurrentDuration;
                     UpdatePlayPauseUI("play");
@@ -154,7 +155,7 @@ namespace VusicPlayer
                     txtRunningDuration.Text = curTime.ToString(@"hh\:mm\:ss");
                     sldMain.Value = curTime.TotalSeconds;
                     txtLoaded.Text = $"Loaded playback of {txtFileName.Text} at {txtRunningDuration.Text}";
-                }   
+                }
             }
         }
         private void LoadFlyLeafEngine()
@@ -229,7 +230,7 @@ namespace VusicPlayer
         private void LoadCustomAspectRatioDialog()
         {
             if (App.VideoPlayerWindowInstance == null) { return; }
-            var dlg = VideoOptionsWindow.ShowDialog(customAspectRatio);
+            var dlg = VideoOptionsWindow.ShowDialog(customAspectRatio, 600, 600, true);
             dlg.CloseRequested += () =>
             {
                 dlg.HideDialog();
@@ -316,7 +317,7 @@ namespace VusicPlayer
             if (stateofplay == "playing")
             {
                 player.Pause();
-               
+
                 _saveTimer?.Stop();
                 UpdatePlayPauseUI("pause");
             }
@@ -423,7 +424,7 @@ namespace VusicPlayer
             sldVol.IsEnabled = true;
             if (player != null)
             {
-                sldVol.Value = player.Audio.Volume; 
+                sldVol.Value = player.Audio.Volume;
                 txtVolumepercent.Text = player.Audio.Volume.ToString();
             }
         }
@@ -482,7 +483,7 @@ namespace VusicPlayer
         {
             FileOpenPicker picker = new FileOpenPicker();
 
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.m_window);
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.VideoPlayerWindowInstance);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             picker.FileTypeFilter.Add(".mp4");
@@ -494,7 +495,7 @@ namespace VusicPlayer
         {
             FileOpenPicker picker = new FileOpenPicker();
 
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.m_window);
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App. VideoPlayerWindowInstance);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             picker.FileTypeFilter.Add(".srt");
@@ -1394,6 +1395,188 @@ namespace VusicPlayer
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void btnNewSubtitleCreate_Click(object sender, RoutedEventArgs e)
+        {
+                SaveSubtitleFile();
+            txtboxMaster.Text = "";
+            txtSubFileName.Text = "Untitled";
+        }
+        private async void SaveSubtitleFile()
+        {
+            if (filepathname != "")
+            {
+                savedfiletext = txtboxMaster.Text;
+                txtSubFileName.Text.Replace("*", "");
+                await File.WriteAllTextAsync(filepathname, txtboxMaster.Text);
+            }
+            else
+            {
+                var picker = new FileSavePicker();
+
+                var hwnd = WindowNative.GetWindowHandle(App.HomeWindowInstance);
+                InitializeWithWindow.Initialize(picker, hwnd);
+
+                picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+                picker.SuggestedFileName = "untitled";
+
+                picker.FileTypeChoices.Add("SubRip Subtitle", new List<string>() { ".srt" });
+                picker.FileTypeChoices.Add("ASS Subtitle", new List<string>() { ".ass" });
+                picker.FileTypeChoices.Add("WebVTT Subtitle", new List<string>() { ".vtt" });
+
+                StorageFile file = await picker.PickSaveFileAsync();
+
+                if (file != null)
+                {
+                    await FileIO.WriteTextAsync(file, txtboxMaster.Text);
+                }
+            }
+        }
+        
+        private void tglbtnTextEditor_Checked(object sender, RoutedEventArgs e)
+        {
+            ToggleButton? tgl = sender as ToggleButton;
+            if (tgl != null)
+            {
+                if (tgl.Tag.ToString() == "TE")
+                {
+                    stkTextEditor.Visibility = Visibility.Visible;
+                    stkVisualEditor.Visibility = Visibility.Collapsed;
+                    tglbtnSidebyside.IsChecked = false;
+                    tglbtnVisualEditor.IsChecked = false;
+                    Grid.SetColumn(stkTextEditor, 0);
+                }
+                else if (tgl.Tag.ToString() == "VE")
+                {
+                    tglbtnSidebyside.IsChecked = false;
+                    tglbtnTextEditor.IsChecked = false;
+                    stkTextEditor.Visibility = Visibility.Collapsed;
+                    stkVisualEditor.Visibility = Visibility.Visible;
+                    Grid.SetColumn(stkVisualEditor, 0);
+                }
+                else
+                {
+                    tglbtnVisualEditor.IsChecked = false;
+                    tglbtnTextEditor.IsChecked = false;
+                    stkTextEditor.Visibility = Visibility.Visible;
+                    stkVisualEditor.Visibility = Visibility.Visible;
+                    Grid.SetColumn(stkTextEditor, 0);
+                    Grid.SetColumn(stkVisualEditor, 1);
+
+                }
+            }
+        }
+
+        private void tglbtnTextEditor_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnCopyText_Click(object sender, RoutedEventArgs e)
+        {
+            var buttn = (Button)sender;
+            if (buttn == null) return;
+            string tag = buttn.Tag.ToString();
+            if(tag == "Undo")
+            {
+                txtboxMaster.Undo();
+            }
+            else if(tag == "Redo")
+            {
+                txtboxMaster.Redo();
+            }
+            else if (tag == "Copy")
+            {
+                txtboxMaster.CopySelectionToClipboard();
+            }
+            else if(tag == "Cut")
+            {
+                txtboxMaster.CutSelectionToClipboard();
+              
+            }
+            else if (tag == "Paste")
+            {
+                txtboxMaster.PasteFromClipboard();
+            }
+            else if (tag == "Delete")
+            {
+                txtboxMaster.SelectedText.Replace(txtboxMaster.SelectedText, "");
+            }
+            else if (tag == "SelAll")
+            {
+                txtboxMaster.SelectAll();
+            }
+        }
+
+        private void btnReplace_Click(object sender, RoutedEventArgs e)
+        {
+            ttFindReplace.IsOpen = true;
+            expReplace.IsExpanded = true;
+        }
+
+        private void btnZoomOut_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            if (App.VideoPlayerWindowInstance == null) { return; }
+            var dlg = VideoOptionsWindow.ShowDialog(grdSubtitleEditor, 900, 900, false);
+            dlg.CloseRequested += () =>
+            {
+                dlg.HideDialog();
+            };
+        }
+        string filepathname = "";
+        private async void  btnImportSubtitleCreate_Click(object sender, RoutedEventArgs e)
+        {
+            var file = await PickSubtitles();
+            if(file != null)
+            {
+                filepathname = file.Path;
+                string content = await FileIO.ReadTextAsync(file);
+                txtboxMaster.Text = content;
+                txtSubFileName.Text = Path.GetFileName(filepathname);
+            }
+        
+        }
+        string savedfiletext = "";
+        private void txtboxMaster_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (txtboxMaster.Text != savedfiletext)
+            {
+                txtSubFileName.Text = Path.GetFileName(filepathname) + "*";
+            }
+            else
+            {
+                txtSubFileName.Text.Replace("*", "");
+            }
+        }
+
+        private async void btnSaveSubtitleCreate_Click(object sender, RoutedEventArgs e)
+        {
+            SaveSubtitleFile();
+        }
+
+        private void btnFindReplace_Click(object sender, RoutedEventArgs e)
+        {
+            ttFindReplace.IsOpen = true;
+            expReplace.IsExpanded = false;
+        }
+
+       
+        private void btnShowAll_Click_1(object sender, RoutedEventArgs e)
+        {
+            if(btnShowAll.IsChecked == true)
+            {
+                stkAllResults.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                stkAllResults.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }

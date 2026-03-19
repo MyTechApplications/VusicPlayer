@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,12 +18,16 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Resources.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Globalization;
 using Windows.Storage.Pickers;
 using Windows.System;
 using WinRT.Interop;
+using AppInstance = Microsoft.Windows.AppLifecycle.AppInstance;
 using Button = Microsoft.UI.Xaml.Controls.Button;
+using ComboBoxItem = Microsoft.UI.Xaml.Controls.ComboBoxItem;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using SelectionChangedEventArgs = Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs;
 using StackPanel = Microsoft.UI.Xaml.Controls.StackPanel;
@@ -423,7 +428,7 @@ namespace VusicPlayer
         public async void ShowWhatNew(XamlRoot rot)
         {
             if (App.HomeWindowInstance == null) return;
-            OceanContentDialog.Show($"What's New in Version {VersionStringApp.VersionText}","", "", "OK", OceanContentDialogDefault.Close, grdNewUpdates, rot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+            OceanContentDialog.Show($"What's New in Version {VersionStringApp.VersionText}","", "", "OK", OceanContentDialogDefault.Close, grdNewUpdates, rot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "");
         }
         private void HyperlinkButton_Click_1(object sender, RoutedEventArgs e)
         {
@@ -437,6 +442,49 @@ namespace VusicPlayer
             await Launcher.LaunchUriAsync(
                 new Uri($"ms-settings:defaultapps?registeredAppUser={pfn}"));
 
+        }
+
+        private void cmbLanguages_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem? comboBoxItem = cmbLanguages.SelectedItem as ComboBoxItem;
+            txtConfirmlanguagechange.Text = $"Are you sure you want to change the App Language to {comboBoxItem?.Content.ToString()}";
+
+        }
+
+        private void Button_Click_6(object sender, RoutedEventArgs e)
+        {
+            Button? btn = sender as Button;
+            ComboBoxItem? comboBoxItem = cmbLanguages.SelectedItem as ComboBoxItem;
+            if (comboBoxItem?.Content.ToString()== "English")
+            {
+                ChangeLanguage("en-US");
+            }
+            else if (comboBoxItem?.Content.ToString() == "Spanish")
+            {
+                ChangeLanguage("es-ES");
+            }
+            else if (comboBoxItem?.Content.ToString() == "Hindi")
+            {
+                ChangeLanguage("hi-IN");
+            }
+
+            if (btn.Flyout is Flyout f)
+            {
+                f.Hide();
+            }
+        }
+        public void ChangeLanguage(string languageCode) // e.g., "es-ES"
+        {
+            // 1. Set the global override so the app remembers this on next launch
+            ApplicationLanguages.PrimaryLanguageOverride = languageCode;
+
+            // 2. In WinUI 3, we create a ResourceManager and a ResourceContext manually
+            var resourceManager = new Microsoft.Windows.ApplicationModel.Resources.ResourceManager();
+            var resourceContext = resourceManager.CreateResourceContext();
+
+            resourceContext.QualifierValues["Language"] = languageCode;
+            AppInstance.Restart("");
+            
         }
     }
 }

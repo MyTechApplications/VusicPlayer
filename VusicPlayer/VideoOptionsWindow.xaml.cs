@@ -245,7 +245,7 @@ where T : DependencyObject
         {
             HideDialog();
         }
-        public void Setup( Grid contents)
+        public void Setup( Grid contents, bool showact)
         {
             if (contents.Parent is Panel parentPanel)
                 parentPanel.Children.Remove(contents);
@@ -253,6 +253,14 @@ where T : DependencyObject
             Contents.Children.Clear();
             Contents.Children.Add(contents);
             StartShimmer(btnPrimary);
+            if (showact == true)
+            {
+                stkActionButtons.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                stkActionButtons.Visibility = Visibility.Collapsed;
+            }
         }
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
@@ -278,7 +286,7 @@ where T : DependencyObject
             appWindow.Resize(new Windows.Graphics.SizeInt32(400, 260));
         }
 
-        public static VideoOptionsWindow ShowDialog(Grid contents)
+        public static VideoOptionsWindow ShowDialog(Grid contents, int Width, int Height, bool ShowActionButtons)
         {
             if (_instance == null)
             {
@@ -286,8 +294,9 @@ where T : DependencyObject
             }
             App.OceanDialogInstance = _instance;
 
-            _instance.Setup(contents);
-            _instance.ResizeWind(600, 600);
+            _instance.Setup(contents, ShowActionButtons);
+            _instance.ResizeWind(Width, Height);
+         
             _instance.Activate();
             return _instance;
         }

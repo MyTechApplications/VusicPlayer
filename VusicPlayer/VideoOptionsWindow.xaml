@@ -112,7 +112,7 @@
 
 
 
-            <StackPanel  Spacing="10" Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="0, 0">
+            <StackPanel Name="stkActionButtons" Spacing="10" Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="0, 0">
                 <local:OceanButton  Style="{StaticResource OceanShim   }" x:Name="btnPrimary" Click="btnPrimary_Click">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="20" Name="imgPrimary" Source="/Assets/saveicon.png"></Image>

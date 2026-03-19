@@ -198,16 +198,6 @@ namespace VusicPlayer
                 //            txtClose.Text = value;
             }
         }
-        public string SecondaryButtonText
-        {
-            get => _secondarybuttonText;
-            set
-            {
-                _secondarybuttonText = value;
-                if (txtSecondary != null)
-                    txtSecondary.Text = value;
-            }
-        }
         public string PrimaryButtonIcon = "";
 
         [DllImport("user32.dll", SetLastError = true)]
@@ -222,7 +212,16 @@ namespace VusicPlayer
 
         const int GWL_HWNDPARENT = -8;
         private static OceanDialog? _instance;
-        public void Setup(string Title, bool secondaryvisible, Grid contents, OceanContentDialogDefault dlg, string CloseButtonTex, string primarybtntex)
+        void SetImage(Image img, string iconName)
+        {
+            if (!string.IsNullOrEmpty(iconName))
+            {
+                img.Source = new BitmapImage(
+                    new Uri($"ms-appx:///Assets/{iconName}.png")
+                );
+            }
+        }
+        public void Setup(string Title, bool secondaryvisible, Grid contents, OceanContentDialogDefault dlg, string CloseButtonTex, string primarybtntex, string secondarybtntext, string pbi, string sbi, string cbi)
         {
             txtTitle.Text = Title;
 
@@ -231,11 +230,15 @@ namespace VusicPlayer
 
             Contents.Children.Clear();
             Contents.Children.Add(contents);
-
+            SetImage(imgPrimary, pbi);
+            SetImage(imgSecondary, sbi);
+            SetImage(imgClose, cbi);
             txtClose.Text = CloseButtonTex;
+            btnClose.Visibility = string.IsNullOrEmpty(CloseButtonTex)
+             ? Visibility.Collapsed
+             : Visibility.Visible;
             txtPrimary.Text = primarybtntex;
-            txtSecondary.Text = SecondaryButtonText;
-            Debug.WriteLine(primarybtntex);
+            txtSecondary.Text = secondarybtntext;
             btnSecondary.Visibility = secondaryvisible
                 ? Visibility.Visible
                 : Visibility.Collapsed;
@@ -245,37 +248,30 @@ namespace VusicPlayer
             }
             else
             {
-                Debug.WriteLine("No");
                 btnPrimary.Visibility = Visibility.Visible;
             }
-            if (dlg == OceanContentDialogDefault.Primary)
-            {
-                var style = (Style)rootgrr.Resources["OceanShimmer"];
-                btnClose.Style = null;
-                btnPrimary.Style = style;
-                btnSecondary.Style = null;
-                StartShimmer(btnPrimary);
+            var style = (Style)rootgrr.Resources["OceanShimmer"];
 
-            }
+            btnClose.Style = null;
+            btnPrimary.Style = null;
+            btnSecondary.Style = null;
+
+            Button? target = null;
+
+            if (dlg == OceanContentDialogDefault.Primary)
+                target = btnPrimary;
             else if (dlg == OceanContentDialogDefault.Secondary)
-            {
-                var style = (Style)rootgrr.Resources["OceanShimmer"];
-                btnClose.Style = null;
-                btnPrimary.Style = null;
-                btnSecondary.Style = style;
-                StartShimmer(btnSecondary);
-            }
+                target = btnSecondary;
             else if (dlg == OceanContentDialogDefault.Close)
+                target = btnClose;
+
+            if (target != null)
             {
-                var style = (Style)rootgrr.Resources["OceanShimmer"];
-                btnClose.Style = style;
-                btnPrimary.Style = null;
-                btnSecondary.Style = null;
-                StartShimmer(btnClose);
+                target.Style = style;
+                StartShimmer(target);
             }
-                
         }
-        public static OceanDialog ShowDialog(string Title, bool secondaryvisible, Grid contents, OceanContentDialogDefault dlg, string CloseButtonTex,string primarybuttex, int Width, int Height, OceanContentDialogType DialogType, Window wind)
+        public static OceanDialog ShowDialog(string Title, bool secondaryvisible, Grid contents, OceanContentDialogDefault dlg, string CloseButtonTex,string primarybuttex,string secondarybuttontex, int Width, int Height, OceanContentDialogType DialogType, Window wind, string Primarybtnicon, string Secondarybtnicon, string Closebtnicon)
         {
             if (_instance == null)
             {
@@ -283,7 +279,7 @@ namespace VusicPlayer
             }
             App.OceanDialogInstance = _instance;
 
-            _instance.Setup(Title, secondaryvisible, contents, dlg, CloseButtonTex, primarybuttex);
+            _instance.Setup(Title, secondaryvisible, contents, dlg, CloseButtonTex, primarybuttex, secondarybuttontex, Primarybtnicon, Secondarybtnicon, Closebtnicon);
             _instance.ResizeWind(Width, Height);
             _instance.Activate();
             return _instance;

@@ -76,7 +76,7 @@
 
                     <!-- Action Buttons -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10" Margin="0,10,0,0">
-                        <Button x:Name="BtnRename" Click="BtnRename_Click_1" ToolTipService.ToolTip="Rename">
+                        <Button x:Name="BtnRename" Click="BtnRename_Click_2" ToolTipService.ToolTip="Rename">
                             <StackPanel Orientation="Horizontal" Spacing="5">
                                 <Image Source="/Assets/renameicon.png" Width="16"/>
                             </StackPanel>
@@ -114,7 +114,7 @@
                     </BreadcrumbBar.ItemTemplate>
                 </BreadcrumbBar>                
                 <Button Margin="10, 0" ToolTipService.ToolTip="Rename Folder" Name="btnRenameFolder" Click="Button_Click_1">
-                    <Image Width="20" Source="/Assets/editicon.png"></Image>
+                    <Image Width="20" Source="/Assets/renameicon.png"></Image>
                 </Button>
                 <TeachingTip Name="ttRenameFolder" IsOpen="False" Target="{x:Bind btnRenameFolder}">
                     <StackPanel Orientation="Vertical">
@@ -141,7 +141,16 @@
                 </TeachingTip>
             </StackPanel>
             <HyperlinkButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" Click="HyperlinkButton_Click" Margin="0, 10" Padding="0" Name="hypPath">
-                <TextBlock Name="txtFolderPath" Grid.Row="1" Margin="0, 10" Style="{StaticResource CaptionTextBlockStyle}" Text="Path"></TextBlock>
+                <TextBlock  Name="txtFolderPath" Grid.Row="1" Margin="0, 10" Style="{StaticResource CaptionTextBlockStyle}" Text="Path"></TextBlock>
+                <HyperlinkButton.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Name="mnftCopyPath" Click="mnftCopyPath_Click" Text="Copy" >
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8C8;"></FontIcon>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </HyperlinkButton.ContextFlyout>
             </HyperlinkButton>
             <TextBlock  Grid.Row="2" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Folder" Margin="0, 0" Style="{StaticResource TitleTextBlockStyle}"></TextBlock>
             <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="0, 20">
@@ -157,7 +166,7 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                <Button Name="btnRename" Click="btnRename_Click" Margin="10, 0" ToolTipService.ToolTip="Rename Selected File" >
+                <Button Name="btnRename" Click="btnRename_Click_3"  Margin="10, 0" ToolTipService.ToolTip="Rename Selected File" >
                     <Image Width="25" Source="/Assets/renameicon.png"></Image>
                     <Button.ContextFlyout>
                         <MenuFlyout>

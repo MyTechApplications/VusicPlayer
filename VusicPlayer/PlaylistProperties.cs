@@ -1,6 +1,8 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -8,15 +10,22 @@ using System.Threading.Tasks;
 
 namespace VusicPlayer
 {
-    public class PlaylistProperties
+    public class PlaylistProperties : INotifyPropertyChanged
     {
-        public string PlaylistName { get; set; }
-        public string PlaylistCount { get; set; }
-        public string PlaylistNowPlaying { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string? PlaylistName { get; set; } = "";
+        public string? PlaylistCount { get; set; } = "";
+        public string? PlaylistNowPlaying { get; set; } = "";
     
-        public string Thumbnail { get; set; }
-        public string PlaylistGenre { get; set; }
-        public List<string> SongsPaths { get; set; }
+        public string? Thumbnail { get; set; } = "";
+        public string? PlaylistGenre { get; set; } = "";
+        public List<string> SongsPaths { get; set; } = new();
         public DateTime DateCreation { get; set; }
+        public void NotifyCountChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PlaylistCount)));
+        }
+     
     }
 }

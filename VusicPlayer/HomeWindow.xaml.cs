@@ -1,7 +1,11 @@
 using ABI.Microsoft.UI.Xaml;
+using CommunityToolkit.WinUI;
+using CSCore.Codecs;
+using CSCore.Codecs.WAV;
+using CSCore.DMO.Effects;
 using FlyleafLib;
+using FlyleafLib.MediaFramework.MediaDecoder;
 using FlyleafLib.MediaPlayer;
-using LibVLCSharp.Shared;
 using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
@@ -52,19 +56,10 @@ using Window = Microsoft.UI.Xaml.Window;
 using WindowActivatedEventArgs = Microsoft.UI.Xaml.WindowActivatedEventArgs;
 using WindowEventArgs = Microsoft.UI.Xaml.WindowEventArgs;
 using XamlRoot = Microsoft.UI.Xaml.XamlRoot;
-
-//Vusic Player Version 1.1.0.0 Build 06.03.2026
-//Development Reset  - 27/02/2026
-//Switch to FlyLeaf Media Engine from LibVLCsharp due to failures with rendering of playbacks and audio output
-//Code Cleanup Initiated
-//FFmpeg DLLs to be shipped with the app
+//Vusic Player - OceanCyan Tech - Version 1.1.0.0 
 
 namespace VusicPlayer
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    /// 
     ///DEVELOPMENT
     public sealed partial class HomeWindow : Window
     {
@@ -73,7 +68,7 @@ namespace VusicPlayer
         {
             InitializeComponent();
 
-            txtPreviewBuild.Text = $"Vusic Player Version {Appversionstrings.AppVersion + Environment.NewLine} {Appversionstrings.VersionType} Build {Appversionstrings.BuildNumber}";
+            txtPreviewBuild.Text = $"Vusic Player {Strings.VersionText} {Appversionstrings.AppVersion + Environment.NewLine} {Appversionstrings.VersionType} {Strings.BuildText} {Appversionstrings.BuildNumber}";
             //  LoadTheme();
             if (App.MainWindowInstance != null)
             {
@@ -104,7 +99,7 @@ namespace VusicPlayer
             {
                 //  await CheckAndDownloadUpdate();
 
-                await ScanAllFoldersAsync();
+                //     await ScanAllFoldersAsync();
             });
             Engine.Start(new EngineConfig()
             {
@@ -124,20 +119,19 @@ namespace VusicPlayer
             }
             SplashComplete();
             CheckForDefaultNess();
-         //  CheckForFileArguments();
+            //  CheckForFileArguments();
         }
         public async Task<bool> IsAppDefault()
         {
-            // This checks which app is currently the default for .mp3
+
             var result = await Launcher.FindFileHandlersAsync(".mp3");
 
             foreach (var handler in result)
             {
-                // Check if the handler's Package Family Name matches yours
+
                 if (handler.PackageFamilyName == Windows.ApplicationModel.Package.Current.Id.FamilyName)
                 {
-                    // Note: This only tells you if your app IS an option. 
-                    // Finding if it is the SPECIFIC default is more complex due to privacy.
+
                     return true;
                 }
             }
@@ -172,7 +166,7 @@ namespace VusicPlayer
                 ttDefaultAppSet.IsOpen = true;
             }
             var currentSettings = await SettingsHelper.LoadSettingsAsync();
-            if(currentSettings.ShowDefaultMessage == false)
+            if (currentSettings.ShowDefaultMessage == false)
             {
                 ttDefaultAppSet.IsOpen = false;
             }
@@ -230,30 +224,21 @@ namespace VusicPlayer
                     args.WindowActivationState != WindowActivationState.Deactivated;
             }
 
-            // Reattach acrylic if needed
-
         }
 
         private void Window_Closed(object sender, WindowEventArgs args)
         {
-            // Make sure any Mica/Acrylic controller is disposed
             configurationSource = null;
-            if (player != null)
+            if (PlayerService.MasterPlayer != null)
             {
-                player.Stop();
-                player.Dispose();
+                PlayerService.MasterPlayer.Stop();
+                PlayerService.MasterPlayer.Dispose();
+                PlayerService.maintimer?.Stop();
             }
-
             acrylicController?.Dispose();
             acrylicController = null;
-
             Activated -= Window_Activated;
             configurationSource = null;
-            if (player != null)
-            {
-                player.Stop();
-                player.Dispose();
-            }
         }
         private void SetConfigurationSourceTheme()
 
@@ -400,127 +385,120 @@ namespace VusicPlayer
         bool _isDragging = false;
         private void SldMain_DragCompleted()
         {
-            if (player == null) return;
-            double newPosition = sldMain.Value / sldMain.Maximum;
-            player.CurTime = TimeSpan.FromSeconds(sldMain.Value).Ticks;
-            var curTime = TimeSpan.FromTicks(player.CurTime);
-            txtRunningDuration.Text = curTime.ToString(@"hh\:mm\:ss");
-            /*   if (_mediaPlayer != null)
-               {
-                   if (_mediaPlayer.State != VLCState.Stopped)
-                   {
-                       _mediaPlayer.Position = (float)newPosition;
-                       long currentTimeMs = _mediaPlayer.Time;
-                       txtRunningDuration.Text = TimeSpan.FromMilliseconds(currentTimeMs).ToString(@"hh\:mm\:ss");
+            //if (player == null) return;
+            //double newPosition = sldMain.Value / sldMain.Maximum;
+            //player.CurTime = TimeSpan.FromSeconds(sldMain.Value).Ticks;
+            //var curTime = TimeSpan.FromTicks(player.CurTime);
+            //txtRunningDuration.Text = curTime.ToString(@"hh\:mm\:ss");
 
-                       _mediaPlayer.Mute = false;
-                       if (stateofplay == "playing")
-                           maintimer.Start();
-                   }
-                   else
-                   {
-                   }*/
-            _isDragging = false;
-            maintimer.Start();
-            /*      _mediaPlayer.Play();
-                  _mediaPlayer.Position = (float)newPosition;
-                  _mediaPlayer.Pause();
-                  maintimer.Stop();
-                  stateofplay = "paused";
-                  long currentTimeMs = _mediaPlayer.Time;
-                  txtRunningDuration.Text = TimeSpan.FromMilliseconds(currentTimeMs).ToString(@"hh\:mm\:ss");
-                  _isDragging = false;
-                  _mediaPlayer.Mute = false;
-              }*/
+            //_isDragging = false;
+
         }
 
 
         private void SldMain_DragStarted()
         {
 
-            _isDragging = true;
-            maintimer.Stop();
+            //  _isDragging = true;
+            //maintimer.Stop();
         }
         Player? player;
+        public async void ReattachUI()
+        {
+            PlayerService.AttachUI(txtRunningDuration, sldMain);
+        }
         public async void LoadFileFromPath(ObservableCollection<string> path)
         {
-            _pendingPath = path[currentVideoIndex];
-            if (File.Exists(_pendingPath))
+            currentVideoIndex = 0;
+            queuepaths = path;
+            currentVideoPath = path[currentVideoIndex];
+            if (File.Exists(currentVideoPath))
             {
-                currentVideoPath = _pendingPath;
-                PlaybackState.CurrentlyPlayingPath = _pendingPath;
-
-                if (player == null)
-                {
-                    player = new Player(new Config());
-                    mediaEngine.Player = player;
-                }
-                player.Open(path[currentVideoIndex]);
-                player.Play();
-                stateofplay = "playing";
-                imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
-                imgThumbnailCover.Source = await GetFileThumbnailAsync(_pendingPath);
-                txtSongName.Text = Path.GetFileName(_pendingPath);
-                txtRunningDuration.Text = "00:00:00";
-                sldMain.Value = 0;
-                ToolTipService.SetToolTip(txtSongName, txtSongName.Text);
-                btnPlayPause.IsEnabled = true;
                 sldMain.IsEnabled = true;
-                maintimer = new DispatcherTimer();
-                maintimer.Interval = TimeSpan.FromMilliseconds(250);
-                maintimer.Tick += Maintimer_Tick;
-                StorageFile file = await StorageFile.GetFileFromPathAsync(_pendingPath);
-                var musicProps = await file.Properties.GetMusicPropertiesAsync();
-
-                TimeSpan duration = musicProps.Duration;
-
-                // Set slider max from metadata
-                sldMain.Maximum = duration.TotalSeconds;
-
-                // Set total duration label
-                txtTotalDuration.Text = duration.ToString(@"hh\:mm\:ss");
-
-                player.Audio.Volume = (int)sldVolume.Value;
-                originalvolume = player.Audio.Volume;
-                if (originalvolume.HasValue)
-                {
-                    currentvol = originalvolume.Value.ToString();
-                }
-                maintimer.Start();
-                _ = SaveRecents();
+                PlaybackState.CurrentlyPlayingPath = currentVideoPath;
+                PlayVideoPath(currentVideoPath);
             }
         }
-
+        public async void UpdateQueuePath(ObservableCollection<string> path)
+        {
+            queuepaths = path;
+        }
         private void PlayNext()
         {
-            if (currentVideoIndex + 1 < queuepaths.Count)
-            {
-                PlayVideoAtIndex(currentVideoIndex + 1);
-            }
-            player?.Stop();
-            maintimer.Stop();
-            //    _mediaPlayer.Position = 0;
-            sldMain.Value = 0;
-            txtRunningDuration.Text = "00:00:00";
-
-            imgPlayPause.Source =
-                new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
-            stateofplay = "paused";
+            // PlayVideoAtIndex already handles the bounds check, 
+            // so it will simply return if (currentVideoIndex + 1) is invalid.
+            PlayVideoAtIndex(currentVideoIndex + 1);
         }
+
+        private void PlayPrevious()
+        {
+            PlayVideoAtIndex(currentVideoIndex - 1);
+        }
+        private async void PlayVideoPath(string path)
+        {
+            StorageFile file = await StorageFile.GetFileFromPathAsync(currentVideoPath);
+            var musicProps = await file.Properties.GetMusicPropertiesAsync();
+
+            TimeSpan duration = musicProps.Duration;
+
+
+            sldMain.Maximum = duration.TotalSeconds;
+            txtTotalDuration.Text = duration.ToString(@"hh\:mm\:ss");
+            if (player == null)
+            {
+                PlayerService.AttachUI(txtRunningDuration, sldMain);
+                PlayerService.CreatePlayer();
+                player = PlayerService.MasterPlayer;
+                mediaEngine.Player = player;
+            }
+
+            player?.Open(path);
+            PlayerService.Play();
+            stateofplay = "playing";
+            imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
+            imgThumbnailCover.Source = await GetFileThumbnailAsync(currentVideoPath);
+            txtSongName.Text = Path.GetFileName(currentVideoPath);
+
+            ToolTipService.SetToolTip(txtSongName, txtSongName.Text);
+            btnPlayPause.IsEnabled = true;
+            if (player != null)
+            {
+                player.Audio.Volume = (int)sldVolume.Value;
+                originalvolume = player.Audio.Volume;
+            }
+            if (originalvolume.HasValue)
+            {
+                currentvol = originalvolume.Value.ToString();
+            }
+            _ = SaveRecents();
+        }
+        private async void PlayVideoAtIndex(int index)
+        {
+            if (index < 0 || index >= queuepaths.Count)
+
+                return; 
+            if (queuepaths.Count == 0) return;
+
+            currentVideoIndex = index;
+            currentVideoPath = queuepaths[index];
+
+            PlayVideoPath(currentVideoPath);
+        }
+
         private async Task SaveRecents()
         {
             var settings = await SettingsHelper.LoadSettingsAsync();
             var NewRecent = new RecentMusic
             {
-                SongName = Path.GetFileName(_pendingPath),
-                SongPath = _pendingPath,
+                SongName = Path.GetFileName(currentVideoPath),
+                SongPath = currentVideoPath,
                 FolderName = new DirectoryInfo(
-                    Path.GetDirectoryName(_pendingPath) ?? string.Empty
+                    Path.GetDirectoryName(currentVideoPath) ?? string.Empty
                 ).Name,
             };
 
             bool alreadyExists = settings.RecentMusic
-                .Any(x => x.SongPath == _pendingPath);
+                .Any(x => x.SongPath == currentVideoPath);
 
             if (!alreadyExists)
             {
@@ -532,48 +510,6 @@ namespace VusicPlayer
         }
         string currentVideoPath = "";
         int currentVideoIndex = 0;
-        bool mediaended;
-        private async void CheckForFileArguments()
-        {
-            var activatedArgs = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
-            if (activatedArgs.Kind == ExtendedActivationKind.File)
-            {
-                var fileArgs = (FileActivatedEventArgs)activatedArgs.Data;
-                var file = fileArgs.Files.FirstOrDefault();
-
-                if (file != null)
-                {
-                    string filePath = file.Path;
-
-                    string extension = Path.GetExtension(filePath).ToLower();
-
-                    string[] videoExtensions = { ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm" };
-                    string[] audioExtensions = { ".mp3", ".wav", ".aac", ".flac", ".m4a", ".ogg", ".wma" };
-
-                    if (videoExtensions.Contains(extension))
-                    {
-                        var videoItems = new ObservableCollection<VideoItem>();
-                        videoItems.Add(new VideoItem { FilePath = filePath });
-
-                        var playerWindow = new MainWindow(videoItems, filePath, 0, true);
-
-                        playerWindow.Activate();
-                        App.SetCurrentMainWindow(playerWindow);
-                        App.VideoPlayerWindowInstance = playerWindow;
-                        HomeWindow.HideWindow();
-
-                        return;
-                    }
-                    else if (audioExtensions.Contains(extension))
-                    {
-                        var home = HomeWindow.ShowWindow();
-                        home.LoadFileFromPath(new ObservableCollection<string> { filePath });
-                        return;
-                    }
-                }
-
-            }
-        }
         public void PausePlayer()
         {
             if (player == null) return;
@@ -612,89 +548,15 @@ namespace VusicPlayer
             App.MainWindowInstance = instance;
             App.MainWindowInstance2 = instance;
             App.HomeWindowInstance = instance;
-          //  instance.CheckForFileArguments();
+            //  instance.CheckForFileArguments();
             return instance;
         }
 
-        private async void PlayVideoAtIndex(int index)
-        {
-            if (index < 0 || index >= queuepaths.Count)
-
-                return; // out of range
-
-            // Safety check for empty lists
-            if (queuepaths.Count == 0) return;
-
-            currentVideoIndex = index;
-            currentVideoPath = queuepaths[index];
-            PlaybackState.CurrentlyPlayingPath = _pendingPath;
-            if (frmMain.Content is IUpdateableMusicPage activePage)
-            {
-                // C# now treats 'activePage' as something that definitely has the method
-                activePage.UpdateCurrentListhere(_pendingPath);
-            }
-            if (_libVLC == null)
-                return;
-            var media = new Media(_libVLC, currentVideoPath, FromType.FromPath);
-            media?.Parse(MediaParseOptions.ParseLocal);
-            stateofplay = "playing";
-            imgThumbnailCover.Source = await GetFileThumbnailAsync(currentVideoPath);
-            txtSongName.Text = Path.GetFileName(currentVideoPath);
-            ToolTipService.SetToolTip(txtSongName, txtSongName.Text);
-            if (_mediaPlayer == null)
-                return;
-
-            //     _mediaPlayer.Media = media;
-            //       _mediaPlayer.Play();
-            sldMain.Value = 0;
-            txtRunningDuration.Text = "00:00:00";
-            maintimer.Start();
-            imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
-        }
-        private Random rdm = new Random();
-        private List<string> _originalOrder = new List<string>();
-        public void ShuffleRemaining()
-        {
-
-            if (queuepaths.Count <= 1) return;
-
-            // 1. Identify the currently playing path
-            string currentPath = currentVideoPath; // Your string variable
-
-            // 2. Shuffle the ENTIRE list (starting from index 0)
-            for (int i = queuepaths.Count - 1; i > 0; i--)
-            {
-                int j = rdm.Next(0, i + 1);
-                var temp = queuepaths[i];
-                queuepaths[i] = queuepaths[j];
-                queuepaths[j] = temp;
-            }
-
-            // 3. Find where the current song moved to after the shuffle
-            int newIdx = queuepaths.IndexOf(currentPath);
-
-            // 4. Move the current song to the top (Index 0)
-            if (newIdx != -1)
-            {
-                queuepaths.Move(newIdx, 0);
-                currentVideoIndex = 0; // The current song is now always at the start
-            }
-        }
-        public void RestoreOriginalOrder(ObservableCollection<string> path)
-        {
-
-            queuepaths.Clear();
-            queuepaths = path;
-            if (queuepaths.Contains(currentVideoPath))
-            {
-                currentVideoIndex = queuepaths.IndexOf(currentVideoPath);
-            }
-
-        }
         private void Maintimer_Tick(object? sender, object e)
         {
             if (!_isDragging && player != null)
             {
+              
                 var curTime = TimeSpan.FromTicks(player.CurTime);
                 txtRunningDuration.Text = curTime.ToString(@"hh\:mm\:ss");
                 sldMain.Value = curTime.TotalSeconds;
@@ -726,19 +588,8 @@ namespace VusicPlayer
 
             return new BitmapImage(new Uri("ms-appx:///Assets/Placeholder.png"));
         }
-        // The "Is the engine started?" flag
-        private string _pendingPath = "";
-        private async Task PreloadLibVLCAsync(LibVLCSharp.Platforms.Windows.InitializedEventArgs e)
-        {
-            await Task.Run(() =>
-            {
-                _libVLC = new LibVLC(enableDebugLogs: true, e.SwapChainOptions);
-                _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_libVLC);
-            });
-        }
 
-        private LibVLC? _libVLC;
-        private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
+
         private async void FrmMain_Navigated(object sender, NavigationEventArgs e)
         {
 
@@ -766,9 +617,7 @@ namespace VusicPlayer
             else
                 nvgMain.Header = "";
         }
-        private void nvgMain_SelectionChanged(
-            NavigationView sender,
-            NavigationViewSelectionChangedEventArgs args)
+        private void nvgMain_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             MusicPlayerMaster.Visibility = Visibility.Visible;
             if (args.IsSettingsSelected)
@@ -805,90 +654,26 @@ namespace VusicPlayer
         }
         string stateofplay = "paused";
         string Headersearch = "Search results";
-        public void PlayPausePublic(string statesofplay)
-        {
-            stateofplay = statesofplay;
-            if (stateofplay == "playing")
-            {
-                stateofplay = "paused";
-                _mediaPlayer?.Pause();
-                maintimer.Stop();
-                imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
-
-            }
-            else
-            {
-                stateofplay = "playing";
-                maintimer.Start();
-                _mediaPlayer?.Play();
-                imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
-            }
-        }
+        
         private async void btnPlayPause_Click(object sender, RoutedEventArgs e)
         {
             if (player == null) return;
             if (stateofplay == "playing")
             {
-                player.Pause();
+                PlayerService.Pause();
                 stateofplay = "paused";
-                maintimer.Stop();
                 imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
             }
             else
             {
-                player.Play();
+                PlayerService.Play();
                 stateofplay = "playing";
-                maintimer.Start();
                 imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
             }
-            /*   if (_mediaPlayer == null || _isProcessing)
-                   return;
 
-               _isProcessing = true;
-
-               try
-               {
-                   if (_mediaPlayer.State == VLCState.Stopped)
-                   {
-                       float seekTo = (float)(sldMain.Value / sldMain.Maximum);
-                       _mediaPlayer.Play();
-                       await Task.Delay(100);
-                       _mediaPlayer.Position = seekTo;
-
-                       stateofplay = "playing";
-                       maintimer.Start();
-                       UpdatePlayUI(true);
-                       return;
-                   }
-
-                   _ = SaveRecents(); // run in background
-
-                   if (stateofplay == "playing")
-                   {
-                       _mediaPlayer.SetPause(true);
-                       stateofplay = "paused";
-                       maintimer.Stop();
-                   }
-                   else
-                   {
-                       _mediaPlayer.SetPause(false);
-                       stateofplay = "playing";
-                       maintimer.Start();
-                   }
-
-                   UpdatePlayUI(stateofplay == "playing");
-
-                   await Task.Delay(100);
-               }
-               finally
-               {
-                   _isProcessing = false;
-               }*/
         }
 
-        /// <summary>
-        /// Updates the Play/Pause button icon and tooltip based on state.
-        /// </summary>
+
         private void UpdatePlayUI(bool isPlaying)
         {
             string iconName = isPlaying ? "pause" : "play";
@@ -899,49 +684,15 @@ namespace VusicPlayer
         }
         private void btnPrev_Click(object sender, RoutedEventArgs e)
         {
-            if (currentVideoIndex <= queuepaths.Count)
-            {
-                PlayVideoAtIndex(currentVideoIndex - 1);
-                if (frmMain.Content is IUpdateableMusicPage activePage)
-                {
-                    // C# now treats 'activePage' as something that definitely has the method
-                    activePage.UpdateCurrentListhere(currentVideoPath);
-                }
-            }
+            PlayPrevious();
         }
 
         private void btnNext_Click(object sender, RoutedEventArgs e)
         {
-            if (currentVideoIndex <= queuepaths.Count)
-            {
-                PlayVideoAtIndex(currentVideoIndex + 1);
-                if (frmMain.Content is IUpdateableMusicPage activePage)
-                {
-                    // C# now treats 'activePage' as something that definitely has the method
-                    activePage.UpdateCurrentListhere(currentVideoPath);
-                }
-            }
+            PlayNext();
         }
-        void SeekRelative(int seconds)
-        {
-            if (_mediaPlayer == null || _mediaPlayer.Length <= 0)
-                return;
-
-            // Calculate new time in milliseconds
-            long newTime = _mediaPlayer.Time + seconds * 1000;
-
-            // Clamp between 0 and total length
-            newTime = Math.Max(0, Math.Min(newTime, _mediaPlayer.Length));
-
-            // Apply the new time to the media player
-            _mediaPlayer.Time = newTime;
-
-            // Update slider (in seconds)
-            sldMain.Value = newTime / 1000.0;
-
-            // Update running duration text
-            txtRunningDuration.Text = TimeSpan.FromMilliseconds(newTime).ToString(@"hh\:mm\:ss");
-        }
+        
+        
 
         private void nvgMain_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
         {
@@ -994,8 +745,7 @@ namespace VusicPlayer
 
         private void btnSkipForward_Click(object sender, RoutedEventArgs e)
         {
-            SeekRelative(+10);
-
+         
         }
         public void RestoreBackOriginalWindow(long time)
         {
@@ -1003,7 +753,6 @@ namespace VusicPlayer
         }
         private void btnSkipBack_Click(object sender, RoutedEventArgs e)
         {
-            SeekRelative(-10);
         }
         string videospeed = "1";
         private void btnSpeedfly_Click(object sender, RoutedEventArgs e)
@@ -1015,9 +764,7 @@ namespace VusicPlayer
             videospeed = speed;
             if (player != null && maintimer != null)
             {
-                //       player.Speed = 1.5;
-                //  player?.Pause();
-                //   maintimer.Stop();
+             
                 if (menuflyoutitem != null)
                 {
 
@@ -1036,9 +783,9 @@ namespace VusicPlayer
             ttSpeedCustom.IsOpen = true;
         }
 
-        private void btnEffects_Click(object sender, RoutedEventArgs e)
+        private async void btnEffects_Click(object sender, RoutedEventArgs e)
         {
-
+            await dlgEffects.ShowAsync();
         }
 
         private async void btnInfo_Click(object sender, RoutedEventArgs e)
@@ -1058,64 +805,79 @@ namespace VusicPlayer
         {
             AllAvailableSongs.Clear();
 
+            var userPaths = UserDataPaths.GetDefault();
+
             string[] searchPaths =
             {
-        UserDataPaths.GetDefault().Music,
-        UserDataPaths.GetDefault().Downloads,
-        UserDataPaths.GetDefault().Pictures,
-        UserDataPaths.GetDefault().Videos,
+        userPaths.Music,
+        userPaths.Downloads,
+        userPaths.Pictures,
+        userPaths.Videos
     };
 
-            var extensions = new[] { ".mp3", ".flac", ".m4a" };
+            var extensions = new HashSet<string>
+    {
+        ".mp3", ".wav", ".aac", ".flac", ".m4a", ".ogg", ".wma",
+        ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm"
+    };
 
             foreach (var path in searchPaths)
             {
+                if (!Directory.Exists(path))
+                    continue;
+
+                IEnumerable<string> files;
+
                 try
                 {
-                    var files = Directory.EnumerateFiles(
-                        path,
-                        "*.*",
-                        SearchOption.AllDirectories);
-
-                    foreach (var file in files)
-                    {
-                        string ext = Path.GetExtension(file).ToLower();
-                        if (!extensions.Contains(ext))
-                            continue;
-
-                        try
-                        {
-                            StorageFile storageFile =
-                                await StorageFile.GetFileFromPathAsync(file);
-
-                            MusicProperties props =
-                                await storageFile.Properties.GetMusicPropertiesAsync();
-
-                            AllAvailableSongs.Add(new SongModel
-                            {
-                                Title = string.IsNullOrEmpty(props.Title)
-                                        ? Path.GetFileNameWithoutExtension(file)
-                                        : props.Title,
-
-                                Artist = string.IsNullOrEmpty(props.Artist)
-                                        ? "Unknown"
-                                        : props.Artist,
-
-                                AlbumName = props.Album ?? "",
-
-                                SongDuration = props.Duration,
-
-                                FilePath = file
-                            });
-                        }
-                        catch
-                        {
-                            // Some files may fail metadata extraction
-                        }
-                    }
+                    files = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories);
                 }
                 catch
                 {
+                    continue;
+                }
+
+                foreach (var file in files)
+                {
+                    string ext = Path.GetExtension(file).ToLower();
+
+                    if (!extensions.Contains(ext))
+                        continue;
+
+                    try
+                    {
+                        StorageFile storageFile =
+                            await StorageFile.GetFileFromPathAsync(file);
+
+                        MusicProperties props =
+                            await storageFile.Properties.GetMusicPropertiesAsync();
+
+                        var song = new SongModel
+                        {
+                            Title = string.IsNullOrEmpty(props.Title)
+                                ? Path.GetFileNameWithoutExtension(file)
+                                : props.Title,
+
+                            Artist = string.IsNullOrEmpty(props.Artist)
+                                ? "Unknown"
+                                : props.Artist,
+
+                            AlbumName = props.Album ?? "",
+
+                            SongDuration = props.Duration,
+
+                            FilePath = file
+                        };
+
+                        await DispatcherQueue.EnqueueAsync(() =>
+                        {
+                            AllAvailableSongs.Add(song);
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "HomeWindow", Logger.LogLevelType.Error);
+                    }
                 }
             }
         }
@@ -1141,14 +903,7 @@ namespace VusicPlayer
 
         private void hypGoToLocation_Click(object sender, RoutedEventArgs e)
         {
-            string filePath = txtInfoFilePath.Text;
-
-            if (File.Exists(filePath))
-            {
-                // This opens explorer and HIGHLIGHTS the specific file
-                Process.Start("explorer.exe", $"/select,\"{filePath}\"");
-            }
-
+            NavigateToExplorer.GoToLocation(txtInfoFilePath.Text);
         }
 
         private async void txtInfoRating_ValueChanged(RatingControl sender, object args)
@@ -1185,10 +940,7 @@ namespace VusicPlayer
 
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var package = new DataPackage();
-            package.SetText(txtInfoFilePath.Text);
-            Clipboard.SetContent(package);
-
+            CopyToClipboard.CopyStringToClipboard(txtInfoFilePath.Text);
         }
         public async void ShowSongDetails(string FilePath)
         {
@@ -1464,9 +1216,9 @@ namespace VusicPlayer
 
             if (button != null)
             {
-                DataPackage dt = new();
-                dt.SetText(button.Content as string);
-                Clipboard.SetContent(dt);
+                string textToCopy = button.Content?.ToString() ?? string.Empty;
+
+                CopyToClipboard.CopyStringToClipboard(textToCopy);
             }
         }
 
@@ -1493,10 +1245,9 @@ namespace VusicPlayer
                 hypGoToSettings.Visibility = Visibility.Visible;
             }
         }
-
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-
+           
         }
 
         private async void ttDefaultAppSet_CloseButtonClick(TeachingTip sender, object args)
@@ -1512,6 +1263,49 @@ namespace VusicPlayer
             }
             await SettingsHelper.SaveSettingsAsync(currentSettings);
 
+        }
+
+        private void btnEffects_Click_1(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnSetReverb_Click(object sender, RoutedEventArgs e)
+        {
+            if (player == null) return;
+            if (player.Config.Audio.Filters == null)
+                player.Config.Audio.Filters = new List<Filter>();
+
+            player.Config.Audio.Filters.Clear();
+
+            // Step 1: Add filter BEFORE opening media
+            player.Config.Audio.Filters.Add(new Filter()
+            {
+                Name = "freeverb",
+                Args = "roomsize=0.9:damp=0.5:wet=0.3:dry=0.8"
+            });
+
+            // Step 2: Open media (this builds pipeline WITH filter)
+            player.Open(currentVideoPath);
+
+            // Step 3: (optional) tweak AFTER playback starts
+            player.Config.Audio.UpdateFilter("freeverb", "roomsize", "0.9");
+
+            foreach (var f in player.Config.Audio.Filters)
+            {
+                Debug.WriteLine(f.Name + " | " + f.Args);
+            }
+            player.Config.Audio.Filters.Clear();
+
+            player.Config.Audio.Filters.Add(new Filter()
+            {
+                Name = "volume",
+                Args = "volume=0.1"
+            });
+
+            // Force rebuild
+            player.Stop();
+            player.Open(currentVideoPath);
         }
     }
 }

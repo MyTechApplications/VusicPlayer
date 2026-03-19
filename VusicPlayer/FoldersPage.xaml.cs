@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -228,12 +229,12 @@ public sealed partial class FoldersPage : Page
         //Rename File
         if (sender is MenuFlyoutItem { DataContext: VideoItem data } && !data.IsFolder)
         {
-            ttRenameFile.IsOpen = true;
+         //   ttRenameFile.IsOpen = true;
             var container = VideoGrid.ContainerFromItem(data) as GridViewItem;
             if (container != null)
             {
                 ttRenameFile.Target = container;
-                ttRenameFile.IsOpen = true;
+           //     ttRenameFile.IsOpen = true;
                 ttRenameFile.PreferredPlacement = TeachingTipPlacementMode.Bottom;
             }
             txtRenameFile.Text = Path.GetFileNameWithoutExtension(data.FilePath);
@@ -399,7 +400,7 @@ public sealed partial class FoldersPage : Page
         {
             if (App.HomeWindowInstance != null)
             {
-                OceanContentDialog.Show("Access Denied", "", "", "OK", OceanContentDialogDefault.Close, AccessDeniedGrid, this.XamlRoot, 400, 260, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+                OceanContentDialog.Show("Access Denied", "", "", "OK", OceanContentDialogDefault.Close, AccessDeniedGrid, this.XamlRoot, 400, 260, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "removeicon");
             }
             else
             {
@@ -664,11 +665,7 @@ public sealed partial class FoldersPage : Page
         }
     }
 
-    private void btnRename_Click(object sender, RoutedEventArgs e)
-    {
-
-    }
-
+   
     private void BtnDelete_Click_2(object sender, RoutedEventArgs e)
     {
     }
@@ -830,8 +827,31 @@ public sealed partial class FoldersPage : Page
             Grid grd = new();
             text.Text = $"The folder path {clickedCrumb.Path} doesn't exist.";
             grd.Children.Add(text);
-            OceanContentDialog.Show("Create New Playlist", "", "", "OK", OceanContentDialogDefault.Close, grd, this.XamlRoot, 400, 260, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+            OceanContentDialog.Show("Folder Does Not Exist", "", "", "OK", OceanContentDialogDefault.Close, grd, this.XamlRoot, 400, 260, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "");
 
         }
+    }
+
+    private void mnftCopyPath_Click(object sender, RoutedEventArgs e)
+    {
+        var package = new DataPackage();
+        package.SetText(txtFolderPath.Text);
+        Clipboard.SetContent(package);
+
+    }
+
+    private void BtnRename_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void BtnRename_Click_2(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void btnRename_Click_3(object sender, RoutedEventArgs e)
+    {
+
     }
 }

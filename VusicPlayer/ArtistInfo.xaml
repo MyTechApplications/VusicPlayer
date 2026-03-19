@@ -21,9 +21,42 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-        
-                <PersonPicture Grid.Row="0" Name="imgArtist" Width="300" Height="300" />
-          
+            <TeachingTip PreferredPlacement="Bottom" Title="Finding files across your libraries" Name="ttProgress" >
+                <StackPanel Orientation="Horizontal" Margin="0, 15">
+                    <ProgressBar Name="prgProgress" IsIndeterminate="True" Width="300" Margin="10, 0"></ProgressBar>
+                </StackPanel>
+            </TeachingTip>
+            <PersonPicture Grid.Row="0" Name="imgArtist" Width="300" Tapped="imgArtist_Tapped" Height="300" >
+                <PersonPicture.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Change Image" Click="btnSetArtistProfilePicture_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="x"></FontIcon>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Remove Image" Name="mnftRemoveImage" Click="mnftRemoveImage_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="x"></FontIcon>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </PersonPicture.ContextFlyout>
+            </PersonPicture>
+            <ContentDialog>
+                <Grid Name="grdImageLarge">
+                    <Image Stretch="Uniform" Name="imgLargeViewer"></Image>
+                    <Canvas x:Name="canvasOverlay">
+                        <Ellipse x:Name="cropCircle"
+                     Width="300"
+                     Height="300"
+                     Stroke="White"
+                     StrokeThickness="3"
+                     PointerPressed="cropCircle_PointerPressed"
+                     PointerMoved="cropCircle_PointerMoved"
+                     PointerReleased="cropCircle_PointerReleased"/>
+                    </Canvas>
+                </Grid>
+            </ContentDialog>
 
             <StackPanel Grid.Row="1" Margin="0, 20" Orientation="Vertical" HorizontalAlignment="Center">
                 <TextBlock Text="Artist name" Name="txtArtistName" 
@@ -32,8 +65,8 @@
                TextWrapping="Wrap" />
                 <StackPanel Margin="0, 20" Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="• Artist" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Margin="10, 0" Text="• n Albums" Name="txtAlbumCount" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Margin="0, 0" Text="• n Songs" Name="txtSongCount" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="10, 0" Text="• 0 Albums" Name="txtAlbumCount" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0, 0" Text="• 0 Songs" Name="txtSongCount" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <TextBlock Text="&#xE823;" FontFamily="Segoe Fluent Icons" 
@@ -42,58 +75,284 @@ Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0, 3" />
 Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 </StackPanel>
             </StackPanel>
+            <Border 
+Padding="10,0" 
+VerticalAlignment="Top" 
+HorizontalAlignment="Center"
+Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" 
+BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+BorderThickness="1" 
+CornerRadius="16"
+                Grid.Row="2">
 
-            <ItemsControl Grid.Row="2" Margin="0, 20" HorizontalAlignment="Center">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VariableSizedWrapGrid Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                <ItemsControl Grid.Row="2" Margin="0, 10" HorizontalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VariableSizedWrapGrid Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                <Button Margin="5" ToolTipService.ToolTip="Rename Artist" >
-                    <Button.Flyout>
-                        <Flyout x:Name="flyoutRename">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBox GotFocus="txtRename_GotFocus" Width="150" Grid.Column="0" 
+                    <Button Background="Transparent" BorderBrush="Transparent" Margin="5" Click="Button_Click_1" ToolTipService.ToolTip="Rename Artist" >
+                        <Button.Flyout>
+                            <Flyout x:Name="flyoutRename">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox GotFocus="txtRename_GotFocus" Width="150" Grid.Column="0" 
                              Name="txtRename" PlaceholderText="Rename artist" />
-                                <Button Grid.Column="1" Click="btnRenameArtist_Click" Name="btnRenameArtist" >
-                                    <Image Margin="5, 0" Width="20" Source="/Assets/tickicon.png" />
-                                </Button>
-                            </Grid>
-                        </Flyout>
-                    </Button.Flyout>
-                    <Image Width="25" Source="/Assets/editicon.png" />
-                </Button>
+                                    <Button Background="Transparent" BorderBrush="Transparent" Margin="5, 0" Grid.Column="1" Click="btnRenameArtist_Click" Name="btnRenameArtist" >
+                                        <Image Margin="5, 0" Width="20" Source="/Assets/tickicon.png" />
+                                    </Button>
+                                </Grid>
+                            </Flyout>
+                        </Button.Flyout>
+                        <Image Width="25" Source="/Assets/editicon.png" />
+                    </Button>
 
-                <Button Name="btnPlayAll" Click="btnPlayAll_Click" Margin="5"
+                    <Button Background="Transparent" BorderBrush="Transparent" Name="btnPlayAll" Click="btnPlayAll_Click" Margin="5"
             ToolTipService.ToolTip="Play all songs of Artist">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Width="25" Source="/Assets/play.png" />
-                        <TextBlock Margin="5,2" Text="Play all" />
-                    </StackPanel>
-                </Button>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="25" Source="/Assets/play.png" />
+                            <TextBlock Margin="5,2" Text="Play all" />
+                        </StackPanel>
+                    </Button>
 
-                <ToggleButton Name="btnShuffle" Click="btnShuffle_Click" Margin="5"
+                    <ToggleButton Background="Transparent" BorderBrush="Transparent" Name="btnShuffle" Click="btnShuffle_Click" Margin="5"
                   ToolTipService.ToolTip="Shuffle playlist">
-                    <Image Width="25" Source="/Assets/shuffleicon.png" />
-                </ToggleButton>
+                        <Image Width="25" Source="/Assets/shuffleicon.png" />
+                    </ToggleButton>
 
-                <Button Name="btnAddSongs" Margin="5"
-            ToolTipService.ToolTip="Add songs to this Artist">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Width="25" Source="/Assets/addicon.png" />
-                        <TextBlock Margin="5,2" Text="Add Songs" />
-                    </StackPanel>
-                </Button>
-            </ItemsControl>
+                    <Button Name="btnAddSongs" Margin="5"
+            ToolTipService.ToolTip="Add songs to this Artist" Click="btnAddSongs_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="25" Source="/Assets/addicon.png" />
+                            <TextBlock Margin="5,2" Text="Add Songs" />
+                        </StackPanel>
+
+                    </Button>
+                    <Button Name="btnSetArtistProfilePicture" Margin="5"
+ToolTipService.ToolTip="Set Artist Cover">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Orientation="Vertical" Spacing="5">
+                                    <Button Name="btnFindArtistProfileOnline" Click="btnFindArtistProfileOnline_Click">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Width="25" Source="/Assets/addimgicon.png" />
+                                            <TextBlock Margin="5,2" Text="Find artist picture online" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Name="btnFindArtistProfileLocal" Click="btnSetArtistProfilePicture_Click" >
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Width="25" Source="/Assets/addimgicon.png" />
+                                            <TextBlock Margin="5,2" Text="Find artist picture on disk" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="25" Source="/Assets/addimgicon.png" />
+                            <TextBlock Margin="5,2" Text="Set Album Cover" />
+                        </StackPanel>
+                    </Button>
+                </ItemsControl>
+            </Border>
+            <ContentDialog>
+                <Grid Name="grdFindOnline">
+                    <ScrollViewer>
+                    <StackPanel Orientation="Vertical" Spacing="10">
+                            <InfoBar Name="ifbNoInternet" IsOpen="False">
+                                <StackPanel Orientation="Vertical" Spacing="5">
+                                    <TextBlock Name="ifbMessage"></TextBlock>
+                                    <Button Name="ifbActionButton"></Button>
+                                </StackPanel>
+                            </InfoBar>
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBox  Name="txtArtistToFind" PlaceholderText="Artist name...."></TextBox>
+                            <Button Name="btnFindOnline" Click="btnFindOnline_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="20" Source="/Assets/searchicon.png" />
+                                    <TextBlock Margin="5,2" Text="Find pictures for artist profile online" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <Button Name="btnShowMoreResults" Visibility="Collapsed" Content="Show more results" Click="btnShowMoreResults_Click"></Button>
+                        <ProgressBar Name="prgWaitOnline" IsIndeterminate="True" Visibility="Collapsed" Width="100"></ProgressBar>
+                        <TextBlock Name="txtWaitOnline" Text="Finding online..." Visibility="Collapsed"></TextBlock>
+                    
+                            <GridView x:Name="ImageGrid"
+                  IsItemClickEnabled="True"
+                  SelectionMode="None">
+
+                                <GridView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ItemsWrapGrid MaximumRowsOrColumns="4"/>
+                                    </ItemsPanelTemplate>
+                                </GridView.ItemsPanel>
+
+                                <GridView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="10"
+                            Margin="5"
+                            Background="Gray">
+
+                                            <Image Width="150"
+                               Height="150"
+                               Stretch="UniformToFill"
+                               Source="{Binding}" >
+                                                <Image.ContextFlyout>
+                                                    <MenuFlyout>
+                                                        <MenuFlyoutItem Text="Set Image" Click="MenuFlyoutItem_Click_4">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE8DA;"></FontIcon>
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                        <MenuFlyoutItem Text="Download Image" Visibility="Collapsed" Click="MenuFlyoutItem_Click_5">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE8DA;"></FontIcon>
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                    </MenuFlyout>
+                                                </Image.ContextFlyout>
+                                            </Image>
+                                        </Border>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+
+                            </GridView>
+                        <Button Click="btnSetArtistProfilePicture_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="25" Source="/Assets/addimgicon.png" />
+                                <TextBlock Margin="5,2" Text="Find on Disk instead" />
+                            </StackPanel>
+                        </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </ContentDialog>
         </Grid>
         <ScrollView Margin="10, 0" Grid.Column="1">
-            <StackPanel Orientation="Vertical">
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Artist Discography"></TextBlock>
+            <StackPanel Orientation="Vertical" Spacing="20">
+                <InfoBar Name="ifbError" Visibility="Collapsed" CloseButtonClick="ifbError_CloseButtonClick"></InfoBar>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Artist Discography" ></TextBlock>
+                    <Button Margin="20, 0" BorderBrush="Transparent" Style="{StaticResource AccentButtonStyle}" Name="btnRefresh" Click="btnRefresh_Click" ToolTipService.ToolTip="Refresh Album">
+                        <FontIcon Glyph="&#xE72C;"></FontIcon>
+                    </Button>
+                </StackPanel>
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Your most played"></TextBlock>
+                <TextBlock Text="Play songs of this artist to show them here!" Name="txtEmptyMostPlayed" Visibility="Visible"></TextBlock>
+
+                <local:ListViewMedia x:Name="lstViewMostPlayed"></local:ListViewMedia>
+
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                    <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Albums"></TextBlock>
+                    <CheckBox Content="Select" Margin="0, 5" Checked="chckSelectAlbums_Checked" Unchecked="chckSelectAlbums_Unchecked" Name="chckSelectAlbums"></CheckBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Visibility="Collapsed" Spacing="10" Name="stkMultiOptionsAlbums">
+                    <Button Name="btnRemoveSelections" ToolTipService.ToolTip="Remove from playlist" Margin="0, 10" >
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                        </StackPanel>
+                    
+                    </Button>
+                  
+                    
+
+                    <Button Name="btnSelectAll" ToolTipService.ToolTip="Select All" Margin="0, 10" Click="btnSelectAll_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="btnClearSelection" ToolTipService.ToolTip="Clear Selection" Margin="0, 10" Click="btnClearSelection_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <TextBlock Text="There are no albums for this artist." Name="txtEmptyAlbums" Visibility="Collapsed"></TextBlock>
+
+                <GridView SelectionMode="Single" SelectionChanged="grdViewAlbums_SelectionChanged" Name="grdViewAlbums" IsItemClickEnabled="True" Grid.Row="4" CanReorderItems="True"  AllowDrop="True" CanDragItems="True"  ItemClick="grdViewAlbums_ItemClick">
+                    <GridView.ItemTemplate>
+                        <DataTemplate >
+                            <StackPanel Width="150">
+                                <StackPanel.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Text="Open Album" Click="MenuFlyoutItem_Click">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE8DA;"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem Text="Rename Album" Click="MenuFlyoutItem_Click_2" >
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="D"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem Text="View Album Info" Click="MenuFlyoutItem_Click_3" >
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="D"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem Text="Change Album Cover" Name="mnftChangeAlbumCover" Click="mnftChangeAlbumCover_Click" >
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="D"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem Text="Find Album Cover Online" Name="mnftFindAlbumCoverOnline" Click="mnftFindAlbumCoverOnline_Click" >
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="D"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem Text="Remove Album" Name="mnftRemoveAlbum" Click="mnftRemoveAlbum_Click" >
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE8DA;"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem Text="Delete Album and its contents" Name="mnftDeleteAlbum" Click="mnftDeleteAlbum_Click" >
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE8DA;"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                     
+                                        
+                                    </MenuFlyout>
+                                </StackPanel.ContextFlyout>
+                                <Image Source="{Binding AlbumCoverThumbnail}" Width="150" Height="150" Stretch="UniformToFill"/>
+
+                                <TextBlock Margin="0, 5" Style="{StaticResource BodyLargeTextBlockStyle}" Text="{Binding AlbumName}" Visibility="Visible" TextWrapping="Wrap" />
+                                <Grid >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="Visible" TextWrapping="Wrap" >
+                                      <Run Text="• " />
+  <Run Text="{Binding AlbumCount}" />
+                                </TextBlock>
+                                <TextBlock Grid.Column="1" FontSize="12"
+           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+           TextWrapping="Wrap">
+    <Run Text="• " />
+    <Run Text="{Binding AlbumYear}" />
+                                    </TextBlock>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Singles"></TextBlock>
+                <TextBlock Text="There are no singles for this artist." Visibility="Collapsed" Name="txtEmptySingles"></TextBlock>
+                <local:ListViewMedia x:Name="lstViewSingles"></local:ListViewMedia>
+                <StackPanel Orientation="Horizontal" Margin="0, 20">
+                    <TextBlock Name="txtPlaylistContentHeader" Style="{StaticResource SubtitleTextBlockStyle}" Text="All Songs"></TextBlock>
+                    <TextBlock Margin="10,5" Style="{StaticResource BaseTextBlockStyle}" ToolTipService.ToolTip="Media will play shuffled" Text="shuffled" Name="txtShuffled" Visibility="Collapsed" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                </StackPanel>
+                <TextBlock Text="There are no songs for this artist." Name="txtEmptySongs" Visibility="Collapsed"></TextBlock>
+
+                <local:ListViewMedia x:Name="lstViewAllSongs"></local:ListViewMedia>
+
             </StackPanel>
         </ScrollView>
     </Grid>

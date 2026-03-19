@@ -167,6 +167,11 @@ public sealed partial class Album : Page, IUpdateableMusicPage
                     txtAlbumHeader.Visibility = Visibility.Visible;
                 }
             };
+            if (NotifierClass.RenameAlbum == true)
+            {
+                flyoutRename.ShowAt(btnRename);
+                NotifierClass.RenameAlbum = false;
+            }
         }
         if (FoundSongs.Count == 0)
         {

@@ -56,7 +56,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
-                <Button Margin="5" ToolTipService.ToolTip="Rename Album" Click="Button_Click">
+                <Button Name="btnRename" Margin="5" ToolTipService.ToolTip="Rename Album" Click="Button_Click">
                     <Button.Flyout>
                         <Flyout x:Name="flyoutRename">
                             <Grid>
@@ -72,7 +72,7 @@ Name="txtTotalDuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             </Grid>
                         </Flyout>
                     </Button.Flyout>
-                    <Image Width="25" Source="/Assets/editicon.png" />
+                    <Image Width="25" Source="/Assets/renameicon.png" />
                 </Button>
 
                 <Button Name="btnPlayAll" Click="btnPlayAll_Click" Margin="5"

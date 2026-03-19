@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -54,6 +55,7 @@ namespace VusicPlayer
         }
         private void MainWindowInstance_SizeChanged(object sender, WindowSizeChangedEventArgs args)
         {
+            Debug.WriteLine("Size modified");
             UpdateLayout(args.Size.Width, args.Size.Height);
         }
         private void UpdateLayout(double width, double height)

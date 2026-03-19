@@ -1,9 +1,11 @@
+using FlyleafLib.MediaPlayer;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,14 @@ namespace VusicPlayer
         {
             InitializeComponent();
         }
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            if(App.HomeWindowInstance is HomeWindow wind)
+            {
+                wind.ReattachUI();
+            }
+            base.OnNavigatedFrom(e);
+        }
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             if(e.Parameter is TransposeMediaDetails MediaPath)
@@ -41,19 +51,32 @@ namespace VusicPlayer
 
                 MusicProperties props =
                     await storageFile.Properties.GetMusicPropertiesAsync();
+            
                 txtAlbum.Content = $"• {props.Album}";
                 txtArtist.Content = $"• {props.Artist}";
                 TimeSpan duration = props.Duration;
+
+                sldMain.Maximum = duration.TotalSeconds;
                 txtTotalDuration.Text = duration.ToString(@"hh\:mm\:ss");
-                txtRunningDuration.Text = MediaPath.CurrentDur;
+                PlayerService.AttachUI(txtRunningDuration, sldMain);
                 btnPlayPause.IsEnabled = true;
                 btnPrev.IsEnabled = true;
                 btnFav.IsEnabled = true;
                 btnShuffle.IsEnabled = true;
                 btnVolume.IsEnabled = true;
-                sldMain.IsEnabled = true;
+                sldMain!.IsEnabled = true;
                 sldVolume.IsEnabled = true;
                 btnNext.IsEnabled = true;
+                var player = PlayerService.MasterPlayer;
+                if (player == null) return;
+                if (player.IsPlaying)
+                {
+                    imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
+                }
+                else
+                {
+                    imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
+                }
             }
         }
         private void btnPrev_Click(object sender, RoutedEventArgs e)
@@ -65,10 +88,24 @@ namespace VusicPlayer
         {
 
         }
-
+        private void PlayPauseEvent()
+        {
+            var player = PlayerService.MasterPlayer;
+            if (player == null) return;
+            if (player.IsPlaying)
+            {
+                player.Pause();
+                imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
+            }
+            else
+            {
+                player.Play();
+                imgPlayPause.Source = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
+            }
+        }
         private void btnPlayPause_Click(object sender, RoutedEventArgs e)
         {
-
+            PlayPauseEvent();
         }
 
         private void btnVolume_Click(object sender, RoutedEventArgs e)

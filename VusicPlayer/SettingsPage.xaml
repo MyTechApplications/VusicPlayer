@@ -9,8 +9,9 @@
     mc:Ignorable="d">
 
     <ScrollViewer Name="scrViewerMaster">
+        
         <StackPanel Spacing="32" Padding="24">
-
+            <AutoSuggestBox QueryIcon="Find" PlaceholderText="Find settings..."></AutoSuggestBox>
             <!-- ===================== -->
             <!-- Appearance Section -->
             <!-- ===================== -->
@@ -30,7 +31,36 @@
                 </RadioButtons>
             </StackPanel>
 
+            <!-- ===================== -->
+            <!-- Language Section -->
+            <!-- ===================== -->
 
+            <StackPanel Spacing="12">
+                <TextBlock Text="Language"
+                 Style="{StaticResource TitleTextBlockStyle}" />
+
+                <ComboBox x:Name="cmbLanguages" IsEnabled="True"
+                    Header="Select App Language to be displayed" SelectionChanged="cmbLanguages_SelectionChanged">
+                    <ComboBox.Items>
+                        <ComboBoxItem Content="English"></ComboBoxItem>
+                        <ComboBoxItem Content="Spanish"></ComboBoxItem>
+                        <ComboBoxItem Content="Hindi"></ComboBoxItem>
+                        <ComboBoxItem Content="French"></ComboBoxItem>
+                    </ComboBox.Items>
+                </ComboBox>
+                <Button Content="Set App Language">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Spacing="12" Padding="12" Width="250">
+                                <TextBlock Text="Are you sure you want to change the App Language to " Name="txtConfirmlanguagechange"
+                 TextWrapping="Wrap"/>
+                                <Button Content="Confirm"
+              Click="Button_Click_6"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
 
             <!-- ===================== -->
             <!-- Video Section -->

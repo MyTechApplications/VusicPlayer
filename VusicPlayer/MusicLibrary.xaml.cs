@@ -18,6 +18,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using Vortice.Direct3D11;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Playlists;
@@ -26,7 +28,13 @@ using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 using FrameworkElement = Microsoft.UI.Xaml.FrameworkElement;
+using Grid = Microsoft.UI.Xaml.Controls.Grid;
+using Page = Microsoft.UI.Xaml.Controls.Page;
 using RoutedEventArgs = Microsoft.UI.Xaml.RoutedEventArgs;
+using TextBlock = Microsoft.UI.Xaml.Controls.TextBlock;
+using TextBox = Microsoft.UI.Xaml.Controls.TextBox;
+using TextChangedEventArgs = Microsoft.UI.Xaml.Controls.TextChangedEventArgs;
+using ToolTipService = Microsoft.UI.Xaml.Controls.ToolTipService;
 using Window = Microsoft.UI.Xaml.Window;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -43,16 +51,11 @@ namespace VusicPlayer
         {
             InitializeComponent();
             GrdViewPlaylists.ItemsSource = MyItems;
-            CallValues();
+         //   CallValues();
             MyItems.CollectionChanged += MyItems_CollectionChanged;
             RecentMusicItems.CollectionChanged += RecentMusicItems_CollectionChanged;
-            loadedSongs.CollectionChanged += LoadedSongs_CollectionChanged;
         }
 
-        private void LoadedSongs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            txtAddedSongs.Text = "Added Songs: " + $"{loadedSongs.Count} {(loadedSongs.Count == 1 ? "item" : "items")}";
-        }
 
         private async void RecentMusicItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
@@ -83,15 +86,21 @@ namespace VusicPlayer
         private async void CallValues()
         {
             MyItems.Clear();
-
+            RecentMusicItems.Clear();
             var settings = await SettingsHelper.LoadSettingsAsync();
-            var unfinishedItems = settings.SavedPlaylists;
+            var playlistitemss = settings.SavedPlaylists;
             var recentmusicitems = settings.RecentMusic;
-            foreach (var item in unfinishedItems)
+            foreach (var item in playlistitemss)
             {
+                string defaultThumbnail = Path.Combine(AppContext.BaseDirectory, "Assets", "playlistdefaultdark.png");
+
                 if (item.Thumbnail == null && item.SongsPaths?.Count > 0)
                 {
                     item.Thumbnail = new Uri(item.SongsPaths[0]).AbsoluteUri;
+                }
+                else if (item.Thumbnail == null)
+                {
+                    item.Thumbnail = new Uri(defaultThumbnail).AbsoluteUri;
                 }
                 MyItems.Add(item); // This sends a notification
             }
@@ -117,6 +126,8 @@ namespace VusicPlayer
                 grdViewRecentMusic.Visibility = Visibility.Collapsed;
                 chckmultiplerecent.Visibility = Visibility.Collapsed;
             }
+            GrdViewPlaylists.ItemsSource = MyItems;
+
         }
         public ObservableCollection<PlaylistProperties> MyItems { get; set; } = new();
         public ObservableCollection<RecentMusic> RecentMusicItems { get; set; } = new();
@@ -161,109 +172,31 @@ namespace VusicPlayer
         private async void btnNewPlaylist_Click(object sender, RoutedEventArgs e)
         {
             if (App.HomeWindowInstance == null) return;
-            OceanContentDialog.Show("Create New Playlist", "Create", "", "Cancel", OceanContentDialogDefault.Primary, contentsNewPlaylist, this.XamlRoot, 600, 760, OceanContentDialogType.Elevated, App.HomeWindowInstance);
+
+            PlaylistDialog.LoadPlaylistCreationDialog(true, new PlaylistProperties { PlaylistName="New Playlist"}, this.Frame);
+            OceanContentDialog.Show("Create New Playlist", "Create", "", "Cancel", OceanContentDialogDefault.Primary, contentsNewPlaylist, this.XamlRoot, 600, 760, OceanContentDialogType.Elevated, App.HomeWindowInstance, "addicon", "", "");
             OceanContentDialog.PrimaryRequested += Dlg_PrimaryRequested;
 
-            if (lstViewPlaylistAddedSongs.Items.Count == 0)
-            {
-                txtNullAddedSongs.Visibility = Visibility.Visible;
-            }
         }
         OceanDialog dlg2;
         OceanPopup oceanPopup;
         private async void Dlg_PrimaryRequested()
         {
-            if (_isCreatingPlaylist)
-                return;
-
-            _isCreatingPlaylist = true;
-            try
-            {
-                OceanContentDialog.HideDlg();
-                HomeWindow.ShowWindow();
-                //          oceanPopup.Hide();
-                var currentSettings = await SettingsHelper.LoadSettingsAsync();
-                string baseName = txtPlaylistName.Text.Trim();
-                if (string.IsNullOrEmpty(baseName)) baseName = "New Playlist";
-
-                string finalName = baseName;
-                int counter = 1;
-
-                // 2. Check for duplicates in your SavedPlaylists collection
-                // Use LINQ's Any() to check if a playlist with the same name exists
-                while (currentSettings.SavedPlaylists.Any(p => p.PlaylistName.Equals(finalName, StringComparison.OrdinalIgnoreCase)))
-                {
-                    finalName = $"{baseName} ({counter++})";
-                }
-                string baseDirectory = AppContext.BaseDirectory;
-                string defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultdark.png");
-                if (!isdarkmode)
-                {
-
-                    defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultlight.png");
-                }
-
-                if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
-                {
-                    defaultPath = bitmap.UriSource.ToString();
-                }
-
-                // 3. Create the new playlist object
-                var newPlaylist = new PlaylistProperties
-                {
-                    PlaylistName = finalName,
-
-                    PlaylistCount = $"{loadedSongs.Count} {(loadedSongs.Count == 1 ? "item" : "items")}",
-                    PlaylistNowPlaying = "",
-                    PlaylistGenre = txtGenre.Text,
-                    SongsPaths = loadedSongs.Select(s => s.SongPath).ToList(),
-                    Thumbnail = defaultPath,
-                    DateCreation = DateTime.Now.Date,
-                };
-
-                // 4. Add to the collection and save
-                currentSettings.SavedPlaylists.Add(newPlaylist);
-                MyItems.Add(newPlaylist);
-                if (GrdViewPlaylists.Items.Count == 0)
-                {
-                    chckmultiple.Visibility = Visibility.Collapsed;
-                    txtEmptyPlaylists.Visibility = Visibility.Visible;
-                    GrdViewPlaylists.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    chckmultiple.Visibility = Visibility.Visible;
-                    txtEmptyPlaylists.Visibility = Visibility.Collapsed;
-                    GrdViewPlaylists.Visibility = Visibility.Visible;
-                }
-                await SettingsHelper.SaveSettingsAsync(currentSettings);
-                ttPlaylistDeleted.Title = $"New Playlist '{finalName}' created!";
-
-                ttPlaylistDeleted.IsOpen = true;
-                await Task.Delay(5000);
-                ttPlaylistDeleted.IsOpen = false;
-            }
-            finally
-            {
-
-                _isCreatingPlaylist = false;
-            }
+            OceanContentDialog.HideDlg();
+            HomeWindow.ShowWindow();
+            PlaylistDialog.SavePlaylist();
+            CallValues();
         }
-
-        private async void btnOpenMusic_Click(object sender, RoutedEventArgs e)
+        public async Task<StorageFile?> PickFileAsync(Window wind)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
-            // Get the handle from the specific instance we know is alive
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance);
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(wind);
 
             if (hwnd == IntPtr.Zero)
             {
-                // If for some reason the main window is gone, try the current active one
                 hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.CurrentActiveWindow);
             }
-
-            // 2. Initialize the picker with the handle
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             #region AudioFileTypes 
@@ -291,7 +224,12 @@ namespace VusicPlayer
             #endregion
 
             var files = await picker.PickSingleFileAsync();
-
+            return files;
+        } 
+        private async void btnOpenMusic_Click(object sender, RoutedEventArgs e)
+        {
+            if (App.HomeWindowInstance == null) return;
+            var files = await PickFileAsync(App.HomeWindowInstance);
             if (files != null)
             {
 
@@ -317,86 +255,24 @@ namespace VusicPlayer
 
         private void txtPlaylistName_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox textBox)
-            {
-                // Use the Dispatcher to run this after the click event fully completes
-                textBox.DispatcherQueue.TryEnqueue(() =>
-                {
-                    textBox.SelectAll();
-                });
-            }
+
         }
 
 
 
         private void btnActualReset_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            txtPlaylistName.Text = "";
 
-            txtGenre.Text = "";
-            loadedSongs.Clear();
-            imgPlaylistCov.Source = null;
-            CoverOptions.Visibility = Visibility.Collapsed;
-            btnAddPlaylistCover.IsEnabled = true;
-            lstViewPlaylistAddedSongs.ItemsSource = loadedSongs;
         }
         private async void removesongfromplaylistcreation_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement element && element.DataContext is NewPlaylistSongProperty song)
-            {
-                // This single line will now update the UI automatically
-                loadedSongs.Remove(song);
-            }
-            if (lstViewPlaylistAddedSongs.Items.Count == 0)
-            {
-                txtNullAddedSongs.Visibility = Visibility.Visible;
-            }
+
         }
-        private ObservableCollection<NewPlaylistSongProperty> loadedSongs = new ObservableCollection<NewPlaylistSongProperty>();
         BitmapImage? img;
         private async void btnAddSongs_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new FileOpenPicker();
-            btnAddPlaylistCover.IsEnabled = false;
-            btnAddSongs.IsEnabled = false;
-            var hwnd = WindowNative.GetWindowHandle(App.MainWindowInstance);
-            InitializeWithWindow.Initialize(picker, hwnd);
-
-            picker.FileTypeFilter.Add(".mp3");
-            picker.FileTypeFilter.Add(".wav");
-            picker.FileTypeFilter.Add(".m4a");
-            picker.FileTypeFilter.Add(".ogg");
-
-            var files = await picker.PickMultipleFilesAsync();
-
-            if (files == null) return;
-
-            foreach (var file in files)
-            {
-                if (!loadedSongs.Any(s => s.SongPath == file.Path))
-                {
-                    var musicProps = await file.Properties.GetMusicPropertiesAsync();
-
-                    string duration = FormatDuration(musicProps.Duration);
-
-                    loadedSongs.Add(new NewPlaylistSongProperty
-                    {
-                        SongPath = file.Path,
-                        SongDuration = duration
-                    });
-                }
-            }
-            lstViewPlaylistAddedSongs.ItemsSource = loadedSongs;
-            btnAddPlaylistCover.IsEnabled = true;
-            btnAddSongs.IsEnabled = true;
         }
-        private string FormatDuration(TimeSpan duration)
-        {
-            if (duration.Hours > 0)
-                return duration.ToString(@"hh\:mm\:ss");
 
-            return duration.ToString(@"mm\:ss");
-        }
         bool isdarkmode = true;
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -411,6 +287,7 @@ namespace VusicPlayer
                     ttPlaylistDeleted.IsOpen = false;
                 }
             }
+            CallValues();
         }
         private async void dlgNewPlaylist_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
@@ -504,45 +381,12 @@ namespace VusicPlayer
 
         private async void btnAddPlaylistCover_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            btnAddPlaylistCover.IsEnabled = false;
-            btnAddSongs.IsEnabled = false;
-            // Get the handle from the specific instance we know is alive
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance);
 
-            if (hwnd == IntPtr.Zero)
-            {
-                // If for some reason the main window is gone, try the current active one
-                hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.CurrentActiveWindow);
-            }
-            picker.CommitButtonText = "Choose";
-            // 2. Initialize the picker with the handle
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            picker.FileTypeFilter.Add(".png");
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".ico");
-
-            var file = await picker.PickSingleFileAsync();
-
-            if (file != null)
-            {
-                CoverOptions.Visibility = Visibility.Visible;
-                btnAddPlaylistCover.IsEnabled = false;
-                ToolTipService.SetToolTip(imgPlaylistCov, Path.GetFileName(file.Path));
-                imgPlaylistCov.Source = new BitmapImage(new Uri(file.Path));
-            }
-            btnAddPlaylistCover.IsEnabled = true;
-            btnAddSongs.IsEnabled = true;
         }
 
         private void btnRemovePlaylistCover_Click(object sender, RoutedEventArgs e)
         {
-            ToolTipService.SetToolTip(imgPlaylistCov, "");
-            CoverOptions.Visibility = Visibility.Collapsed;
-            btnAddPlaylistCover.IsEnabled = true;
-            imgPlaylistCov.Source = null;
+
         }
 
 
@@ -600,18 +444,33 @@ namespace VusicPlayer
         {
 
         }
-
+        RecentMusic temp = new();
         private void RecentMusic_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (chckmultiplerecent.IsChecked == false)
             {
                 var clickedRecent = e.ClickedItem as RecentMusic;
-                if (clickedRecent == null) return;
-                if (App.MainWindowInstance is HomeWindow wind)
+                if (clickedRecent == null)
                 {
-                    ObservableCollection<string> pt = new();
-                    pt.Add(clickedRecent.SongPath);
-                    wind.LoadFileFromPath(pt);
+                
+                    return;
+                }
+                temp = clickedRecent;
+                if (App.HomeWindowInstance is HomeWindow wind)
+                {
+                    if (File.Exists(clickedRecent.SongPath))
+                    {
+                        ObservableCollection<string> pt = new();
+                        pt.Add(clickedRecent.SongPath);
+                        wind.LoadFileFromPath(pt);
+                    }
+                    else
+                    {
+                      
+                        txtMissingpath.Text = clickedRecent.SongPath;
+                       
+                        OceanContentDialog.Show("Missing File", "", "", "OK", OceanContentDialogDefault.Close, AccessDeniedGrid, this.XamlRoot, 500,460, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "");
+                    }
                 }
             }
         }
@@ -655,7 +514,6 @@ namespace VusicPlayer
                 string filePath = song.SongPath;
                 if (File.Exists(filePath))
                 {
-                    // This opens explorer and HIGHLIGHTS the specific file
                     Process.Start("explorer.exe", $"/select,\"{filePath}\"");
                 }
             }
@@ -669,6 +527,96 @@ namespace VusicPlayer
         private void MenuFlyoutItem_Click_3(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void mnftOpenPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.DataContext is PlaylistProperties playlist)
+            {
+                var clickedPlaylist = playlist;
+                PlaybackState.currentPlaylist = clickedPlaylist;
+                if (clickedPlaylist != null)
+                {
+                    this.Frame.Navigate(typeof(Playlist), clickedPlaylist);
+                }
+            }
+        }
+
+        private void MenuFlyoutItem_Click_4(object sender, RoutedEventArgs e)
+        {
+            MenuFlyoutItem? it = sender as MenuFlyoutItem;
+            if (it == null) return;
+            if (it.Tag.ToString() == "name")
+            {
+                var sorted = MyItems.OrderBy(x => x.PlaylistName).ToList();
+                MyItems.Clear();
+                foreach (var item in sorted)
+                    MyItems.Add(item);
+            }
+            else if (it.Tag.ToString() == "date")
+            {
+                var sorted = MyItems.OrderBy(x => x.DateCreation).ToList();
+                MyItems.Clear();
+                foreach (var item in sorted)
+                    MyItems.Add(item);
+            }
+            else if (it.Tag.ToString() == "items")
+            {
+                var sorted = MyItems.OrderBy(x => x.PlaylistCount).ToList();
+                MyItems.Clear();
+                foreach (var item in sorted)
+                    MyItems.Add(item);
+            }
+        }
+
+        private void btnRemoveFile_Click(object sender, RoutedEventArgs e)
+        {
+            RecentMusicItems.Remove(temp);
+            OceanContentDialog.HideDlg();
+            HomeWindow.ShowWindow();
+        }
+
+        private async void btnRelocate_Click(object sender, RoutedEventArgs e)
+        {
+            if(App.OceanDialogInstance == null)
+            {
+                ifbMessagee.IsOpen = true;
+                ifbMessagee.Title = "Error";
+                ifbMessagee.Message = "An unexpected error occured. Check log details in Settings Page.";
+                ifbMessagee.Severity = InfoBarSeverity.Error;
+                Logger.Log("Error code 0x0012oc. Refer the github page for more details.", "PlaylistCreation", Logger.LogLevelType.Error);
+                return;
+            }
+            var file = await PickFileAsync(App.OceanDialogInstance);
+
+            if (file != null)
+            {
+                int index = RecentMusicItems.IndexOf(temp);
+
+                if (index != -1)
+                {
+                    RecentMusicItems.RemoveAt(index);
+
+                    var newfile = new RecentMusic
+                    {
+                        SongName = Path.GetFileName(file.Path),
+                        SongPath = file.Path,
+                        FolderName = new DirectoryInfo(
+                            Path.GetDirectoryName(file.Path) ?? string.Empty
+                        ).Name
+                    };
+                    newfile.Thumbnail = await GetFileThumbnailAsync(file.Path);
+                    RecentMusicItems.Insert(index, newfile);
+                    ttPlaylistDeleted.Title = "File Relocated to";
+                    ttPlaylistDeleted.Content = $"{file.Path}";
+                    OceanContentDialog.HideDlg();
+                    HomeWindow.ShowWindow();
+                    ttPlaylistDeleted.IsOpen = true;
+                    await Task.Delay(5000);
+                    ttPlaylistDeleted.IsOpen = false;
+                    ttPlaylistDeleted.Content = "";
+                }
+            }
         }
     }
 

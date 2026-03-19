@@ -11,7 +11,7 @@
 xmlns:ui="using:CommunityToolkit.WinUI"
     Title="HomeWindow">
 
- 
+
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/oceanglow.png" 
@@ -23,45 +23,45 @@ Stretch="UniformToFill"/>
                 <media:BackdropBlurBrush Amount="10.0" />
             </Border.Background>
             <Grid>
-            <Frame VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Mainframe"  Visibility="Visible"></Frame>
-        <Grid Background="Transparent" Name="rootgrid" Visibility="Collapsed" >
-            <Grid.ColumnDefinitions>
-            <ColumnDefinition ></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <ProgressRing x:Name="loadingRing"
+                <Frame VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Mainframe"  Visibility="Visible"></Frame>
+                <Grid Background="Transparent" Name="rootgrid" Visibility="Collapsed" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition ></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <ProgressRing x:Name="loadingRing"
                   IsActive="True"
                   Visibility="Collapsed"
                   HorizontalAlignment="Center" 
                   VerticalAlignment="Center"
                   Width="60" Height="60"/>
-        <NavigationView IsBackButtonVisible="Auto" IsBackEnabled="True" BackRequested="nvgMain_BackRequested" Grid.Column="0" Background="Transparent" Name="nvgMain" PaneDisplayMode="Top" IsSettingsVisible="True" SelectionChanged="nvgMain_SelectionChanged">
+                    <NavigationView IsBackButtonVisible="Auto" IsBackEnabled="True" BackRequested="nvgMain_BackRequested" Grid.Column="0" Background="Transparent" Name="nvgMain" PaneDisplayMode="Top" IsSettingsVisible="True" SelectionChanged="nvgMain_SelectionChanged">
 
-            <NavigationView.MenuItems>
-                <NavigationViewItem Name="nvgitHome" Content="Home" Tag="HomePage"></NavigationViewItem>
-                <NavigationViewItem Name="nvgitMusic" Content="Music Library" Tag="MusicLibrary"></NavigationViewItem>
-                <NavigationViewItem Name="nvgitVideo" Content="Video Library"></NavigationViewItem>
-                <NavigationViewItem Name="nvgitQueue" Content="Play Queue" Visibility="Collapsed"></NavigationViewItem>
-            </NavigationView.MenuItems>
-            <NavigationView.AutoSuggestBox>
-                <AutoSuggestBox TextChanged="AutoSuggestBox_TextChanged" QuerySubmitted="AutoSuggestBox_QuerySubmitted" SuggestionChosen="AutoSuggestBox_SuggestionChosen" QueryIcon="Find" PlaceholderText="Search for files across your libraries"  AutomationProperties.Name="Search" >
-                    <AutoSuggestBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <FontIcon Glyph="&#xEC4F;" FontFamily="Segoe Fluent Icons" FontSize="16"/>
-                                <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </AutoSuggestBox.ItemTemplate>
-                </AutoSuggestBox>
-            </NavigationView.AutoSuggestBox>
-                <Grid>
-                   
-                    <Frame Name="frmMain" Background="Transparent">
-                
-                    </Frame>
-                </Grid>
-            </NavigationView>
+                        <NavigationView.MenuItems>
+                            <NavigationViewItem Name="nvgitHome" Content="Home" Tag="HomePage"></NavigationViewItem>
+                            <NavigationViewItem Name="nvgitMusic" Content="Music Library" Tag="MusicLibrary"></NavigationViewItem>
+                            <NavigationViewItem Name="nvgitVideo" Content="Video Library"></NavigationViewItem>
+                            <NavigationViewItem Name="nvgitQueue" Content="Play Queue" Visibility="Visible"></NavigationViewItem>
+                        </NavigationView.MenuItems>
+                        <NavigationView.AutoSuggestBox>
+                            <AutoSuggestBox TextChanged="AutoSuggestBox_TextChanged" QuerySubmitted="AutoSuggestBox_QuerySubmitted" SuggestionChosen="AutoSuggestBox_SuggestionChosen" QueryIcon="Find" PlaceholderText="Search for files across your libraries"  AutomationProperties.Name="Search" >
+                                <AutoSuggestBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <FontIcon Glyph="&#xEC4F;" FontFamily="Segoe Fluent Icons" FontSize="16"/>
+                                            <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </AutoSuggestBox.ItemTemplate>
+                            </AutoSuggestBox>
+                        </NavigationView.AutoSuggestBox>
+                        <Grid>
+
+                            <Frame Name="frmMain" Background="Transparent">
+
+                            </Frame>
+                        </Grid>
+                    </NavigationView>
                     <TextBlock Name="txtPreviewBuild" HorizontalAlignment="Right" VerticalAlignment="Bottom" Style="{StaticResource BaseTextBlockStyle}"></TextBlock>
                     <TeachingTip HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsOpen="False" Title="Media Opened" PreferredPlacement="BottomLeft" Name="ttMediaOpened"></TeachingTip>
                     <TeachingTip CloseButtonClick="ttDefaultAppSet_CloseButtonClick"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsOpen="False" Title="Set Vusic Player as Default Media App" PreferredPlacement="BottomLeft" Name="ttDefaultAppSet">
@@ -78,227 +78,239 @@ Stretch="UniformToFill"/>
                     </TeachingTip>
 
                     <Grid Visibility="Visible" Background="Transparent" VerticalAlignment="Center" Margin="20, 0" Name="MusicPlayerMaster" Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-                <winui:FlyleafHost x:Name="mediaEngine"></winui:FlyleafHost>
-            <Image Name="imgThumbnailCover" Source="/Assets/appicon.png" Width="150" Grid.Row="0"></Image>
-
-            <TextBlock Margin="0, 20" Width="200"  Name="txtSongName" Grid.Row="1" Text="Nothing playing" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" >
-
-            </TextBlock>
-            <local:SliderReuse x:Name="sldMain"  IsEnabled="False" Grid.Row="2" HorizontalAlignment="Stretch" ></local:SliderReuse>
-            <Grid x:Name="grdTexts" Margin="5,0,0, 0" Grid.Row="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" HorizontalAlignment="Left" Text="00:00:00" Name="txtRunningDuration" FontSize="11" Opacity="0.8"/>
-                <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="00:00:00" Name="txtTotalDuration" FontSize="11" Opacity="0.8"/>
-            </Grid>
-            <StackPanel Margin="0, 5" HorizontalAlignment="Center" Orientation="Horizontal" Grid.Row="4">
-                <Button Name="btnSkipBack" Background="Transparent" ToolTipService.ToolTip="Skip 10 seconds before" BorderBrush="Transparent" Click="btnSkipBack_Click">
-                    <Image Name="imgSkipBack" Width="26" Source="/Assets/skipbackicon.png"/>
-                </Button>
-                <Button Name="btnPrev" Background="Transparent" ToolTipService.ToolTip="Previous in queue or playlist" BorderBrush="Transparent" Click="btnPrev_Click">
-                    <Image Name="imgPrev" Width="26" Source="/Assets/previous.png"/>
-                </Button>
-                <Button Name="btnPlayPause" IsEnabled="False" Background="Transparent" ToolTipService.ToolTip="" BorderBrush="Transparent" Click="btnPlayPause_Click">
-                    <Image Name="imgPlayPause" Width="26" Source="/Assets/play.png"/>
-                    <Button.KeyboardAccelerators>
-                        <KeyboardAccelerator Key="F10"></KeyboardAccelerator>
-                    </Button.KeyboardAccelerators>
-                </Button>
-                <Button Name="btnNext" Background="Transparent" ToolTipService.ToolTip="Next in queue or playlist" BorderBrush="Transparent" Click="btnNext_Click">
-                    <Image Name="imgNext" Width="26" Source="/Assets/next.png"/>
-                </Button>
-                <Button Name="btnSkipForward" Background="Transparent" ToolTipService.ToolTip="Skip 10 seconds ahead" BorderBrush="Transparent" Click="btnSkipForward_Click">
-                    <Image Name="imgSkipForward" Width="26" Source="/Assets/skipforwardicon.png"/>
-                </Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Grid.Row="5" HorizontalAlignment="Center">
-                <Button Background="Transparent" BorderThickness="0" Name="btnVolume" Click="btnVolume_Click" ToolTipService.ToolTip="Volume">
-                    <FontIcon Name="VolumeIcon" FontSize="15" Glyph="&#xE767;"></FontIcon>
-                </Button>
-                <local:SliderReuse x:Name="sldVolume" Width="100" ValueChanged="sldVolume_ValueChanged" IsTooltipEnabled="False" HorizontalAlignment="Stretch" Maximum="130" Value="100"></local:SliderReuse>
-
-                <TextBlock FontSize="12" Name="txtVolume" Text="100%" Margin="5, 7"></TextBlock>
-            </StackPanel>
-            <StackPanel Name="panelControls"  Margin="0, 10" Orientation="Horizontal" Grid.Row="6" HorizontalAlignment="Center">
-                <Button Name="btnSpeed" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Adjust Speed" >
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <RadioMenuFlyoutItem Text="0.25" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem Text="0.50" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem Text="0.75" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem IsChecked="True" Text="1.00" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem Text="1.25" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem Text="1.50" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem Text="1.75" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem Text="2" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                            <RadioMenuFlyoutItem Text="Custom" Click="customSpeed_Click" Name="customSpeed">
-                                <RadioMenuFlyoutItem.Icon>
-                                    <FontIcon Glyph="&#xE9E9;"></FontIcon>
-                                </RadioMenuFlyoutItem.Icon>
-                            </RadioMenuFlyoutItem>
-                        </MenuFlyout>
-                    </Button.Flyout>
-
-                    <Image Name="imgSpeed" Width="24" Source="/Assets/speedicon.png"/>
-                </Button>
-                <TeachingTip Name="ttSpeedCustom" Target="{x:Bind btnSpeed}" IsOpen="True" PreferredPlacement="Bottom" Title="Custom Speed">
-                    <StackPanel Margin="0, 5" Orientation="Vertical" Padding="5" Spacing="5">
-                        <NumberBox SpinButtonPlacementMode="Inline" Name="nmbSpeedCustom" SmallChange="0.05" LargeChange="1" Maximum="4" Minimum="0.15"></NumberBox>
-                        <Button HorizontalAlignment="Stretch" Margin="5, 0" ToolTipService.ToolTip="Set Speed" Background="Transparent" BorderBrush="Transparent"  Name="btnSetCustomSpeed" Click="btnSetCustomSpeed_Click">
-                            <Image  Width="24" Source="/Assets/tickicon.png"/>
-                        </Button>
-                    </StackPanel>
-                </TeachingTip>
-                <TeachingTip Title="File Missing" Name="ttFileMissing" IsOpen="False" PreferredPlacement="Bottom">
-                    <InfoBar IsClosable="False" Severity="Error" Name="iBFileMissing" IsOpen="True" Title="The following file is missing">
-                        <Button Content="Click to relocate" Click="Button_Click_2"></Button>
-                    </InfoBar>
-                </TeachingTip>
-                <ContentDialog Title="Error" Name="dlgError"></ContentDialog>
-                <ContentDialog Name="dlgFileInfo" Title="Information" CloseButtonText="OK" PrimaryButtonText="Save" DefaultButton="Close">
-                    <Grid RowSpacing="12" ColumnSpacing="24">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                        <winui:FlyleafHost x:Name="mediaEngine"></winui:FlyleafHost>
+                        <Image Name="imgThumbnailCover" Source="/Assets/appicon.png" Width="150" Grid.Row="0"></Image>
 
-                        <TextBlock Text="File Name" Grid.Row="0" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoFileName" Grid.Row="0" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
-        
-                        <TextBlock Text="File Path" Grid.Row="0" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <HyperlinkButton x:Name="hypGoToLocation" 
+                        <TextBlock Margin="0, 20" Width="200"  Name="txtSongName" Grid.Row="1" x:Uid="sc1x012" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" >
+
+                        </TextBlock>
+                        <local:SliderReuse x:Name="sldMain"  IsEnabled="False" Grid.Row="2" HorizontalAlignment="Stretch" ></local:SliderReuse>
+                        <Grid x:Name="grdTexts" Margin="5,0,0, 0" Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" Text="00:00:00" Name="txtRunningDuration" FontSize="11" Opacity="0.8"/>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="00:00:00" Name="txtTotalDuration" FontSize="11" Opacity="0.8"/>
+                        </Grid>
+                        <StackPanel Margin="0, 5" HorizontalAlignment="Center" Orientation="Horizontal" Grid.Row="4">
+                            <Button Name="btnSkipBack" Background="Transparent" ToolTipService.ToolTip="Skip 10 seconds before" BorderBrush="Transparent" Click="btnSkipBack_Click">
+                                <Image Name="imgSkipBack" Width="26" Source="/Assets/skipbackicon.png"/>
+                            </Button>
+                            <Button Name="btnPrev" Background="Transparent" x:Uid="sc1x014" BorderBrush="Transparent" Click="btnPrev_Click">
+                                <Image Name="imgPrev" Width="26" Source="/Assets/previous.png"/>
+                            </Button>
+                            <Button Name="btnPlayPause" IsEnabled="False" Background="Transparent" ToolTipService.ToolTip="" BorderBrush="Transparent" Click="btnPlayPause_Click">
+                                <Image Name="imgPlayPause" Width="26" Source="/Assets/play.png"/>
+                                <Button.KeyboardAccelerators>
+                                    <KeyboardAccelerator Key="F10"></KeyboardAccelerator>
+                                </Button.KeyboardAccelerators>
+                            </Button>
+                            <Button Name="btnNext" Background="Transparent" x:Uid="sc1x013" BorderBrush="Transparent" Click="btnNext_Click">
+                                <Image Name="imgNext" Width="26" Source="/Assets/next.png"/>
+                            </Button>
+                            <Button Name="btnSkipForward" Background="Transparent" ToolTipService.ToolTip="Skip 10 seconds ahead" BorderBrush="Transparent" Click="btnSkipForward_Click">
+                                <Image Name="imgSkipForward" Width="26" Source="/Assets/skipforwardicon.png"/>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Grid.Row="5" HorizontalAlignment="Center">
+                            <Button Background="Transparent" BorderThickness="0" Name="btnVolume" Click="btnVolume_Click" ToolTipService.ToolTip="Volume">
+                                <FontIcon Name="VolumeIcon" FontSize="15" Glyph="&#xE767;"></FontIcon>
+                            </Button>
+                            <local:SliderReuse x:Name="sldVolume" Width="100" ValueChanged="sldVolume_ValueChanged" IsTooltipEnabled="False" HorizontalAlignment="Stretch" Maximum="130" Value="100"></local:SliderReuse>
+
+                            <TextBlock FontSize="12" Name="txtVolume" Text="100%" Margin="5, 7"></TextBlock>
+                        </StackPanel>
+                        <StackPanel Name="panelControls"  Margin="0, 10" Orientation="Horizontal" Grid.Row="6" HorizontalAlignment="Center">
+                            <Button Name="btnSpeed" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Adjust Speed" >
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <RadioMenuFlyoutItem Text="0.25" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="0.50" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="0.75" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem IsChecked="True" Text="1.00" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="1.25" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="1.50" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="1.75" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="2" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="Custom" Click="customSpeed_Click" Name="customSpeed">
+                                            <RadioMenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE9E9;"></FontIcon>
+                                            </RadioMenuFlyoutItem.Icon>
+                                        </RadioMenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+
+                                <Image Name="imgSpeed" Width="24" Source="/Assets/speedicon.png"/>
+                            </Button>
+                            <TeachingTip Name="ttSpeedCustom" Target="{x:Bind btnSpeed}" IsOpen="True" PreferredPlacement="Bottom" Title="Custom Speed">
+                                <StackPanel Margin="0, 5" Orientation="Vertical" Padding="5" Spacing="5">
+                                    <NumberBox SpinButtonPlacementMode="Inline" Name="nmbSpeedCustom" SmallChange="0.05" LargeChange="1" Maximum="4" Minimum="0.15"></NumberBox>
+                                    <Button HorizontalAlignment="Stretch" Margin="5, 0" ToolTipService.ToolTip="Set Speed" Background="Transparent" BorderBrush="Transparent"  Name="btnSetCustomSpeed" Click="btnSetCustomSpeed_Click">
+                                        <Image  Width="24" Source="/Assets/tickicon.png"/>
+                                    </Button>
+                                </StackPanel>
+                            </TeachingTip>
+                            <TeachingTip Title="File Missing" Name="ttFileMissing" IsOpen="False" PreferredPlacement="Bottom">
+                                <InfoBar IsClosable="False" Severity="Error" Name="iBFileMissing" IsOpen="True" Title="The following file is missing">
+                                    <Button Content="Click to relocate" Click="Button_Click_2"></Button>
+                                </InfoBar>
+                            </TeachingTip>
+                            <ContentDialog Title="Error" Name="dlgError"></ContentDialog>
+                            <ContentDialog Name="dlgFileInfo" Title="Information" CloseButtonText="OK" PrimaryButtonText="Save" DefaultButton="Close">
+                                <Grid RowSpacing="12" ColumnSpacing="24">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="File Name" Grid.Row="0" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoFileName" Grid.Row="0" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+
+                                    <TextBlock Text="File Path" Grid.Row="0" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <HyperlinkButton x:Name="hypGoToLocation" 
                  Grid.Row="0" Grid.Column="3"
                  Click="hypGoToLocation_Click"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Center">
-                            <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoFilePath" 
+                                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoFilePath" 
                Style="{StaticResource CaptionTextBlockStyle}" 
                TextTrimming="CharacterEllipsis" 
                MaxWidth="300"/>
 
-                            <HyperlinkButton.ContextFlyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem  Click="MenuFlyoutItem_Click" Text="Copy">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE8C8;"></FontIcon>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                </MenuFlyout>
-                            </HyperlinkButton.ContextFlyout>
-                        </HyperlinkButton>
-                        <TeachingTip Title="Edit Info" Name="ttEditInfo" IsOpen="False">
-                            <StackPanel Orientation="Vertical">
-                                <TextBox TextChanged="txtEditTT_TextChanged" PlaceholderText="Type here..." Name="txtEditTT"></TextBox>
-                                
-                            </StackPanel>
-                        </TeachingTip>
-                        <TextBlock  Text="Artist" Grid.Row="1" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <Button Click="Button_Click_1" Grid.Row="1" Grid.Column="1" Padding="2, 2" Background="Transparent" BorderBrush="Transparent">   <TextBlock Tag="Artist" x:Name="txtInfoArtist"  Style="{StaticResource CaptionTextBlockStyle}"/>
-                            <Button.ContextFlyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem  Click="mnftEditProperty_Click" Icon="Edit" Text="Edit"></MenuFlyoutItem>
-                                    <MenuFlyoutItem  Click="mnftCopyProperty_Click" Icon="Copy" Text="Copy"></MenuFlyoutItem>
-                                </MenuFlyout>
-                            </Button.ContextFlyout>
-                        </Button>
+                                        <HyperlinkButton.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem  Click="MenuFlyoutItem_Click" Text="Copy">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon Glyph="&#xE8C8;"></FontIcon>
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </HyperlinkButton.ContextFlyout>
+                                    </HyperlinkButton>
+                                    <TeachingTip Title="Edit Info" Name="ttEditInfo" IsOpen="False">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBox TextChanged="txtEditTT_TextChanged" PlaceholderText="Type here..." Name="txtEditTT"></TextBox>
 
-                        <TextBlock Text="Album" Grid.Row="1" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <Button Click="Button_Click_1" Grid.Row="1" Grid.Column="3" Padding="2, 2" Background="Transparent" BorderBrush="Transparent">
-                            <Button.Flyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem  Click="mnftEditProperty_Click" Icon="Edit" Text="Edit"></MenuFlyoutItem>
-                                    <MenuFlyoutItem  Click="mnftCopyProperty_Click" Icon="Copy" Text="Copy"></MenuFlyoutItem>
-                                    <MenuFlyoutItem></MenuFlyoutItem>
-                                </MenuFlyout>
-                            </Button.Flyout>
-                            <TextBlock Tag="Artist" x:Name="txtInfoAlbum"  Style="{StaticResource CaptionTextBlockStyle}"/>
-                        </Button>
+                                        </StackPanel>
+                                    </TeachingTip>
+                                    <TextBlock  Text="Artist" Grid.Row="1" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <Button Click="Button_Click_1" Grid.Row="1" Grid.Column="1" Padding="2, 2" Background="Transparent" BorderBrush="Transparent">
+                                        <TextBlock Tag="Artist" x:Name="txtInfoArtist"  Style="{StaticResource CaptionTextBlockStyle}"/>
+                                        <Button.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem  Click="mnftEditProperty_Click" Icon="Edit" Text="Edit"></MenuFlyoutItem>
+                                                <MenuFlyoutItem  Click="mnftCopyProperty_Click" Icon="Copy" Text="Copy"></MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </Button.ContextFlyout>
+                                    </Button>
 
-                        <TextBlock Text="Contributing Artists" Grid.Row="2" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Tag="Contributing Artists" PointerPressed="txtInfoAlbum_PointerPressed" IsTextSelectionEnabled="True" x:Name="txtInfoContributingArtists" Grid.Row="2" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Album" Grid.Row="1" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <Button Click="Button_Click_1" Grid.Row="1" Grid.Column="3" Padding="2, 2" Background="Transparent" BorderBrush="Transparent">
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem  Click="mnftEditProperty_Click" Icon="Edit" Text="Edit"></MenuFlyoutItem>
+                                                <MenuFlyoutItem  Click="mnftCopyProperty_Click" Icon="Copy" Text="Copy"></MenuFlyoutItem>
+                                                <MenuFlyoutItem></MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                        <TextBlock Tag="Artist" x:Name="txtInfoAlbum"  Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </Button>
 
-                        <TextBlock Text="Track" Grid.Row="2" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Tag="Track" PointerPressed="txtInfoAlbum_PointerPressed" IsTextSelectionEnabled="True" x:Name="txtInfoTrack" Grid.Row="2" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Contributing Artists" Grid.Row="2" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock Tag="Contributing Artists" PointerPressed="txtInfoAlbum_PointerPressed" IsTextSelectionEnabled="True" x:Name="txtInfoContributingArtists" Grid.Row="2" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Duration" Grid.Row="3" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoDuration" Grid.Row="3" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Track" Grid.Row="2" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock Tag="Track" PointerPressed="txtInfoAlbum_PointerPressed" IsTextSelectionEnabled="True" x:Name="txtInfoTrack" Grid.Row="2" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Year" Grid.Row="3" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoYear" Grid.Row="3" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Duration" Grid.Row="3" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoDuration" Grid.Row="3" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="File Type" Grid.Row="4" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoFileType" Grid.Row="4" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Year" Grid.Row="3" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoYear" Grid.Row="3" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Genre" Grid.Row="4" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoGenre" Grid.Row="4" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="File Type" Grid.Row="4" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoFileType" Grid.Row="4" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Bitrate" Grid.Row="5" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoBitrate" Grid.Row="5" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Genre" Grid.Row="4" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoGenre" Grid.Row="4" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Speed" Grid.Row="5" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoSpeed" Grid.Row="5" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Bitrate" Grid.Row="5" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoBitrate" Grid.Row="5" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Created on" Grid.Row="6" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock  IsTextSelectionEnabled="True" x:Name="txtInfoCreatedOn" Grid.Row="6" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Speed" Grid.Row="5" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoSpeed" Grid.Row="5" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Last Modified" Grid.Row="6" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoLastModified" Grid.Row="6" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Created on" Grid.Row="6" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock  IsTextSelectionEnabled="True" x:Name="txtInfoCreatedOn" Grid.Row="6" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Channels" Grid.Row="7" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoChannels" Grid.Row="7" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Last Modified" Grid.Row="6" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoLastModified" Grid.Row="6" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock  Text="Sample Rate" Grid.Row="7" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoAudioSampleRate" Grid.Row="7" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Channels" Grid.Row="7" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoChannels" Grid.Row="7" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Composers" Grid.Row="8" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoComposers" Grid.Row="8" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock  Text="Sample Rate" Grid.Row="7" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoAudioSampleRate" Grid.Row="7" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Conductors" Grid.Row="8" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoConductors" Grid.Row="8" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Text="Composers" Grid.Row="8" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoComposers" Grid.Row="8" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Rating" Grid.Row="9" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <RatingControl IsReadOnly="True" ValueChanged="txtInfoRating_ValueChanged" x:Name="txtInfoRating" Grid.Row="9" Grid.Column="1" />
+                                    <TextBlock Text="Conductors" Grid.Row="8" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoConductors" Grid.Row="8" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}"/>
 
-                        <TextBlock Text="Comments" Grid.Row="9" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoComments" Grid.Row="9" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="WrapWholeWords"/>
+                                    <TextBlock Text="Rating" Grid.Row="9" Grid.Column="0" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <RatingControl IsReadOnly="True" ValueChanged="txtInfoRating_ValueChanged" x:Name="txtInfoRating" Grid.Row="9" Grid.Column="1" />
+
+                                    <TextBlock Text="Comments" Grid.Row="9" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock IsTextSelectionEnabled="True" x:Name="txtInfoComments" Grid.Row="9" Grid.Column="3" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="WrapWholeWords"/>
+                                </Grid>
+                            </ContentDialog>
+                            <ContentDialog Name="dlgEffects">
+                                <Grid Name="audioeffects">
+                                    <StackPanel Orientation="Vertical" Spacing="10">
+                                        <StackPanel Spacing="10" Orientation="Horizontal">
+                                            <TextBlock Text="Reverb"></TextBlock>
+                                            <Button Content="Add Reverb" Name="btnSetReverb" Click="btnSetReverb_Click" ></Button>
+                                            <TextBlock Text="0%" Name="txtReverbPercentage"></TextBlock>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </ContentDialog>
+                            <Button ToolTipService.ToolTip="Effects and Tools" Background="Transparent" BorderBrush="Transparent"  Name="btnEffects" Margin="5, 0" Click="btnEffects_Click">
+                                <Image  Width="24" Source="/Assets/toolsicon.png"/>
+                            </Button>
+                            <Button ToolTipService.ToolTip="File Info" Background="Transparent" BorderBrush="Transparent"  Name="btnInfo" Click="btnInfo_Click">
+                                <Image  Width="24" Source="/Assets/infoicon.png"/>
+                            </Button>
+                            <Button Visibility="Collapsed" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Mini Player"  Name="btnMiniPlayer" IsEnabled="False" Click="btnMiniPlayer_Click">
+                                <Image  Width="26" Source="/Assets/miniplayer.png"/>
+                            </Button>
+                        </StackPanel>
                     </Grid>
-                </ContentDialog>
-                <Button ToolTipService.ToolTip="Effects and Tools" Background="Transparent" BorderBrush="Transparent"  Name="btnEffects" Margin="5, 0" Click="btnEffects_Click">
-                    <Image  Width="24" Source="/Assets/toolsicon.png"/>
-                </Button>
-                <Button ToolTipService.ToolTip="File Info" Background="Transparent" BorderBrush="Transparent"  Name="btnInfo" Click="btnInfo_Click">
-                    <Image  Width="24" Source="/Assets/infoicon.png"/>
-                </Button>
-                <Button Visibility="Collapsed" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Mini Player"  Name="btnMiniPlayer" IsEnabled="False" Click="btnMiniPlayer_Click">
-                    <Image  Width="26" Source="/Assets/miniplayer.png"/>
-                </Button>
-            </StackPanel>
-        </Grid>
                 </Grid>
             </Grid>
         </Border>

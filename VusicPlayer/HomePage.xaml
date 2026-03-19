@@ -77,19 +77,22 @@ VerticalScrollBarVisibility="Auto">
                 </ScrollViewer>
             </ContentDialog>
 
-            <TextBlock Text="Welcome" Style="{StaticResource TitleLargeTextBlockStyle}" Grid.Row="0"></TextBlock>
+            <TextBlock x:Uid="sc1x000" Style="{StaticResource TitleLargeTextBlockStyle}" Grid.Row="0"></TextBlock>
             <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0, 10" Spacing="10">
                 <Button Margin="0, 0"  Click="Button_Click">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE838;"></TextBlock>
-                        <TextBlock Margin="10, 0" Text="Open Folder"></TextBlock>
+                        <Image Width="20" Source="/Assets/openfolder.png"></Image>
+                        <TextBlock Margin="5,0" x:Uid="sc1x001" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Name="btnOpenMedia" Click="btnOpenMedia_Click">
+                <Button Name="btnOpenMedia" x:Uid="sc1x011" Click="btnOpenMedia_Click">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="20" Source="/Assets/importicon.png"></Image>
-                        <TextBlock Margin="5,0" Text="Open Media" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
+                        <TextBlock Margin="5,0"  x:Uid="sc1x002" Style="{StaticResource BodyTextBlockStyle}"></TextBlock>
                     </StackPanel>
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="O"></KeyboardAccelerator>
+                    </Button.KeyboardAccelerators>
                 </Button>
             </StackPanel>
             <Grid Grid.Row="2">
@@ -100,8 +103,8 @@ VerticalScrollBarVisibility="Auto">
                 </Grid.ColumnDefinitions>
 
             </Grid>
-            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Name="txtRecentHeading" Text="Continue Playing" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
-            <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtEmptyRecents" Grid.Row="4" Visibility="Collapsed" Text="Start watching videos to see them here!" Margin="0, 40"></TextBlock>
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Name="txtRecentHeading"  x:Uid="sc1x004" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
+            <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtEmptyRecents" Grid.Row="4" Visibility="Collapsed"  x:Uid="sc1x003" Margin="0, 40"></TextBlock>
             <TextBlock Style="{StaticResource BodyLargeTextBlockStyle}" Name="txtFolderName" Grid.Row="5" Margin="0, 0"></TextBlock>
             <GridView Visibility="Visible"  
  x:Name="GridContinuePlaying" SelectionMode="Single" IsItemClickEnabled="True"
@@ -111,13 +114,13 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
                         <StackPanel Width="150">
                             <StackPanel.ContextFlyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Text="Remove from Continue Playing" Click="MenuFlyoutItem_Click_3" Icon="Remove"></MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Go to File Location" Click="MenuFlyoutItem_Click_6" >
+                                    <MenuFlyoutItem x:Uid="sc1x007" Click="MenuFlyoutItem_Click_3" Icon="Remove"></MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="sc1x008" Click="MenuFlyoutItem_Click_6" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE8DA;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="View File Info" Click="MenuFlyoutItem_Click_7" >
+                                    <MenuFlyoutItem x:Uid="sc1x009" Click="MenuFlyoutItem_Click_7" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="D"></FontIcon>
                                         </MenuFlyoutItem.Icon>
@@ -133,8 +136,8 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <TextBlock Name="txtFoldersHeader" Text="Recent Folders" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
-            <TextBlock Name="txtEmptyFolders" Text="No folders opened yet!" Margin="0, 30" Style="{StaticResource BodyLargeTextBlockStyle}" Grid.Row="7" Visibility="Collapsed"></TextBlock>
+            <TextBlock Name="txtFoldersHeader"  x:Uid="sc1x005" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
+            <TextBlock Name="txtEmptyFolders" x:Uid="sc1x006" Margin="0, 30" Style="{StaticResource BodyLargeTextBlockStyle}" Grid.Row="7" Visibility="Collapsed"></TextBlock>
             <GridView  CanDragItems="True"
       AllowDrop="True"
       CanReorderItems="True" x:Name="FolderGrid" SelectionMode="Single" IsItemClickEnabled="True"
@@ -145,12 +148,12 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30">
                         <StackPanel Width="150">
                             <StackPanel.ContextFlyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Text="Open Folder" Click="MenuFlyoutItem_Click_5" >
+                                    <MenuFlyoutItem x:Uid="sc1x001" Click="MenuFlyoutItem_Click_5" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE838;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Remove from Recent Folders" Click="MenuFlyoutItem_Click_4" Icon="Remove"></MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="sc1x010" Click="MenuFlyoutItem_Click_4" Icon="Remove"></MenuFlyoutItem>
                                 </MenuFlyout>
                             </StackPanel.ContextFlyout>
                             <Image Source="{Binding Thumbnail}" Width="100" Height="100" Stretch="UniformToFill"/>
