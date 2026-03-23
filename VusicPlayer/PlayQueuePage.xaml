@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VusicPlayer.PlayQueuePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+       xmlns:media="using:CommunityToolkit.WinUI.Media"
+xmlns:ui="using:CommunityToolkit.WinUI">
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+        <TextBlock Text="This page is under construction. It will be available in future updates." Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Top"></TextBlock>
+        <Grid Margin="50, 50">
+
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+        </Grid>
+        <Grid Grid.Column="0" Name="grdNowPlaying">
+
+            <Border x:Name="ShadowTarget" />
+
+            <Grid   CornerRadius="20">
+                <Grid.Background>
+                    <ImageBrush ImageSource="/Assets/oceancyan.png" 
+                    Stretch="UniformToFill"/>
+                </Grid.Background>
+                <ui:Effects.Shadow>
+                    <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget}" CornerRadius="20" BlurRadius="20" Opacity="0.5" Offset="0,0" />
+                </ui:Effects.Shadow>
+                <Border CornerRadius="20">
+                    <Border.Background>
+                        <media:BackdropBlurBrush Amount="5.0" />
+                    </Border.Background>
+
+                    <StackPanel Margin="30, 15" Padding="15"  CornerRadius="20" Spacing="20" Orientation="Vertical" HorizontalAlignment="Center">
+                        <StackPanel.Background>
+                            <AcrylicBrush TintColor="Black" 
+                      TintOpacity="0.1" 
+                                         
+                      FallbackColor="Black" 
+                      AlwaysUseFallback="False"/>
+                        </StackPanel.Background>
+                        <TextBlock HorizontalAlignment="Center" Text="Now Playing" Style="{StaticResource TitleTextBlockStyle}"/>
+
+                        <Grid Name="imgBackground"  CornerRadius="20" Padding="20" Width="300" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Vertical" Spacing="10" HorizontalAlignment="Center">
+                                <Image Width="110" Name="imgCover" HorizontalAlignment="Center" />
+                                <TextBlock Name="txtSongName"  HorizontalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"/>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <HyperlinkButton Click="txtArtist_Click" Name="txtArtist" ToolTipService.ToolTip="Artist" HorizontalAlignment="Left" FontSize="15" Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <TextBlock Text="• "></TextBlock>
+                                            <TextBlock Name="txtArtistDisplay" ></TextBlock>
+                                        </StackPanel>
+                                    </HyperlinkButton>
+                                    <HyperlinkButton Click="txtAlbum_Click" ToolTipService.ToolTip="Album" Name="txtAlbum" Grid.Column="1" HorizontalAlignment="Right" FontSize="15" Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <TextBlock Text="• "></TextBlock>
+                                            <TextBlock Name="txtAlbumDisplay" ></TextBlock>
+                                        </StackPanel>
+                                    </HyperlinkButton>
+                                </Grid>
+
+                                <local:SliderReuse  IsEnabled="True"  DragStarted="sldMain_DragStarted" DragCompleted="sldMain_DragCompleted"  x:Name="sldMain"/>
+
+                                <Grid>
+                                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Left" Name="txtRunningDuration"/>
+                                    <TextBlock  Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right" Name="txtTotalDuration"/>
+                                </Grid>
+
+                                <StackPanel Padding="10" Spacing="5" CornerRadius="20" HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <StackPanel.Background>
+                                        <AcrylicBrush TintColor="Black" 
+TintOpacity="0.3" 
+                   
+FallbackColor="Black" 
+AlwaysUseFallback="False"/>
+                                    </StackPanel.Background>
+                                    <Button Name="btnPrev" IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent" Click="btnPrev_Click">
+                                        <Image Name="imgPrev" Width="26" Source="/Assets/previous.png"/>
+                                    </Button>
+                                    <Button Name="btnPlayPause"  IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent" Click="btnPlayPause_Click">
+                                        <Image Name="imgPlayPause" Width="26" />
+                                    </Button>
+                                    <Button Name="btnNext" IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent" Click="btnNext_Click">
+                                        <Image Name="imgNext" Width="26" Source="/Assets/next.png"/>
+                                    </Button>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5" CornerRadius="20" Padding="10">
+
+                                    <StackPanel.Background>
+                                        <AcrylicBrush TintColor="Black" 
+TintOpacity="0.3" 
+                   
+FallbackColor="Black" 
+AlwaysUseFallback="False"/>
+                                    </StackPanel.Background>
+                                    <Button IsEnabled="False"  Background="Transparent" BorderBrush="Transparent" Name="btnVolume" Click="btnVolume_Click">
+                                        <FontIcon Name="VolumeIcon" FontSize="15" Glyph="&#xE767;"/>
+                                    </Button>
+                                    <local:SliderReuse IsEnabled="False"  x:Name="sldVolume" Width="100" Value="100" VerticalAlignment="Center"/>
+                                    <TextBlock Margin="5, 0" FontSize="12" Name="txtVolume" Text="100%" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="5" HorizontalAlignment="Center" Orientation="Horizontal" Padding="10" CornerRadius="20">
+                                    <StackPanel.Background>
+                                        <AcrylicBrush TintColor="Black" 
+TintOpacity="0.3" 
+                   
+FallbackColor="Black" 
+AlwaysUseFallback="False"/>
+                                    </StackPanel.Background>
+                                    <Button Name="btnFav" IsEnabled="False"  ToolTipService.ToolTip="Add to Favourites" CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
+                                        <Image Name="imgFav" Width="26" Source="/Assets/favicon.png"/>
+                                    </Button>
+                                    <ToggleButton Name="btnShuffle"  IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
+                                        <ToggleButton.Resources>
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="Crimson"/>
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#FF1746"/>
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#940D28"/>
+
+                                            <SolidColorBrush x:Key="ToggleButtonBackground" Color="#A36C7F"/>
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="#FFA9C7"/>
+                                        </ToggleButton.Resources>
+                                        <Image Name="imgShuffle" Width="26" Source="/Assets/shuffleicon.png"/>
+                                    </ToggleButton>
+                                    <Button Name="btnOptions" IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
+                                        <Image Name="threedot" Width="26" Source="/Assets/options.png"/>
+                                    </Button>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="1">
+
+            <Border x:Name="ShadowTarget2" />
+            <Grid 
+      Name="grdQueue"
+      CornerRadius="20"
+      Margin="50,0">
+                <Grid.Background>
+                    <AcrylicBrush TintColor="Black" 
+TintOpacity="0" 
+                   
+FallbackColor="Black" 
+AlwaysUseFallback="False"/>
+                </Grid.Background>
+                <ui:Effects.Shadow>
+                    <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget2}" CornerRadius="20" BlurRadius="20" Opacity="0.5" Offset="0,0" />
+                </ui:Effects.Shadow>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+
+                    <!-- HEADER -->
+                    <Grid Grid.Row="0" Padding="30,30,30,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="300"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Queue"
+                   Style="{StaticResource TitleTextBlockStyle}"/>
+
+                        <AutoSuggestBox  IsEnabled="False"  Grid.Column="1" Name="asbFindQueue"
+                        QueryIcon="Find"
+                        PlaceholderText="Find in queue..."
+                        HorizontalAlignment="Stretch"/>
+                    </Grid>
+
+
+                    <!-- QUEUE INFO + CONTROLS -->
+                    <Grid Grid.Row="1" Padding="30,0,30,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Queue information -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="• 0 items"
+                       Name="txtCount"
+                       Style="{StaticResource BaseTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+                            <TextBlock Text="• 00:00"
+                       Name="txtTotalDurQueue"
+                       ToolTipService.ToolTip="Runtime Duration of queue"
+                       Style="{StaticResource BaseTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+
+
+                        <!-- Controls -->
+                        <StackPanel Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="10">
+
+                            <Button IsEnabled="False" Background="Transparent" Name="btnRemoveSelectionFromQueue"
+                    ToolTipService.ToolTip="Remove selection from queue">
+                                <Image Width="20" Source="/Assets/deleteicon.png"/>
+                            </Button>
+
+                            <ToggleButton Checked="tglShuffleQueue_Checked" Unchecked="tglShuffleQueue_Unchecked" IsEnabled="False"  Background="Transparent" Name="tglShuffleQueue"
+                          ToolTipService.ToolTip="Shuffle Play Queue">
+                                <Image Width="20" Source="/Assets/shuffleicon.png"/>
+                            </ToggleButton>
+
+                            <ToggleButton IsEnabled="False"  Background="Transparent" Name="tglLoopQueue"
+                          ToolTipService.ToolTip="Loop list">
+                                <Image Width="20" Source="/Assets/StoreLogo.png"/>
+                            </ToggleButton>
+
+                            <Button  IsEnabled="False"  Background="Transparent" Name="btnClearQueue" Click="btnClearQueue_Click"
+                    ToolTipService.ToolTip="Clear Queue">
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Image Width="20" Source="/Assets/StoreLogo.png"/>
+                                    <TextBlock Text="Clear queue"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button  IsEnabled="False"  Background="Transparent" Name="btnSaveQueue"
+                    ToolTipService.ToolTip="Save Queue">
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Image Width="20" Source="/Assets/saveicon.png"/>
+                                    <TextBlock Text="Save Queue"/>
+                                </StackPanel>
+                            </Button>
+
+                        </StackPanel>
+                    </Grid>
+
+
+                    <!-- SECTION LABEL -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="2" Spacing="10">
+                        <TextBlock 
+               Text="Up Next"
+               Margin="30,0,0,10"
+               FontSize="18" Name="txtUpNext"
+               FontWeight="SemiBold"
+               Opacity="0.85"/>
+                        <ToggleButton Checked="btnViewQueue_Checked" Unchecked="btnViewQueue_Unchecked"  Background="Transparent" Name="btnViewQueue"
+>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Image Width="20" Source="/Assets/StoreLogo.png"/>
+                                <TextBlock Text="View full queue"/>
+                            </StackPanel>
+                        </ToggleButton>
+                    </StackPanel>
+
+
+                    <!-- QUEUE LIST -->
+                    <local:ListViewMedia x:Name="lstViewQueue" Grid.Row="4"></local:ListViewMedia>
+                    <StackPanel Orientation="Vertical" Grid.Row="3" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center" Name="grdEmptyQueue">
+                        <StackPanel Spacing="20" Orientation="Horizontal">
+                            <Image Source="/Assets/StoreLogo.png" Width="100"></Image>
+                            <TextBlock Text="Your play queue is empty!" VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
+                        </StackPanel>
+                        <Button CornerRadius="10" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center">
+                            <Button.Background>
+                                <AcrylicBrush TintColor="Black" 
+TintOpacity="0.4" 
+                   
+FallbackColor="Black" 
+AlwaysUseFallback="False"/>
+                            </Button.Background>
+                            <StackPanel  Orientation="Horizontal" Spacing="10">
+
+                                <Image Width="26" Source="/Assets/Square44x44Logo.png"></Image>
+                                <TextBlock Foreground="White" Text="Open Media" Margin="0, 5"></TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</Page>

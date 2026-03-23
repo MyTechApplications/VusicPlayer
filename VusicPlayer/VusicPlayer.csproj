@@ -31,11 +31,12 @@
     <None Remove="MediaControls.xaml" />
     <None Remove="MiniPlayerWind.xaml" />
     <None Remove="MusicLibrary.xaml" />
+    <None Remove="NoSearchResultsPage.xaml" />
     <None Remove="OceanDialog.xaml" />
     <None Remove="OceanPopup.xaml" />
     <None Remove="Playlist.xaml" />
-    <None Remove="PlaylistDialogUI.xaml" />
     <None Remove="PlaylistParameters.xaml" />
+    <None Remove="PlayQueuePage.xaml" />
     <None Remove="QueuePage.xaml" />
     <None Remove="SearchResults.xaml" />
     <None Remove="SettingsPage.xaml" />
@@ -85,10 +86,13 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <Page Update="ListViewMedia.xaml">
+    <Page Update="NoSearchResultsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="PlaylistDialogUI.xaml">
+    <Page Update="PlayQueuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ListViewMedia.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="PlaylistParameters.xaml">

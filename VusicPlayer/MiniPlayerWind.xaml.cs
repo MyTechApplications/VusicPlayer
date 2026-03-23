@@ -82,10 +82,7 @@ namespace VusicPlayer
 
      
 
-        private void VideoView_Initialized(object? sender, LibVLCSharp.Platforms.Windows.InitializedEventArgs e)
-        {
-            
-        }
+        
         bool _isDragging = false;
         private void Maintimer_Tick(object? sender, object e)
         {

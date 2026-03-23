@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Windows.System;
 using Windows.UI;
 
 namespace VusicPlayer
@@ -41,8 +44,9 @@ namespace VusicPlayer
             set { _albumName = value; OnPropertyChanged(); }
         }
         private Brush _titleColor = new SolidColorBrush(Microsoft.UI.Colors.White); // Safe for any thread!
-
-        public Brush TitleColor
+        public Visibility VisibilityOfStrikethrough => IsCompleted
+            ? Visibility.Visible
+            : Visibility.Collapsed; public Brush TitleColor
         {
             get => _titleColor;
             set
@@ -57,13 +61,38 @@ namespace VusicPlayer
             get => _glyph;
             set { _glyph = value; OnPropertyChanged(nameof(Glyph)); }
         }
+        private bool _isCompleted;
+        public bool IsCompleted
+        {
+            get => _isCompleted;
+            set
+            {
+                if (_isCompleted != value)
+                {
+                    _isCompleted = value;
+                    DispatcherQueue.GetForCurrentThread()?.TryEnqueue(() =>
+                    {
+                        OnPropertyChanged();
+
+                        // Explicitly notify that the dependent property has changed
+                        OnPropertyChanged(nameof(VisibilityOfStrikethrough));
+                    });
+                }
+            }
+        }
         public TimeSpan? SongDuration { get; set; }
-        public string FormattedDuration => $"{(int)SongDuration.Value.TotalMinutes:D2}:{SongDuration.Value.Seconds:D2}";
+        public string FormattedDuration => SongDuration.HasValue
+            ? $"{(int)SongDuration.Value.TotalMinutes:D2}:{SongDuration.Value.Seconds:D2}"
+            : "00:00";
         public string? FilePath { get; set; }
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        public bool? IsFavourite { get; set; }
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            DispatcherQueue.GetForCurrentThread()?.TryEnqueue(() =>
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            });
         }
         // You can add an Icon property here later!
     }

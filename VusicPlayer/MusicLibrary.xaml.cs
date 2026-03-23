@@ -85,6 +85,7 @@ namespace VusicPlayer
 
         private async void CallValues()
         {
+           
             MyItems.Clear();
             RecentMusicItems.Clear();
             var settings = await SettingsHelper.LoadSettingsAsync();
@@ -185,7 +186,8 @@ namespace VusicPlayer
             OceanContentDialog.HideDlg();
             HomeWindow.ShowWindow();
             PlaylistDialog.SavePlaylist();
-            CallValues();
+            DispatcherQueue.TryEnqueue(() => CallValues());
+
         }
         public async Task<StorageFile?> PickFileAsync(Window wind)
         {
@@ -237,7 +239,7 @@ namespace VusicPlayer
                 str.Add(files.Path);
                 if (App.MainWindowInstance is HomeWindow homeWindow)
                 {
-                    homeWindow.LoadFileFromPath(str);
+                    QueueService.PlayMedia(str);
                 }
             }
 
@@ -303,7 +305,8 @@ namespace VusicPlayer
             }
             else
             {
-                GrdViewPlaylists.SelectionMode = ListViewSelectionMode.Single; btnDeletePlaylists.Visibility = Visibility.Collapsed;
+                GrdViewPlaylists.SelectionMode = ListViewSelectionMode.Single; 
+                btnDeletePlaylists.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -438,6 +441,10 @@ namespace VusicPlayer
             var currentSettings = await SettingsHelper.LoadSettingsAsync();
             currentSettings.RecentMusic = RecentMusicItems;
             await SettingsHelper.SaveSettingsAsync(currentSettings);
+            if (btnRemoveSelectedRecents.Flyout is Flyout f)
+            {
+                f.Hide();
+            }
         }
 
         private void RecentMusic_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
@@ -462,7 +469,7 @@ namespace VusicPlayer
                     {
                         ObservableCollection<string> pt = new();
                         pt.Add(clickedRecent.SongPath);
-                        wind.LoadFileFromPath(pt);
+                        QueueService.PlayMedia(pt);
                     }
                     else
                     {

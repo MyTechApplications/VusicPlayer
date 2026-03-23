@@ -332,6 +332,8 @@ namespace VusicPlayer
 
         private async void FolderGrid_ItemClick(object sender, ItemClickEventArgs e)
         {
+            if (chckSelectFolders.IsChecked == true) return;
+
             var folderr = (FolderModel)e.ClickedItem;
             if (Directory.Exists(folderr.Path))
             {
@@ -362,6 +364,7 @@ namespace VusicPlayer
 
         private async void GridContinuePlaying_ItemClick(object sender, ItemClickEventArgs e)
         {
+            if (chckSelectContinuePlaying.IsChecked == true) return;
             var clickedVideo = (VideoProgress)e.ClickedItem;
             prg = clickedVideo;
             if (File.Exists(clickedVideo.FilePath))
@@ -567,7 +570,8 @@ namespace VusicPlayer
             }
             else if (AudioExtensions.Contains(ext))
             {
-                HomeWindow.ShowWindow().LoadFileFromPath(new ObservableCollection<string> { file.Path });
+                HomeWindow.ShowWindow();
+                QueueService.PlayMedia(new ObservableCollection<string> { file.Path });
             }
         }
         private async void btnOpenMedia_Click(object sender, RoutedEventArgs e)
@@ -653,11 +657,17 @@ namespace VusicPlayer
             {
                 MyItems.Remove(item);
             }
+            if (MyItems.Count == 0)
+            {
+                txtRecentHeading.Visibility = Visibility.Collapsed;
+                GridContinuePlaying.Visibility = Visibility.Collapsed;
+                txtEmptyRecents.Visibility = Visibility.Visible;
+            }
         }
 
         private void FolderGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (GridContinuePlaying.SelectedItems.Count != 0)
+            if (FolderGrid.SelectedItems.Count != 0)
             {
                 btnRemoveFromRecentFoldersSelection.Visibility = Visibility.Visible;
             }
@@ -719,6 +729,11 @@ namespace VusicPlayer
             foreach (var item in selectedItems)
             {
                 folders2.Remove(item);
+            }
+            if (folders2.Count == 0)
+            {
+                txtEmptyFolders.Visibility = Visibility.Visible;
+                txtFoldersHeader.Visibility = Visibility.Collapsed;
             }
         }
 

@@ -15,7 +15,7 @@
 
         </ContentDialog>
         <ContentDialog  Title="Edit Playlist Info" PrimaryButtonText="Save" DefaultButton="Primary" CloseButtonText="Cancel">
-          
+
             <Grid Name="MassEditgrd">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -78,6 +78,7 @@
                                         <TextBlock Text="{Binding AlbumName}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
                                     </HyperlinkButton>
                                     <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" ToolTipService.ToolTip="{Binding FormattedDuration}"  Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 20"/>
+
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -102,13 +103,13 @@ Margin="0,0,0,10">
                             </InfoBar.ActionButton>
                         </InfoBar>
                         <TabView VerticalAlignment="Stretch" Margin="0, 30" IsAddTabButtonVisible="False"  Grid.Row="2" SelectionChanged="TabView_SelectionChanged">
-                    <TabViewItem  IsClosable="False" Name="tbviArtist" Header="Edit Artist">
-                        <StackPanel VerticalAlignment="Stretch" Margin="0, 30" Orientation="Vertical" Spacing="20">
-                            
+                            <TabViewItem  IsClosable="False" Name="tbviArtist" Header="Edit Artist">
+                                <StackPanel VerticalAlignment="Stretch" Margin="0, 30" Orientation="Vertical" Spacing="20">
+
                                     <TextBox Name="txtEditArtist" PlaceholderText="Artist name..."></TextBox>
                                     <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="This property will be applied to all the files selected."></TextBlock>
-                        </StackPanel>
-                    </TabViewItem>
+                                </StackPanel>
+                            </TabViewItem>
                             <TabViewItem  IsClosable="False" Header="Edit Album" Name="tbviAlbum">
                                 <StackPanel Margin="0, 30"  Orientation="Vertical" Spacing="20">
 
@@ -118,17 +119,17 @@ Margin="0,0,0,10">
                             </TabViewItem>
                             <TabViewItem IsClosable="False" Header="Add to Playlist" Name="tbviAddToPlaylist">
                                 <ScrollViewer>
-                                <StackPanel Margin="0, 30" Orientation="Vertical" Spacing="5">
-                                    <Button Click="Button_Click_1">
-                                        <StackPanel Orientation="Horizontal" Spacing="5">
-                                            <Image Source="/Assets/addicon.png" Width="20"></Image>
-                                            <TextBlock Text="Create New Playlist" ></TextBlock>
-                                        </StackPanel>
-                                    </Button>
-                                    <ListView SelectionMode="Multiple" ItemClick="lstViewAddToPlaylists_ItemClick" Name="lstViewAddToPlaylists"></ListView>
-                                    <TeachingTip Name="ttInfo" IsOpen="False"></TeachingTip>
-                                    <Button Style="{StaticResource AccentButtonStyle}" Content="Add to selected playlist(s)" Click="Button_Click_2"></Button>
-                                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="This property will be applied to all the files selected."></TextBlock>
+                                    <StackPanel Margin="0, 30" Orientation="Vertical" Spacing="5">
+                                        <Button Click="Button_Click_1">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                                <TextBlock Text="Create New Playlist" ></TextBlock>
+                                            </StackPanel>
+                                        </Button>
+                                        <ListView SelectionMode="Multiple" ItemClick="lstViewAddToPlaylists_ItemClick" Name="lstViewAddToPlaylists"></ListView>
+                                        <TeachingTip Name="ttInfo" IsOpen="False"></TeachingTip>
+                                        <Button Style="{StaticResource AccentButtonStyle}" Content="Add to selected playlist(s)" Click="Button_Click_2"></Button>
+                                        <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="This property will be applied to all the files selected."></TextBlock>
 
                                     </StackPanel>
                                 </ScrollViewer>
@@ -169,7 +170,7 @@ Margin="0,0,0,10">
                         <Image Source="/Assets/openfolder.png" Width="20"></Image>
                     </StackPanel>
                 </Button>
-              
+
                 <Button Name="btnSelectAll" ToolTipService.ToolTip="Select All" Margin="0, 10" Click="btnSelectAll_Click">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Assets/openfolder.png" Width="20"></Image>
@@ -180,112 +181,151 @@ Margin="0,0,0,10">
                         <Image Source="/Assets/openfolder.png" Width="20"></Image>
                     </StackPanel>
                 </Button>
+                <Button Name="btnRemoveSelectionsFromFavourites" ToolTipService.ToolTip="Remove Selection from Favourites" Margin="0, 10" Click="btnRemoveSelectionsFromFavourites_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                    </StackPanel>
+                </Button>
             </StackPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
             </Grid>
-        <ListView   Margin="0, 0" CanDragItems="True" Visibility="Visible" CanReorderItems="True" AllowDrop="True"
+            <ListView   Margin="0, 0" CanDragItems="True" Visibility="Visible" CanReorderItems="True" AllowDrop="True"
     SelectionMode="Multiple" SelectionChanged="lstViewPlaylist_SelectionChanged" ItemClick="lstViewPlaylist_ItemClick" Name="lstViewPlaylist" DragItemsCompleted="lstViewPlaylist_DragItemsCompleted">
 
-            <ListView.ItemTemplate>
+                <ListView.ItemTemplate>
 
-                <DataTemplate >
-                    <Grid Margin="0, 5" VerticalAlignment="Stretch" Background="Transparent" HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid.ContextFlyout>
-                            <MenuFlyout Opened="mnftContext_Opened" x:Name="mnftContext">
-                                <MenuFlyoutItem Text="Play Song" Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Remove Song" Name="removesongfromplaylistcreation" Click="removesongfromplaylistcreation_Click" Icon="Delete"></MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Song Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE946;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutSubItem Text="Add to Playlist"  x:Name="mnftAddtoPlaylist" Loaded="mnftAddtoPlaylist_Loaded">
-                                    <MenuFlyoutSubItem.Icon>
-                                        <FontIcon Glyph="&#xECC8;"></FontIcon>
-                                    </MenuFlyoutSubItem.Icon>
-                                </MenuFlyoutSubItem>
-                                <MenuFlyoutItem Text="Add to play queue"  Name="mnftAddtoQueue" Click="mnftAddtoQueue_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE81E;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Edit info"  Name="mnftEditInfo" Click="mnftEditInfo_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE70F;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Go to artist"  Name="mnftGoToArtist" Click="mnftGoToArtist_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE77B;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Go to album"  Name="mnftGoToAlbum" Click="mnftGoToAlbum_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE93C;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Add to Favourites"  Name="mnftAddToFavourites" Click="mnftAddToFavourites_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE735;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                                <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftMoveup_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE70E;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Move down"  Name="mnftMovedown" Click="mnftMovedown_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE70D;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Move to top"  Name="mnftMovetotop" Click="mnftMovetotop_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74A;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Move to bottom"  Name="mnftMovetobottom" Click="mnftMovetobottom_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74B;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                                <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftTools_Click" >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE713;"></FontIcon>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyout>
-                        </Grid.ContextFlyout>
-                        <Button Padding="0" MinHeight="0" MinWidth="0" Margin="0, 0" Width="35" Grid.Column="0" Content="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Click="Button_Click" Visibility="Visible" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" >
-                            <Button.Resources>
-                                <Thickness x:Key="ButtonPadding">0</Thickness>
-                            </Button.Resources>
-                        </Button>
-                        <HyperlinkButton Click="txtTitle_Click" Grid.Column="1" Name="txtTitle"   Visibility="Visible"  Margin="0, 0">
-                                <TextBlock Text="{Binding Title}" ToolTipService.ToolTip="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
-                        </HyperlinkButton>
+                    <DataTemplate >
+                        <Grid Margin="0, 5" VerticalAlignment="Stretch" Background="Transparent" HorizontalAlignment="Stretch">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.ContextFlyout>
+                                <MenuFlyout Opened="mnftContext_Opened" x:Name="mnftContext">
+                                    <MenuFlyoutItem Text="Play Song"  Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Remove Song" Name="removesongfromplaylistcreation" Click="removesongfromplaylistcreation_Click" Icon="Delete"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Song Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE946;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSubItem Text="Add to Playlist"  x:Name="mnftAddtoPlaylist" Loaded="mnftAddtoPlaylist_Loaded">
+                                        <MenuFlyoutSubItem.Icon>
+                                            <FontIcon Glyph="&#xECC8;"></FontIcon>
+                                        </MenuFlyoutSubItem.Icon>
+                                    </MenuFlyoutSubItem>
+                                    <MenuFlyoutItem Text="Add to play queue"  Name="mnftAddtoQueue" Click="mnftAddtoQueue_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE81E;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Edit info"  Name="mnftEditInfo" Click="mnftEditInfo_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE70F;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Go to artist"  Name="mnftGoToArtist" Click="mnftGoToArtist_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE77B;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Go to album"  Name="mnftGoToAlbum" Click="mnftGoToAlbum_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE93C;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Add to Favourites"  Name="mnftAddToFavourites" Click="mnftAddToFavourites_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE735;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                    <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftMoveup_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE70E;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Move down"  Name="mnftMovedown" Click="mnftMovedown_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE70D;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Move to top"  Name="mnftMovetotop" Click="mnftMovetotop_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74A;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Move to bottom"  Name="mnftMovetobottom" Click="mnftMovetobottom_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74B;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                    <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftTools_Click" >
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE713;"></FontIcon>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Grid.ContextFlyout>
+                            <Button Padding="0" MinHeight="0" MinWidth="0" Margin="0, 0" Width="35" Grid.Column="0" Content="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Click="Button_Click" Visibility="Visible" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" >
+                                <Button.Resources>
+                                    <Thickness x:Key="ButtonPadding">0</Thickness>
+                                </Button.Resources>
+                            </Button>
+                            <HyperlinkButton Click="txtTitle_Click" Grid.Column="1" Name="txtTitle"   Visibility="Visible"  Margin="0, 0">
+                                <Grid>
+                                    <TextBlock Text="{Binding Title}"    ToolTipService.ToolTip="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
+                                    <Border Height="2" 
+            Background="Cyan" 
+            VerticalAlignment="Center" 
+            Margin="0,2,0,0"
+                                            CornerRadius="4"
+            Visibility="{Binding VisibilityOfStrikethrough}" />
+                                </Grid>
+                            </HyperlinkButton>
                             <HyperlinkButton Grid.Column="2" Name="txtArtistHyp" ToolTipService.ToolTip="{Binding Artist}" Click="txtArtistHyp_Click"   Visibility="Visible"  Margin="0, 0">
-                            <TextBlock Text="{Binding Artist}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
-                        </HyperlinkButton>
+                                <TextBlock Text="{Binding Artist}"  FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                            </HyperlinkButton>
                             <HyperlinkButton ToolTipService.ToolTip="{Binding AlbumName}" Grid.Column="3" Name="txtAlbumHyp" Click="txtAlbumHyp_Click"   Visibility="Visible"  Margin="10, 0">
-                            <TextBlock Text="{Binding AlbumName}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
-                        </HyperlinkButton>
+                                <TextBlock Text="{Binding AlbumName}"   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                            </HyperlinkButton>
                             <TextBlock ToolTipService.ToolTip="{Binding FormattedDuration}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 20"/>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
+                            <Button ToolTipService.ToolTip="Add to Favourites" Grid.Column="5" Margin="30, 0" x:Name="btnFavourite" 
+Click="FavoriteButton_Click"
+Background="Transparent" 
+BorderThickness="0">
+                                <Grid>
+                                    <FontIcon Name="OutlineHeart" 
+    Glyph="&#xEB51;" 
+    FontFamily="{StaticResource SymbolThemeFontFamily}" 
+    Foreground="Gray"
+                                              FontSize="16"/>
+
+                                    <FontIcon Name="FillHeart" 
+    Glyph="&#xEB52;" 
+    FontFamily="{StaticResource SymbolThemeFontFamily}" 
+    Foreground="Red" 
+    Opacity="0"
+    RenderTransformOrigin="0.5,0.5"  FontSize="16">
+                                        <FontIcon.RenderTransform>
+                                            <ScaleTransform x:Name="FillScale" ScaleX="0" ScaleY="0"/>
+                                        </FontIcon.RenderTransform>
+                                    </FontIcon>
+                                </Grid>
+                            </Button>
+
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </StackPanel>
     </Grid>

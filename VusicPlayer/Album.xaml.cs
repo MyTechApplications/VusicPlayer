@@ -230,7 +230,7 @@ public sealed partial class Album : Page, IUpdateableMusicPage
         }
         if (App.MainWindowInstance is HomeWindow homeWindow)
         {
-            homeWindow.LoadFileFromPath(paths);
+            QueueService.PlayMedia(paths);
         }
 
     }
@@ -242,7 +242,7 @@ public sealed partial class Album : Page, IUpdateableMusicPage
         this.DispatcherQueue.TryEnqueue(() =>
         {
             // Get the system's standard text color for the current theme
-            var normalBrush = Application.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
+            var normalBrush = (Application.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush);
             var highlightBrush = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
             var Playing = "\uE769";
             foreach (var item in lstViewPlaylist.Items)
@@ -370,7 +370,7 @@ public sealed partial class Album : Page, IUpdateableMusicPage
                 }
                 paths = new();
                 paths.Add(selectedSong.FilePath);
-                homeWindow.LoadFileFromPath(paths);
+                QueueService.PlayMedia(paths);
             }
         }
     }

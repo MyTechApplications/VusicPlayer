@@ -62,7 +62,6 @@ namespace VusicPlayer
 
             foreach (string path in selectedPlaylist.SongsPaths)
             {
-                Debug.WriteLine("EachPath: "+ path);
                 try
                 {
                     StorageFile file = await StorageFile.GetFileFromPathAsync(path);
@@ -80,7 +79,8 @@ namespace VusicPlayer
                         AlbumName = album,
                         Artist = artist,
                         SongDuration = properties.Duration,
-                        FilePath = file.Path
+                        FilePath = file.Path,
+
                     });
                 }
                 catch
@@ -89,7 +89,7 @@ namespace VusicPlayer
                 }
             }
             lstViewMaster.LoadMedia(SongCollection, this.Frame);
-            lstViewPlaylist.ItemsSource = SongCollection;
+            //lstViewPlaylist.ItemsSource = SongCollection;
             int count = SongCollection.Count; txtItemCount.Text = $"{count} {(count == 1 ? "item" : "items")}";
             SongCollection.CollectionChanged += SongCollection_CollectionChanged;
             if (PlaybackState.CurrentlyPlayingPath != null)
@@ -150,7 +150,6 @@ namespace VusicPlayer
                 StorageFile newFile = await picker.PickSingleFileAsync();
                 if (newFile != null)
                 {
-                    // Update the playlist path
                     int index = _currentPlaylist.SongsPaths.IndexOf(missingPath);
                     if (index >= 0) _currentPlaylist.SongsPaths[index] = newFile.Path;
                     MusicProperties properties = await newFile.Properties.GetMusicPropertiesAsync();
@@ -280,40 +279,10 @@ namespace VusicPlayer
             }
         }
 
-        private void removesongfromplaylistcreation_Click(object sender, RoutedEventArgs e)
-        {
-           
-        }
-
-        private void mnftSongDetails_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
+    
         ObservableCollection<string> paths = new();
-        private void PlaySelection()
-        {
-            if (selectedSong.FilePath != null)
-            {
-                if (App.MainWindowInstance is HomeWindow homeWindow)
-                {
-                    if (paths.Count != 0)
-                    {
-                        paths.Clear();
-                    }
-                    paths = new();
-                    paths.Add(selectedSong.FilePath);
-                    homeWindow.LoadFileFromPath(paths);
-
-                }
-            }
-        }
-        TimeSpan ts;
-        SongModel selectedSong = new();
-        private void mnftPlaySong_Click(object sender, RoutedEventArgs e)
-        {
-        
-        }
-
+       
+    
         private async void btnOpenFileLoc_Click(object sender, RoutedEventArgs e)
         {
             if (ITM != null)
@@ -472,26 +441,19 @@ namespace VusicPlayer
         bool playallrunning = false;
         private async void btnPlayAll_Click(object sender, RoutedEventArgs e)
         {
-            if (paths.Count != 0)
+            foreach(var item in SongCollection)
             {
-                paths.Clear();
+                item.IsCompleted = false;
             }
-            paths = new();
-            foreach (var itm in SongCollection)
-            {
-                if (itm.FilePath != null)
-                {
-                    paths.Add(itm.FilePath);
-                }
-            }
-            PlayerService.PlayQueue(shuffleenabled, paths);
+            PlayerService.CreatePlayer();
+            QueueHandler.PlayMedia(SongCollection, btnShuffle.IsChecked ?? false, false);
             playallrunning = true;
             UpdatePlaylistPlayState();
         }
         ObservableCollection<string> shuffled = new();
         public void UpdateCurrentState(string currentstate)
         {
-            if (currentstate == null) return;
+           /* if (currentstate == null) return;
 
             this.DispatcherQueue.TryEnqueue(() =>
             {
@@ -517,12 +479,12 @@ namespace VusicPlayer
 
                     }
                 }
-            });
+            }); */
         }
 
         public void UpdateCurrentListhere(string currentplaying)
         {
-            if (currentplaying == null) return;
+         /*   if (currentplaying == null) return;
 
             this.DispatcherQueue.TryEnqueue(() =>
             {
@@ -548,7 +510,7 @@ namespace VusicPlayer
                         }
                     }
                 }
-            });
+            });*/
         }
         private void lstViewPlaylist_ItemClick(object sender, ItemClickEventArgs e)
         {

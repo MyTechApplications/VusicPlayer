@@ -163,14 +163,18 @@ namespace VusicPlayer
             {
                 finalName = $"{baseName} ({counter++})";
             }
-            string baseDirectory = AppContext.BaseDirectory;
-            string defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultdark.png");
+            string defaultPath;
+            string darkIcon = "ms-appx:///Assets/playlistdefaultdark.png";
 
-            defaultPath = Path.Combine(baseDirectory, "Assets", "playlistdefaultlight.png");
+            // Set your initial default (e.g., based on current theme)
+            defaultPath = darkIcon;
 
-            if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
+            if (imgPlaylistCov.Source != null)
             {
-                defaultPath = bitmap.UriSource.ToString();
+                if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
+                {
+                    defaultPath = bitmap.UriSource.ToString();
+                }
             }
             var newPlaylist = new PlaylistProperties
             {

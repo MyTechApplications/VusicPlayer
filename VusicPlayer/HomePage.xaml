@@ -103,7 +103,7 @@ VerticalScrollBarVisibility="Auto">
                 </Grid.ColumnDefinitions>
 
             </Grid>
-            <StackPanel Name="txtRecentHeading"  Orientation="Horizontal" Spacing="5">
+            <StackPanel Name="txtRecentHeading"  Orientation="Horizontal" Grid.Row="3" Spacing="15">
             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"  x:Uid="sc1x004" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
                 <CheckBox x:Uid="sc1x017" Tag="Select" Name="chckSelectContinuePlaying" Checked="chckSelectContinuePlaying_Checked" Unchecked="chckSelectContinuePlaying_Unchecked"></CheckBox>
                 <CheckBox x:Uid="sc1x015" Tag="Selectallcontinuewatch" Name="chckSelectAllContinuePlaying" Visibility="Collapsed" Checked="chckSelectAllContinuePlaying_Checked" Unchecked="chckSelectAllContinuePlaying_Unchecked"></CheckBox>
@@ -145,8 +145,8 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30" SelectionC
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <StackPanel Name="txtFoldersHeader"  Orientation="Horizontal" Spacing="5">
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"  x:Uid="sc1x005" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
+            <StackPanel Name="txtFoldersHeader"  Orientation="Horizontal" Grid.Row="5" Spacing="15">
+                <TextBlock Style="{StaticResource BodyLargeStrongTextBlockStyle}"  x:Uid="sc1x005" Visibility="Visible" Grid.Row="3" Margin="0, 20"></TextBlock>
                 <CheckBox x:Uid="sc1x017" Tag="Selectfolder" Name="chckSelectFolders" Checked="chckSelectFolders_Checked" Unchecked="chckSelectFolders_Unchecked"></CheckBox>
                 <CheckBox x:Uid="sc1x015" Tag="Selectallfolders" Name="chckSelectAllFolders" Visibility="Collapsed" Checked="chckSelectAllFolders_Checked" Unchecked="chckSelectAllFolders_Unchecked"></CheckBox>
                 <Button Background="Transparent" BorderBrush="Transparent" x:Uid="sc1x016" Visibility="Collapsed" Margin="0, 0"  Click="btnRemoveFromRecentFoldersSelection_Click"  Name="btnRemoveFromRecentFoldersSelection" >
@@ -155,7 +155,6 @@ ItemClick="GridContinuePlaying_ItemClick" Grid.Row="4" Margin="0, 30" SelectionC
                     </StackPanel>
                 </Button>
             </StackPanel>
-            <TextBlock Name=""  x:Uid="sc1x005" Margin="0, 30" Style="{StaticResource BodyLargeStrongTextBlockStyle}" Grid.Row="6"></TextBlock>
             <TextBlock Name="txtEmptyFolders" x:Uid="sc1x006" Margin="0, 30" Style="{StaticResource BodyLargeTextBlockStyle}" Grid.Row="7" Visibility="Collapsed"></TextBlock>
             <GridView  CanDragItems="True"
       AllowDrop="True"

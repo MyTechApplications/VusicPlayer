@@ -4,9 +4,11 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -35,9 +37,28 @@ namespace VusicPlayer
 
         public void LoadMedia(ObservableCollection<SongModel> songslist, Frame fr)
         {
-            SongCollection = songslist;
+      
             frm = fr;
-            lstViewPlaylist.ItemsSource = SongCollection;
+            App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(() =>
+            {
+                // 2. Clear the existing collection instead of replacing the reference
+                SongCollection.Clear();
+
+                // 3. Populate it
+                if (songslist != null)
+                {
+                    foreach (var song in songslist)
+                    {
+                        SongCollection.Add(song);
+                    }
+                }
+
+                // 4. Re-assign the ItemsSource ONLY if it's not already set
+                if (lstViewPlaylist.ItemsSource == null)
+                {
+                    lstViewPlaylist.ItemsSource = SongCollection;
+                }
+            });
         }
         Frame? frm;
         SongModel selectedSong = new();
@@ -67,7 +88,7 @@ namespace VusicPlayer
                     }
                     paths = new();
                     paths.Add(selectedSong.FilePath);
-                    homeWindow.LoadFileFromPath(paths);
+                   QueueService.PlayMedia(paths);
 
                 }
             }
@@ -328,7 +349,7 @@ namespace VusicPlayer
             }
         
         }
-
+        public IList<object> SelectedItems => lstViewPlaylist.SelectedItems;
         private void lstViewPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(lstViewPlaylist.SelectedItems.Count > 0)
@@ -564,6 +585,67 @@ namespace VusicPlayer
         private void btnSelectAll_Click(object sender, RoutedEventArgs e)
         {
             lstViewPlaylist.SelectAll();
+        }
+        bool isChecked = false;
+        private void FavoriteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            if (btn == null) return;
+
+            // 1. Get the Grid inside the Button's Content
+            var rootGrid = btn.Content as Grid;
+            if (rootGrid == null) return;
+
+            // 2. Find the FillHeart icon by name within this specific Button
+            var fillHeartIcon = rootGrid.FindName("FillHeart") as FontIcon;
+            if (fillHeartIcon == null) return;
+            // Note: Since 'isChecked' is likely a local variable, 
+            // it will reset every click. Usually, you'd check the current state:
+            bool currentlyChecked = fillHeartIcon.Opacity > 0;
+
+            if (!currentlyChecked)
+            {
+                ToolTipService.SetToolTip(btn, "Remove from Favourites");
+
+                // Pass the specific icon we found to your animation method
+                AnimateHeart(fillHeartIcon, 1.0, 1.0);
+            }
+            else
+            {
+                ToolTipService.SetToolTip(btn, "Add to Favourites");
+
+                AnimateHeart(fillHeartIcon, 0.0, 0.0);
+            }
+        }
+        private void AnimateHeart(FontIcon target, double targetOpacity, double targetScale)
+        {
+            var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
+
+            // Scale X Animation
+            var scaleXAnim = new DoubleAnimation { To = targetScale, Duration = TimeSpan.FromMilliseconds(200) };
+            Storyboard.SetTarget(scaleXAnim, target.RenderTransform);
+            Storyboard.SetTargetProperty(scaleXAnim, "ScaleX");
+
+            // Scale Y Animation
+            var scaleYAnim = new DoubleAnimation { To = targetScale, Duration = TimeSpan.FromMilliseconds(200) };
+            Storyboard.SetTarget(scaleYAnim, target.RenderTransform);
+            Storyboard.SetTargetProperty(scaleYAnim, "ScaleY");
+
+            // Opacity Animation
+            var opacityAnim = new DoubleAnimation { To = targetOpacity, Duration = TimeSpan.FromMilliseconds(150) };
+            Storyboard.SetTarget(opacityAnim, target);
+            Storyboard.SetTargetProperty(opacityAnim, "Opacity");
+
+            storyboard.Children.Add(scaleXAnim);
+            storyboard.Children.Add(scaleYAnim);
+            storyboard.Children.Add(opacityAnim);
+
+            storyboard.Begin();
+        }
+
+        private void btnRemoveSelectionsFromFavourites_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

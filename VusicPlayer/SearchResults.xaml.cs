@@ -1,4 +1,4 @@
-using LibVLCSharp.Shared;
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -113,7 +113,7 @@ namespace VusicPlayer
                     }
                     paths = new();
                     paths.Add(selectedSong.FilePath);
-                    homeWindow.LoadFileFromPath(paths);
+                    QueueService.PlayMedia(paths);
 
                 }
             }

@@ -76,7 +76,7 @@ namespace VusicPlayer
                         else if (audioExtensions.Contains(extension))
                         {
                             var home = HomeWindow.ShowWindow();
-                            home.LoadFileFromPath(new ObservableCollection<string> { filePath });
+                            QueueService.PlayMedia(new ObservableCollection<string> { filePath });
                             return;
                         }
                     }

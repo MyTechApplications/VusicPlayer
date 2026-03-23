@@ -17,26 +17,26 @@
         <Grid Margin="50, 50">
 
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" Name="grdNowPlaying">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Name="grdNowPlaying">
 
-                    <Border x:Name="ShadowTarget" />
+                <Border x:Name="ShadowTarget" />
 
-                    <Grid   CornerRadius="20">
-                        <Grid.Background>
-                            <ImageBrush ImageSource="/Assets/oceancyan.png" 
+                <Grid   CornerRadius="20">
+                    <Grid.Background>
+                        <ImageBrush ImageSource="/Assets/oceancyan.png" 
                     Stretch="UniformToFill"/>
-                        </Grid.Background>
-                        <ui:Effects.Shadow>
-                            <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget}" CornerRadius="20" BlurRadius="20" Opacity="0.5" Offset="0,0" />
-                        </ui:Effects.Shadow>
-                        <Border CornerRadius="20">
-                            <Border.Background>
-                                <media:BackdropBlurBrush Amount="5.0" />
-                            </Border.Background>
+                    </Grid.Background>
+                    <ui:Effects.Shadow>
+                        <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget}" CornerRadius="20" BlurRadius="20" Opacity="0.5" Offset="0,0" />
+                    </ui:Effects.Shadow>
+                    <Border CornerRadius="20">
+                        <Border.Background>
+                            <media:BackdropBlurBrush Amount="5.0" />
+                        </Border.Background>
                         <ScrollViewer>
                             <StackPanel Margin="30, 15" Padding="15"  CornerRadius="20" Spacing="20" Orientation="Vertical" HorizontalAlignment="Center">
                                 <StackPanel.Background>
@@ -50,23 +50,33 @@
 
                                 <Grid Name="imgBackground"  CornerRadius="20" Padding="20" Width="300" HorizontalAlignment="Center">
                                     <StackPanel Orientation="Vertical" Spacing="10" HorizontalAlignment="Center">
-                                        <Image Width="110" Name="imgCover" HorizontalAlignment="Center" Source="/Assets/appicon.png"/>
-                                        <TextBlock Name="txtSongName" Text="Nothing playing" HorizontalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"/>
+                                        <Image Width="110" Name="imgCover" HorizontalAlignment="Center" Source="{x:Bind mediacontroller.Thumbnail2}"/>
+                                        <TextBlock Name="txtSongName" Text="{x:Bind mediacontroller.SongDisplayName, Mode=OneWay}" HorizontalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"/>
 
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <HyperlinkButton Name="txtArtist" Content="• Artist" HorizontalAlignment="Left" FontSize="15" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            <HyperlinkButton Name="txtAlbum" Grid.Column="1" Content="• Album" HorizontalAlignment="Right" FontSize="15" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <HyperlinkButton Click="txtArtist_Click" Name="txtArtist" ToolTipService.ToolTip="Artist" HorizontalAlignment="Left" FontSize="15" Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                                    <TextBlock Text="• "></TextBlock>
+                                                    <TextBlock Name="txtArtistDisplay" Text="{x:Bind mediacontroller.ArtistDisplayName, Mode=OneWay}"></TextBlock>
+                                                </StackPanel>
+                                            </HyperlinkButton>
+                                            <HyperlinkButton Click="txtAlbum_Click" ToolTipService.ToolTip="Album" Name="txtAlbum" Grid.Column="1" HorizontalAlignment="Right" FontSize="15" Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                                    <TextBlock Text="• "></TextBlock>
+                                                    <TextBlock Name="txtAlbumDisplay" Text="{x:Bind mediacontroller.AlbumDisplayName, Mode=OneWay}"></TextBlock>
+                                                </StackPanel>
+                                            </HyperlinkButton>
                                         </Grid>
 
-                                        <local:SliderReuse  IsEnabled="False"  x:Name="sldMain"/>
+                                        <local:SliderReuse  IsEnabled="True" Value="{x:Bind mediacontroller.CurrentPosition, Mode=TwoWay}" Maximum="{x:Bind mediacontroller.TotalDuration, Mode=TwoWay}" DragStarted="sldMain_DragStarted" DragCompleted="sldMain_DragCompleted"  x:Name="sldMain"/>
 
                                         <Grid>
-                                            <TextBlock Text="00:00:00" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Left" Name="txtRunningDuration"/>
-                                            <TextBlock Text="00:00:00" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right" Name="txtTotalDuration"/>
+                                            <TextBlock Text="{x:Bind mediacontroller.RunningDurationString, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Left" Name="txtRunningDuration"/>
+                                            <TextBlock Text="{x:Bind mediacontroller.TotalDurationString, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right" Name="txtTotalDuration"/>
                                         </Grid>
 
                                         <StackPanel Padding="10" Spacing="5" CornerRadius="20" HorizontalAlignment="Center" Orientation="Horizontal">
@@ -81,7 +91,7 @@ AlwaysUseFallback="False"/>
                                                 <Image Name="imgPrev" Width="26" Source="/Assets/previous.png"/>
                                             </Button>
                                             <Button Name="btnPlayPause"  IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent" Click="btnPlayPause_Click">
-                                                <Image Name="imgPlayPause" Width="26" Source="/Assets/play.png"/>
+                                                <Image Name="imgPlayPause" Width="26" Source="{x:Bind mediacontroller.Thumbnail}"/>
                                             </Button>
                                             <Button Name="btnNext" IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent" Click="btnNext_Click">
                                                 <Image Name="imgNext" Width="26" Source="/Assets/next.png"/>
@@ -98,10 +108,10 @@ FallbackColor="Black"
 AlwaysUseFallback="False"/>
                                             </StackPanel.Background>
                                             <Button IsEnabled="False"  Background="Transparent" BorderBrush="Transparent" Name="btnVolume" Click="btnVolume_Click">
-                                                <FontIcon Name="VolumeIcon" FontSize="15" Glyph="&#xE767;"/>
+                                                <FontIcon Name="VolumeIcon" FontSize="15" Glyph="&#xE767;"></FontIcon>
                                             </Button>
-                                            <local:SliderReuse IsEnabled="False"  x:Name="sldVolume" Width="100" Value="100" VerticalAlignment="Center"/>
-                                            <TextBlock Margin="5, 0" FontSize="12" Name="txtVolume" Text="100%" VerticalAlignment="Center"/>
+                                            <local:SliderReuse IsEnabled="False"  x:Name="sldVolume" Maximum="130" Width="100" Value="100" IsTooltipEnabled="False" ValueChanged="sldVolume_ValueChanged" VerticalAlignment="Center"/>
+                                            <TextBlock FontSize="12" Name="txtVolume" Text="100%" Margin="11, 7"></TextBlock>
                                         </StackPanel>
 
                                         <StackPanel Spacing="5" HorizontalAlignment="Center" Orientation="Horizontal" Padding="10" CornerRadius="20">
@@ -112,10 +122,10 @@ TintOpacity="0.3"
 FallbackColor="Black" 
 AlwaysUseFallback="False"/>
                                             </StackPanel.Background>
-                                            <Button Name="btnFav" IsEnabled="False"  ToolTipService.ToolTip="Add to Favourites" CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
+                                            <Button PointerEntered="btnFav_PointerEntered" PointerExited="btnFav_PointerExited" Name="btnFav" IsEnabled="False"  ToolTipService.ToolTip="Add to Favourites" CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
                                                 <Image Name="imgFav" Width="26" Source="/Assets/favicon.png"/>
                                             </Button>
-                                            <ToggleButton Name="btnShuffle"  IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
+                                            <ToggleButton Name="btnShuffle" ToolTipService.ToolTip="Play Queue Shuffled" Checked="btnShuffle_Checked" Unchecked="btnShuffle_Unchecked"  IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
                                                 <ToggleButton.Resources>
                                                     <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="Crimson"/>
                                                     <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#FF1746"/>
@@ -127,7 +137,7 @@ AlwaysUseFallback="False"/>
                                                 <Image Name="imgShuffle" Width="26" Source="/Assets/shuffleicon.png"/>
                                             </ToggleButton>
                                             <Button Name="btnOptions" IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
-                                                <Image Name="threedot" Width="26" Source="/Assets/threedot.png"/>
+                                                <Image Name="threedot" Width="26" Source="/Assets/options.png"/>
                                             </Button>
                                         </StackPanel>
 
@@ -136,26 +146,26 @@ AlwaysUseFallback="False"/>
                             </StackPanel>
                         </ScrollViewer>
                     </Border>
-                    </Grid>
                 </Grid>
+            </Grid>
 
-                <Grid Grid.Column="1">
-               
-                    <Border x:Name="ShadowTarget2" />
-                    <Grid 
+            <Grid Grid.Column="1">
+
+                <Border x:Name="ShadowTarget2" />
+                <Grid 
       Name="grdQueue"
       CornerRadius="20"
       Margin="50,0">
-                        <Grid.Background>
-                            <AcrylicBrush TintColor="Black" 
+                    <Grid.Background>
+                        <AcrylicBrush TintColor="Black" 
 TintOpacity="0" 
                    
 FallbackColor="Black" 
 AlwaysUseFallback="False"/>
-                        </Grid.Background>
-                        <ui:Effects.Shadow>
-                            <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget2}" CornerRadius="20" BlurRadius="20" Opacity="0.5" Offset="0,0" />
-                        </ui:Effects.Shadow>
+                    </Grid.Background>
+                    <ui:Effects.Shadow>
+                        <ui:AttachedDropShadow CastTo="{x:Bind ShadowTarget2}" CornerRadius="20" BlurRadius="20" Opacity="0.5" Offset="0,0" />
+                    </ui:Effects.Shadow>
                     <ScrollViewer>
                         <Grid>
                             <Grid.RowDefinitions>
@@ -176,10 +186,10 @@ AlwaysUseFallback="False"/>
                                 <TextBlock Text="Queue"
                    Style="{StaticResource TitleTextBlockStyle}"/>
 
-                                <AutoSuggestBox  IsEnabled="False"  Grid.Column="1"
+                                <AutoSuggestBox QuerySubmitted="asbFindQueue_QuerySubmitted"  IsEnabled="False"  Grid.Column="1" Name="asbFindQueue" TextChanged="asbFindQueue_TextChanged"
                         QueryIcon="Find"
                         PlaceholderText="Find in queue..."
-                        HorizontalAlignment="Stretch"/>
+                        HorizontalAlignment="Stretch" Height="35" Width="300"/>
                             </Grid>
 
 
@@ -210,22 +220,22 @@ AlwaysUseFallback="False"/>
                     Orientation="Horizontal"
                     Spacing="10">
 
-                                    <Button IsEnabled="False" Background="Transparent"
+                                    <Button IsEnabled="False" Background="Transparent" Name="btnRemoveSelectionFromQueue" Click="btnRemoveSelectionFromQueue_Click"
                     ToolTipService.ToolTip="Remove selection from queue">
                                         <Image Width="20" Source="/Assets/deleteicon.png"/>
                                     </Button>
 
-                                    <ToggleButton IsEnabled="False"  Background="Transparent"
+                                    <ToggleButton Checked="tglShuffleQueue_Checked" Unchecked="tglShuffleQueue_Unchecked" IsEnabled="False"  Background="Transparent" Name="tglShuffleQueue"
                           ToolTipService.ToolTip="Shuffle Play Queue">
                                         <Image Width="20" Source="/Assets/shuffleicon.png"/>
                                     </ToggleButton>
 
-                                    <ToggleButton IsEnabled="False"  Background="Transparent"
+                                    <ToggleButton IsEnabled="False"  Background="Transparent" Name="tglLoopQueue" Checked="tglLoopQueue_Checked" Unchecked="tglLoopQueue_Unchecked"
                           ToolTipService.ToolTip="Loop list">
                                         <Image Width="20" Source="/Assets/StoreLogo.png"/>
                                     </ToggleButton>
 
-                                    <Button  IsEnabled="False"  Background="Transparent"
+                                    <Button  IsEnabled="False"  Background="Transparent" Name="btnClearQueue" Click="btnClearQueue_Click"
                     ToolTipService.ToolTip="Clear Queue">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <Image Width="20" Source="/Assets/StoreLogo.png"/>
@@ -233,11 +243,11 @@ AlwaysUseFallback="False"/>
                                         </StackPanel>
                                     </Button>
 
-                                    <Button  IsEnabled="False"  Background="Transparent"
-                    ToolTipService.ToolTip="Save Queue">
+                                    <Button  IsEnabled="False"  Background="Transparent" Name="btnSaveQueue" Click="btnSaveQueue_Click"
+                    ToolTipService.ToolTip="Save Queue to Playlist">
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <Image Width="20" Source="/Assets/saveicon.png"/>
-                                            <TextBlock Text="Save Queue"/>
+                                            <TextBlock Text="Save Queue to Playlist"/>
                                         </StackPanel>
                                     </Button>
 
@@ -246,23 +256,43 @@ AlwaysUseFallback="False"/>
 
 
                             <!-- SECTION LABEL -->
-                            <TextBlock Grid.Row="2"
+                            <StackPanel Orientation="Horizontal" Grid.Row="2" Spacing="10">
+                                <TextBlock 
                Text="Up Next"
                Margin="30,0,0,10"
-               FontSize="18"
+               FontSize="18" Name="txtUpNext"
                FontWeight="SemiBold"
                Opacity="0.85"/>
+                                <ToggleButton Checked="btnViewQueue_Checked" Unchecked="btnViewQueue_Unchecked"  Background="Transparent" Name="btnViewQueue"
+>
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <Image Width="20" Source="/Assets/StoreLogo.png"/>
+                                        <TextBlock Text="View full queue"/>
+                                    </StackPanel>
+                                </ToggleButton>
+                            </StackPanel>
 
 
                             <!-- QUEUE LIST -->
-                            <ListView Grid.Row="3"
-              Name="lstviewQueue"
-              Margin="20,0,20,20"/>
+                            <local:ListViewMedia x:Name="lstViewQueue" Grid.Row="4"></local:ListViewMedia>
+                            <Grid  Grid.Row="3"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="grdNoSearchResults" Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Row="0" Name="btnCloseSearch" Background="Transparent" BorderBrush="Transparent" Click="btnCloseSearch_Click" ToolTipService.ToolTip="Close Search Results" HorizontalAlignment="Right" Margin="20, 0">
+                                    <FontIcon Glyph="&#xE711;" FontSize="40"></FontIcon>
+                                </Button>
+                                <Frame VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Name="frmSearchResultsNOMATCH"></Frame>
+
+                            </Grid>
+
                             <StackPanel Orientation="Vertical" Grid.Row="3" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center" Name="grdEmptyQueue">
                                 <StackPanel Spacing="20" Orientation="Horizontal">
                                     <Image Source="/Assets/StoreLogo.png" Width="100"></Image>
                                     <TextBlock Text="Your play queue is empty!" VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
                                 </StackPanel>
+
                                 <Button CornerRadius="10" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center">
                                     <Button.Background>
                                         <AcrylicBrush TintColor="Black" 
@@ -281,8 +311,8 @@ AlwaysUseFallback="False"/>
                         </Grid>
                     </ScrollViewer>
                 </Grid>
-                </Grid>
             </Grid>
-     
+        </Grid>
+
     </Grid>
 </Page>

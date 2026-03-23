@@ -4,9 +4,12 @@ using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using Windows.ApplicationModel.Activation;
+using Windows.Storage;
+using Windows.Storage.FileProperties;
 
 namespace VusicPlayer
 {
@@ -28,7 +31,7 @@ namespace VusicPlayer
             RegisterOnce();
         }
 
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             var activatedArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
             if (activatedArgs.Kind == ExtendedActivationKind.File)
@@ -61,8 +64,27 @@ namespace VusicPlayer
                     }
                     else if (audioExtensions.Contains(extension))
                     {
+                        PlayerService.CreatePlayer();
                         var home = HomeWindow.ShowWindow();
-                        home.LoadFileFromPath(new ObservableCollection<string> { filePath });
+                        StorageFile file2 = await StorageFile.GetFileFromPathAsync(filePath);
+                        MusicProperties properties = await file2.Properties.GetMusicPropertiesAsync();
+
+                        string title = !string.IsNullOrWhiteSpace(properties.Title) ? properties.Title : file2.DisplayName;
+                        string album = !string.IsNullOrWhiteSpace(properties.Album) ? properties.Album : "Unknown Album";
+                        string artist = !string.IsNullOrWhiteSpace(properties.Artist) ? properties.Artist : "Unknown Artist";
+
+
+                        var SongCollection = new ObservableCollection<SongModel>();
+                        SongCollection.Add(new SongModel
+                        {
+                            Title = title,
+                            AlbumName = album,
+                            Artist = artist,
+                            SongDuration = properties.Duration,
+                            FilePath = file.Path,
+
+                        });
+                        QueueHandler.PlayMedia(SongCollection, false, false);
                         return;
                     }
                 }

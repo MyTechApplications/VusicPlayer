@@ -26,14 +26,55 @@ namespace VusicPlayer
         }
 
         public double Minimum { get; set; } = 0;
-        public double Maximum { get; set; } = 100;
+        public static readonly DependencyProperty MaximumProperty =
+    DependencyProperty.Register(
+        nameof(Maximum),
+        typeof(double),
+        typeof(SliderReuse),
+        new PropertyMetadata(100.0, OnMaximumChanged));
+
+        public double Maximum
+        {
+            get => (double)GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
+        }
+
+        private static void OnMaximumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+           
+        }
+        public static readonly DependencyProperty ValueProperty =
+    DependencyProperty.Register(
+        nameof(Value),
+        typeof(double),
+        typeof(SliderReuse),
+        new PropertyMetadata(0.0, OnValueChanged));
+
+        // 2. The Wrapper (Keep this simple)
         public double Value
         {
-            get => _value;
-            set
+            get => (double)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+
+        // 3. The Callback (This replaces your 'set' logic)
+        private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is SliderReuse control)
             {
-                _value = Math.Clamp(value, Minimum, Maximum);
-                UpdateVisuals();
+                double newValue = (double)e.NewValue;
+
+                // Clamp the value if necessary
+                double clamped = Math.Clamp(newValue, control.Minimum, control.Maximum);
+
+                // Avoid infinite loops: only update if clamped value differs from what was set
+                if (newValue != clamped)
+                {
+                    control.Value = clamped;
+                    return;
+                }
+
+                control.UpdateVisuals();
             }
         }
         private double _value = 0;
