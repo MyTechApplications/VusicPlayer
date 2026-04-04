@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="VusicPlayer.EnlargeImage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VusicPlayer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="EnlargeImage">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <local:ScrollViewPan x:Name="grdMain" Margin="0, 0">
+        
+        <local:ScrollViewPan.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </local:ScrollViewPan.RowDefinitions>
+        <Grid Name="titlebar" Height="75" Grid.Row="0" VerticalAlignment="Top">
+            <TextBlock VerticalAlignment="Center" Text="Enlarged View" Name="txtTitle" Margin="20, 5" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
+            <Button Name="btnCloseEnlarge" Grid.Row="1" VerticalAlignment="Top" Background="Transparent" BorderBrush="Transparent" Click="btnCloseEnlarge_Click" ToolTipService.ToolTip="Close Search Results" HorizontalAlignment="Right" Margin="0, 10">
+                <FontIcon Glyph="&#xE711;" FontSize="20"></FontIcon>
+            </Button>
+        </Grid>
+   
+        <ScrollViewer x:Name="ImageScanner" Grid.Row="2"
+              MinZoomFactor="1" ViewChanged="ImageScanner_ViewChanged"
+                      PointerPressed="ImageScanner_PointerPressed" 
+               PointerMoved="ImageScanner_PointerMoved" 
+             PointerReleased="ImageScanner_PointerReleased"
+              MaxZoomFactor="10"
+              ZoomMode="Enabled"
+              HorizontalScrollBarVisibility="Auto"
+              VerticalScrollBarVisibility="Auto"
+              HorizontalScrollMode="Enabled"
+              VerticalScrollMode="Enabled">
+            <Image Name="imgLarge"  Width="500"></Image>
+        </ScrollViewer>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 20" Spacing="10">
+            <Button Name="btnZoomOut" Click="btnZoomOut_Click" Background="Transparent" BorderBrush="Transparent">
+                <FontIcon Glyph="&#xE71F;" ></FontIcon>
+            </Button>
+            <local:SliderReuse x:Name="sldZoom" Value="1"  IsTooltipEnabled="False" Width="100" Maximum="10" Minimum="1" ValueChanged="SliderReuse_ValueChanged"></local:SliderReuse>
+       
+            <Button Name="btnZoomIn" Click="btnZoomIn_Click" Background="Transparent" BorderBrush="Transparent">
+                <FontIcon Glyph="&#xE71E;" ></FontIcon>
+            </Button>
+            <TextBlock Text="0%" Margin="0, 5" Tapped="txtZoom_Tapped" Name="txtZoom" ToolTipService.ToolTip="Zoom percentage" ></TextBlock>
+            <TeachingTip Name="tipZoom" Target="{Binding ElementName=txtZoom}" Title="Zoom Percentage" IsOpen="False" >
+                <StackPanel Orientation="Vertical" Spacing="5">
+                <NumberBox Name="txtZoomTip"></NumberBox>
+                    <Button Click="Button_Click" ToolTipService.ToolTip="">
+                        <Image Source="/Assets/tickicon.png" Width="14"/>
+                    </Button>
+                </StackPanel>
+            </TeachingTip>
+            <Button Name="btnOpenFileLoc" Click="btnOpenFileLoc_Click" ToolTipService.ToolTip="Open File Location" Background="Transparent" BorderBrush="Transparent">
+                <FontIcon Glyph="&#xE71F;" ></FontIcon>
+            </Button>
+            <Button Name="btnViewFileInfo" ToolTipService.ToolTip="View Image properties" Background="Transparent" BorderBrush="Transparent">
+                <FontIcon Glyph="&#xE71F;" ></FontIcon>
+            </Button>
+        </StackPanel>
+ 
+    </local:ScrollViewPan>
+</Window>

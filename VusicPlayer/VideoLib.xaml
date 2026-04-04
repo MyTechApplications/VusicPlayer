@@ -651,64 +651,64 @@ Offset="0,0,0"/>
         <ContentDialog>
             <Grid Name="grdSubtitleEditor">
                 <ScrollViewer>
-                <StackPanel Orientation="Vertical" Spacing="20">
-                    <StackPanel Orientation="Horizontal" Spacing="20">
-                        <TextBlock HorizontalAlignment="Left" Style="{StaticResource TitleTextBlockStyle}" Text="View and Modify Subtitles"></TextBlock>
-                        <Button HorizontalAlignment="Right" Name="btnNewSubtitleCreate" Click="btnNewSubtitleCreate_Click">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="/Assets/addicon.png" Width="20"></Image>
-                                <TextBlock Text="Create New Subtitle File"></TextBlock>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock HorizontalAlignment="Left" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Available Subtitles"></TextBlock>
-                        <ComboBox Name="cmbAvailableSubs" PlaceholderText="Select Subtitle File"></ComboBox>
-                        <Button HorizontalAlignment="Right" Name="btnImportSubtitleCreate" Click="btnImportSubtitleCreate_Click">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="/Assets/addicon.png" Width="20"></Image>
-                                <TextBlock Text="Import Subtitle File"></TextBlock>
-                            </StackPanel>
-                        </Button>
-                        <Button HorizontalAlignment="Right" Name="btnSaveSubtitleCreate" Click="btnSaveSubtitleCreate_Click">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="/Assets/addicon.png" Width="20"></Image>
-                                <TextBlock Text="Save Subtitle File"></TextBlock>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock HorizontalAlignment="Left" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="View"></TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="20">
+                        <StackPanel Orientation="Horizontal" Spacing="20">
+                            <TextBlock HorizontalAlignment="Left" Style="{StaticResource TitleTextBlockStyle}" Text="View and Modify Subtitles"></TextBlock>
+                            <Button HorizontalAlignment="Right" Name="btnNewSubtitleCreate" Click="btnNewSubtitleCreate_Click">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                    <TextBlock Text="Create New Subtitle File"></TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock HorizontalAlignment="Left" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Available Subtitles"></TextBlock>
+                            <ComboBox Name="cmbAvailableSubs" PlaceholderText="Select Subtitle File"></ComboBox>
+                            <Button HorizontalAlignment="Right" Name="btnImportSubtitleCreate" Click="btnImportSubtitleCreate_Click">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                    <TextBlock Text="Import Subtitle File"></TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button HorizontalAlignment="Right" Name="btnSaveSubtitleCreate" Click="btnSaveSubtitleCreate_Click">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                    <TextBlock Text="Save Subtitle File"></TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock HorizontalAlignment="Left" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="View"></TextBlock>
 
-                        <ToggleButton Tag="TE" HorizontalAlignment="Right" Name="tglbtnTextEditor" Checked="tglbtnTextEditor_Checked" Unchecked="tglbtnTextEditor_Unchecked">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="/Assets/addicon.png" Width="20"></Image>
-                                <TextBlock Text="Text Editor"></TextBlock>
-                            </StackPanel>
-                        </ToggleButton>
-                        <ToggleButton Tag="VE" HorizontalAlignment="Right" Name="tglbtnVisualEditor" Checked="tglbtnTextEditor_Checked" Unchecked="tglbtnTextEditor_Unchecked">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="/Assets/addicon.png" Width="20"></Image>
-                                <TextBlock Text="vis Editor"></TextBlock>
-                            </StackPanel>
-                        </ToggleButton>
-                        <ToggleButton Tag="SBS" HorizontalAlignment="Right" Name="tglbtnSidebyside" Checked="tglbtnTextEditor_Checked" Unchecked="tglbtnTextEditor_Unchecked">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="/Assets/addicon.png" Width="20"></Image>
-                                <TextBlock Text="sbs"></TextBlock>
-                            </StackPanel>
-                        </ToggleButton>
-                    </StackPanel>
-                    <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Text Editor" Name="txtSubViewHeader"></TextBlock>
-                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="File Name" Name="txtSubFileName"></TextBlock>
-                    <InfoBar Name="ifbMessage" IsOpen="False" Visibility="Collapsed"></InfoBar>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Name="stkTextEditor" Grid.Column="0" Orientation="Vertical">
-                            <Border 
+                            <ToggleButton Tag="TE" HorizontalAlignment="Right" Name="tglbtnTextEditor" Checked="tglbtnTextEditor_Checked" Unchecked="tglbtnTextEditor_Unchecked">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                    <TextBlock Text="Text Editor"></TextBlock>
+                                </StackPanel>
+                            </ToggleButton>
+                            <ToggleButton Tag="VE" HorizontalAlignment="Right" Name="tglbtnVisualEditor" Checked="tglbtnTextEditor_Checked" Unchecked="tglbtnTextEditor_Unchecked">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                    <TextBlock Text="Visual Editor"></TextBlock>
+                                </StackPanel>
+                            </ToggleButton>
+                            <ToggleButton Tag="SBS" HorizontalAlignment="Right" Name="tglbtnSidebyside" Checked="tglbtnTextEditor_Checked" Unchecked="tglbtnTextEditor_Unchecked">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                    <TextBlock Text="Side by Side"></TextBlock>
+                                </StackPanel>
+                            </ToggleButton>
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Text Editor" Name="txtSubViewHeader"></TextBlock>
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="File Name" Name="txtSubFileName"></TextBlock>
+                        <InfoBar Name="ifbMessage" IsOpen="False" Visibility="Collapsed"></InfoBar>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Name="stkTextEditor" Grid.Column="0" Orientation="Vertical">
+                                <Border 
       Padding="10,5" 
       VerticalAlignment="Top" 
       HorizontalAlignment="Center"
@@ -717,323 +717,344 @@ Offset="0,0,0"/>
       BorderThickness="1" 
       CornerRadius="16">
 
-                                <StackPanel Orientation="Horizontal" Spacing="6.5">
+                                    <StackPanel Orientation="Horizontal" Spacing="6.5">
 
-                                    <!-- Undo / Redo -->
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Undo" Tag="Undo" Name="btnUndo" Click="btnCopyText_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/StoreLogo.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="RedO" Tag="Redo" Name="btnRedo" Click="btnCopyText_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/StoreLogo.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
-
-                                    <!-- Cut Copy Paste -->
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Cut" Tag="Cut" Name="btnCut" Click="btnCopyText_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/StoreLogo.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Copy" Tag="Copy" Name="btnCopy" Click="btnCopyText_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/StoreLogo.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Paste" Tag="Paste" Name="btnPaste" Click="btnCopyText_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/StoreLogo.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
-
-                                    <!-- Delete / Select All -->
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Del" Tag="Delete" Name="btnDel" Click="btnCopyText_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/StoreLogo.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Sel All" Tag="SelAll" Name="btnSelectAll" Click="btnCopyText_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/StoreLogo.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
-
-                                    <!-- Find / Replace -->
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="fIND All" Name="btnFindReplace" Click="btnFindReplace_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Assets/searchicon.png" Width="20"/>
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="rep All" Name="btnReplace" Click="btnReplace_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Width="20" Source="/Assets/searchicon.png" />
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
-
-                                    <!-- Zoom -->
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-
-                                        <Button Padding="2" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Zoom Out" Name="btnZoomOut" Click="btnZoomOut_Click">
+                                        <!-- Undo / Redo -->
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Undo" Tag="Undo" Name="btnUndo" Click="btnCopyText_Click">
                                             <StackPanel Orientation="Horizontal">
-                                                <Image Width="20" Source="/Assets/searchicon.png"/>
+                                                <Image Source="/Assets/StoreLogo.png" Width="20"/>
                                             </StackPanel>
                                         </Button>
 
-                                        <local:SliderReuse x:Name="sldZoom" IsTooltipEnabled="False" Width="50" Maximum="100" Value="50"/>
-                                        <TextBlock Text="100%" Margin="2, 5" Name="txtZoomFactorPercentage"></TextBlock>
-                                        <Button Padding="2" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Zoom Out" Name="btnZoomIn" Click="btnZoomOut_Click">
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="RedO" Tag="Redo" Name="btnRedo" Click="btnCopyText_Click">
                                             <StackPanel Orientation="Horizontal">
-                                                <Image Width="20" Source="/Assets/searchicon.png"/>
+                                                <Image Source="/Assets/StoreLogo.png" Width="20"/>
                                             </StackPanel>
                                         </Button>
+
+                                        <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
+
+                                        <!-- Cut Copy Paste -->
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Cut" Tag="Cut" Name="btnCut" Click="btnCopyText_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Assets/StoreLogo.png" Width="20"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Copy" Tag="Copy" Name="btnCopy" Click="btnCopyText_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Assets/StoreLogo.png" Width="20"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Paste" Tag="Paste" Name="btnPaste" Click="btnCopyText_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Assets/StoreLogo.png" Width="20"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
+
+                                        <!-- Delete / Select All -->
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Del" Tag="Delete" Name="btnDel" Click="btnCopyText_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Assets/StoreLogo.png" Width="20"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Sel All" Tag="SelAll" Name="btnSelectAll" Click="btnCopyText_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Assets/StoreLogo.png" Width="20"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
+
+                                        <!-- Find / Replace -->
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="fIND All" Name="btnFindReplace" Click="btnFindReplace_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Assets/searchicon.png" Width="20"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Padding="0" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="rep All" Name="btnReplace" Click="btnReplace_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="20" Source="/Assets/searchicon.png" />
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Rectangle Width="1" Height="24" Fill="{ThemeResource TextFillColorDisabledBrush}" Margin="3,0"/>
+
+                                        <!-- Zoom -->
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+
+                                            <Button Padding="2" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Zoom Out" Name="btnZoomOut" Click="btnZoomOut_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="20" Source="/Assets/searchicon.png"/>
+                                                </StackPanel>
+                                            </Button>
+
+                                            <local:SliderReuse x:Name="sldZoom" IsTooltipEnabled="False" Width="50" Maximum="100" Value="50"/>
+                                            <TextBlock Text="100%" Margin="2, 5" Name="txtZoomFactorPercentage"></TextBlock>
+                                            <Button Padding="2" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Zoom Out" Name="btnZoomIn" Click="btnZoomOut_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="20" Source="/Assets/searchicon.png"/>
+                                                </StackPanel>
+                                            </Button>
+
+                                        </StackPanel>
 
                                     </StackPanel>
+                                </Border>
+                                <ScrollViewer>
+                                    <TextBox Margin="0,10" TextChanged="txtboxMaster_TextChanged" TextWrapping="Wrap" MinHeight="170" Name="txtboxMaster"  AcceptsReturn="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></TextBox>
+                                </ScrollViewer>
+                                <Button  Name="btnApplyToVideo" Content="Apply to Video" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right"></Button>
+                            </StackPanel>
+                            <Grid Name="stkVisualEditor"  Padding="12" Grid.Column="0" Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <!-- Top Toolbar -->
+                                <StackPanel Orientation="Horizontal" Spacing="10">
 
-                                </StackPanel>
-                            </Border>
-                            <ScrollViewer>
-                                <TextBox Margin="0,10" TextChanged="txtboxMaster_TextChanged" TextWrapping="Wrap" MinHeight="170" Name="txtboxMaster"  AcceptsReturn="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></TextBox>
-                            </ScrollViewer>
-                            <Button  Name="btnApplyToVideo" Content="Apply to Video" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right"></Button>
-                        </StackPanel>
-                        <Grid Name="stkVisualEditor"  Padding="12" Grid.Column="0" Visibility="Collapsed">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <!-- Top Toolbar -->
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-
-                                <TextBlock Text="Visual Editor"
+                                    <TextBlock Text="Visual Editor"
                    FontWeight="SemiBold"
                    VerticalAlignment="Center"/>
 
-                                <ToggleButton Name="tglbtnHighlightWVid" Content="Highlight with video"/>
+                                    <ToggleButton Name="tglbtnHighlightWVid" Content="Highlight with video"/>
 
-                                <Button Content="Fix overlaps"/>
-
-                            </StackPanel>
-
-
-                            <!-- Main Editor Area -->
-                            <Grid Grid.Row="1"  ColumnSpacing="20">
-
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*"></ColumnDefinition>
-                                    <ColumnDefinition Width="3*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <!-- LEFT : Subtitle List -->
-                                <StackPanel>
-
-                                    <TextBlock Text="Subtitle List"
-                       FontWeight="SemiBold"
-                       Margin="0,0,0,10"/>
-
-                                    <Grid 
-          Margin="6,0,6,4">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="60"></ColumnDefinition>
-                                            <ColumnDefinition Width="140"></ColumnDefinition>
-                                            <ColumnDefinition Width="140"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="#"
-                   FontWeight="SemiBold"/>
-
-                                        <TextBlock Grid.Column="1"
-                   Text="Start Time"
-                   FontWeight="SemiBold"/>
-
-                                        <TextBlock Grid.Column="2"
-                   Text="End Time"
-                   FontWeight="SemiBold"/>
-
-                                        <TextBlock Grid.Column="3"
-                   Text="Subtitle Text"
-                   FontWeight="SemiBold"/>
-
-                                    </Grid>
-
-
-                                    <!-- GridView -->
-                                    <GridView x:Name="gvSubtitles"
-              SelectionMode="Single"
-              IsItemClickEnabled="True">
-
-                                        <GridView.ItemTemplate>
-                                            <DataTemplate>
-
-                                                <Grid 
-                      Padding="6">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="60"></ColumnDefinition>
-                                                        <ColumnDefinition Width="140"></ColumnDefinition>
-                                                        <ColumnDefinition Width="140"></ColumnDefinition>
-                                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <TextBlock Text="{Binding Index}"
-                               VerticalAlignment="Center"/>
-
-                                                    <TextBlock Grid.Column="1"
-                               Text="{Binding Start}"
-                               VerticalAlignment="Center"/>
-
-                                                    <TextBlock Grid.Column="2"
-                               Text="{Binding End}"
-                               VerticalAlignment="Center"/>
-
-                                                    <TextBlock Grid.Column="3"
-                               Text="{Binding Text}"
-                               TextTrimming="CharacterEllipsis"
-                               VerticalAlignment="Center"/>
-
-                                                </Grid>
-
-                                            </DataTemplate>
-                                        </GridView.ItemTemplate>
-
-                                    </GridView>
-
-
-                                    <!-- List Buttons -->
-                                    <StackPanel Orientation="Horizontal"
-                        Spacing="10"
-                        Margin="0,10,0,0">
-
-                                        <Button Content="Add"/>
-                                        <Button Content="Delete"/>
-                                        <Button Content="Merge Subtitles"/>
-
-                                    </StackPanel>
+                                    <Button Content="Fix overlaps"/>
 
                                 </StackPanel>
 
 
-                                <!-- RIGHT : Edit Subtitle -->
-                                <StackPanel Grid.Column="1">
+                                <!-- Main Editor Area -->
+                                <Grid Grid.Row="1"  ColumnSpacing="20" Margin="0, 20">
 
-                                    <TextBlock Text="Edit Subtitle"
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- LEFT : Subtitle List -->
+                                    <ScrollViewer>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Grid.Row="0" Text="Subtitle List"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,10"/>
+                                            <Grid Grid.Row="1"
+          Margin="6,0,6,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="60"></ColumnDefinition>
+                                                    <ColumnDefinition Width="140"></ColumnDefinition>
+                                                    <ColumnDefinition Width="140"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="#"
+                   FontWeight="SemiBold"/>
+
+                                                <TextBlock Grid.Column="1"
+                   Text="Start Time"
+                   FontWeight="SemiBold"/>
+
+                                                <TextBlock Grid.Column="2"
+                   Text="End Time"
+                   FontWeight="SemiBold"/>
+
+                                                <TextBlock Grid.Column="3"
+                   Text="Subtitle Text"
+                   FontWeight="SemiBold"/>
+
+                                            </Grid>
+
+
+                                            <!-- GridView -->
+                                            <ScrollViewer Grid.Row="3">
+                                            <GridView x:Name="gvSubtitles" Grid.Row="3"
+              SelectionMode="Single"
+              IsItemClickEnabled="True" ItemClick="gvSubtitles_ItemClick">
+
+                                                <GridView.ItemTemplate>
+                                                    <DataTemplate>
+
+                                                        <Grid 
+                      Padding="6">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="60"></ColumnDefinition>
+                                                                <ColumnDefinition Width="140"></ColumnDefinition>
+                                                                <ColumnDefinition Width="140"></ColumnDefinition>
+                                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock Text="{Binding Index}"
+                               VerticalAlignment="Center"/>
+
+                                                            <TextBlock Grid.Column="1"
+                               Text="{Binding Start}"
+                               VerticalAlignment="Center"/>
+
+                                                            <TextBlock Grid.Column="2"
+                               Text="{Binding End}"
+                               VerticalAlignment="Center"/>
+
+                                                            <TextBlock Grid.Column="3"
+                               Text="{Binding Text}" ToolTipService.ToolTip="{Binding Text}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"/>
+
+                                                        </Grid>
+
+                                                    </DataTemplate>
+                                                </GridView.ItemTemplate>
+
+                                            </GridView>
+                                            </ScrollViewer>
+
+                                            <!-- List Buttons -->
+                                            <StackPanel Orientation="Horizontal" Grid.Row="2"
+                        Spacing="10"
+                        Margin="0,10,0,0">
+
+                                                <Button Content="Add"/>
+                                                <Button Content="Delete"/>
+                                                <Button Content="Merge Subtitles"/>
+
+                                            </StackPanel>
+
+                                        </Grid>
+
+                                    </ScrollViewer>
+                                    <!-- RIGHT : Edit Subtitle -->
+                                    <StackPanel Grid.Column="1">
+
+                                        <TextBlock Text="Edit Subtitle"
                        FontWeight="SemiBold"
                        Margin="0,0,0,10"/>
 
-                                    <Grid 
+                                        <Grid 
                   RowSpacing="8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="120"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <TextBlock Text="Start Time"
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="120"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Text="Start Time"
                            VerticalAlignment="Center"/>
 
-                                        <TextBox Grid.Column="1"
-                         x:Name="txtStartTime"/>
+                                          
+                                            <StackPanel Spacing="5" Orientation="Horizontal" Grid.Column="1">
+                                                <NumberBox Name="nmStHH"></NumberBox>
+                                                <TextBlock Text=":"></TextBlock>
+                                                <NumberBox Name="nmStMM"></NumberBox>
+                                                <TextBlock Text=":"></TextBlock>
+                                                <NumberBox Name="nmStSS"></NumberBox>
+                                                <TextBlock Text="."></TextBlock>
+                                                <NumberBox Name="nmStMS"></NumberBox>
+                                            </StackPanel>
 
 
-                                        <TextBlock Grid.Row="1"
+                                            <TextBlock Grid.Row="1"
                            Text="End Time"
                            VerticalAlignment="Center"/>
 
-                                        <TextBox Grid.Row="1"
-                         Grid.Column="1"
-                         x:Name="txtEndTime"/>
+                                            <StackPanel Spacing="5" Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+                                                <NumberBox Name="nmEnHH"></NumberBox>
+                                                <TextBlock Text=":"></TextBlock>
+                                                <NumberBox Name="nmEnMM"></NumberBox>
+                                                <TextBlock Text=":"></TextBlock>
+                                                <NumberBox Name="nmEnSS"></NumberBox>
+                                                <TextBlock Text="."></TextBlock>
+                                                <NumberBox Name="nmEnMS"></NumberBox>
+                                            </StackPanel>
 
 
-                                        <TextBlock Grid.Row="2"
+                                            <TextBlock Grid.Row="2"
                            Text="Subtitle Text"
                            Margin="0,10,0,0"/>
 
-                                        <TextBox Grid.Row="2"
+                                            <TextBox Grid.Row="2"
                          Grid.Column="1"
                          AcceptsReturn="True"
                          Height="120"
                          TextWrapping="Wrap"
                          x:Name="txtSubtitleText"/>
 
-                                    </Grid>
+                                        </Grid>
 
 
-                                    <!-- Edit Buttons -->
-                                    <StackPanel Orientation="Horizontal"
+                                        <!-- Edit Buttons -->
+                                        <StackPanel Orientation="Horizontal"
                         Spacing="10"
                         Margin="0,12,0,0">
 
-                                        <Button Content="Split Subtitle"/>
+                                            <Button Content="Split Subtitle"/>
 
-                                        <Button Content="Set"/>
+                                            <Button Content="Set" Style="{StaticResource AccentButtonStyle}" Name="btnSetSubtitleVisual" Click="btnSetSubtitleVisual_Click"/>
 
-                                        <Button Content="Cancel"/>
+                                            <Button Content="Cancel"/>
+
+                                        </StackPanel>
 
                                     </StackPanel>
 
-                                </StackPanel>
+                                </Grid>
+
 
                             </Grid>
-
-
-                        </Grid>
-                        <TeachingTip Target="{x:Bind btnFindReplace}" PreferredPlacement="Bottom" Title="Find" Name="ttFindReplace">
-                            <ScrollViewer>
-                                <StackPanel Orientation="Vertical">
-                                    <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <TextBox Name="txtboxFind" PlaceholderText="Find in file..."></TextBox>
-                                        <Button Name="btnFindUp" ToolTipService.ToolTip="Find up">
-                                            <Image Width="20" Source="/Assets/searchicon.png"></Image>
-                                        </Button>
-                                        <Button Name="btnFindDown" ToolTipService.ToolTip="Find down">
+                            <TeachingTip Target="{x:Bind btnFindReplace}" PreferredPlacement="Bottom" Title="Find" Name="ttFindReplace">
+                                <ScrollViewer>
+                                    <StackPanel Orientation="Vertical">
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <TextBox Name="txtboxFind" PlaceholderText="Find in file..."></TextBox>
+                                            <Button Name="btnFindUp" ToolTipService.ToolTip="Find up">
                                                 <Image Width="20" Source="/Assets/searchicon.png"></Image>
-                                        </Button>
-                                        <ToggleButton Name="btnMatchCase" ToolTipService.ToolTip="Match case">
-                                                <Image Width="20" Source="/Assets/searchicon.png"></Image>
-                                        </ToggleButton>
-                                        <ToggleButton Name="btnWrapAround" ToolTipService.ToolTip="Wrap case">
-                                                <Image Width="20" Source="/Assets/searchicon.png"></Image>
-                                        </ToggleButton>
-                                        <ToggleButton Name="btnShowAll" ToolTipService.ToolTip="Show all results" Click="btnShowAll_Click_1">
-                                                <Image Width="20" Source="/Assets/searchicon.png"></Image>
-                                        </ToggleButton>
-                                    </StackPanel>
-                                    <Expander Name="expReplace">
-                                        <StackPanel>
-                                            <TextBox Name="txtboxReplace" PlaceholderText="Find in file..."></TextBox>
-                                            <Button Name="btnReplaceStuff" ToolTipService.ToolTip="Replace">
-                                                <TextBlock Text="Re"></TextBlock>
                                             </Button>
-                                            <Button Name="btnReplaceAll" ToolTipService.ToolTip="Find down">
-                                                <TextBlock Text="Rep all"></TextBlock>
+                                            <Button Name="btnFindDown" ToolTipService.ToolTip="Find down">
+                                                <Image Width="20" Source="/Assets/searchicon.png"></Image>
                                             </Button>
+                                            <ToggleButton Name="btnMatchCase" ToolTipService.ToolTip="Match case">
+                                                <Image Width="20" Source="/Assets/searchicon.png"></Image>
+                                            </ToggleButton>
+                                            <ToggleButton Name="btnWrapAround" ToolTipService.ToolTip="Wrap case">
+                                                <Image Width="20" Source="/Assets/searchicon.png"></Image>
+                                            </ToggleButton>
+                                            <ToggleButton Name="btnShowAll" ToolTipService.ToolTip="Show all results" Click="btnShowAll_Click_1">
+                                                <Image Width="20" Source="/Assets/searchicon.png"></Image>
+                                            </ToggleButton>
                                         </StackPanel>
-                                    </Expander>
-                                    <StackPanel Orientation="Vertical" Spacing="5" Name="stkAllResults" Visibility="Collapsed">
-                                        <TextBlock Text="All Results"></TextBlock>
-                                        <TextBlock Name="txtNoResults" Text="Hmm... there are no results for the text" Visibility="Collapsed"></TextBlock>
-                                        <ListView Name="lstviewAllFindResults"></ListView>
+                                        <Expander Name="expReplace">
+                                            <StackPanel>
+                                                <TextBox Name="txtboxReplace" PlaceholderText="Find in file..."></TextBox>
+                                                <Button Name="btnReplaceStuff" ToolTipService.ToolTip="Replace">
+                                                    <TextBlock Text="Re"></TextBlock>
+                                                </Button>
+                                                <Button Name="btnReplaceAll" ToolTipService.ToolTip="Find down">
+                                                    <TextBlock Text="Rep all"></TextBlock>
+                                                </Button>
+                                            </StackPanel>
+                                        </Expander>
+                                        <StackPanel Orientation="Vertical" Spacing="5" Name="stkAllResults" Visibility="Collapsed">
+                                            <TextBlock Text="All Results"></TextBlock>
+                                            <TextBlock Name="txtNoResults" Text="Hmm... there are no results for the text" Visibility="Collapsed"></TextBlock>
+                                            <ListView Name="lstviewAllFindResults"></ListView>
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </ScrollViewer>
-                        </TeachingTip>
-                    </Grid>
+                                </ScrollViewer>
+                            </TeachingTip>
+                        </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

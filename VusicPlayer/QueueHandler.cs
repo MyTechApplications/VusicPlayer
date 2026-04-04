@@ -18,19 +18,19 @@ namespace VusicPlayer
             {
                 videoindex = -1;
                 PlaybackState.CurrentlyPlayingPath = "";
-                    QueueListHolder.VusicQueue.Clear();
+                QueueListHolder.VusicQueue.Clear();
 
-                    foreach (var item in media)
-                    {
-                        QueueListHolder.VusicQueue.Add(item);
-                    }
+                foreach (var item in media)
+                {
+                    QueueListHolder.VusicQueue.Add(item);
+                }
 
-                    if (IsShuffleEnabled)
-                    {
-                        ShuffleList();
-                    }
-                    PlayNext();
-                
+                if (IsShuffleEnabled)
+                {
+                    ShuffleList();
+                }
+                PlayNext();
+
             }
         }
         public static void ResetVideoIndex()
@@ -38,7 +38,7 @@ namespace VusicPlayer
             videoindex = -1;
         }
         private static Random rng = new Random();
-        private static int videoindex = -1;
+        public static int videoindex = -1;
         public static void ShuffleList()
         {
             videoindex = -1;
@@ -54,35 +54,62 @@ namespace VusicPlayer
                 items[k] = items[n];
                 items[n] = value;
             }
-                     QueueListHolder.VusicQueue.Clear();
-                     foreach (var item in items)
-                     {
-                         QueueListHolder.VusicQueue.Add(item);
-                     }
+            QueueListHolder.VusicQueue.Clear();
+            foreach (var item in items)
+            {
+                QueueListHolder.VusicQueue.Add(item);
+            }
 
-           foreach(var item in QueueListHolder.VusicQueue)
+            foreach (var item in QueueListHolder.VusicQueue)
             {
                 Debug.WriteLine(item.FilePath + " QUEUEHANDLER SHUFFLED");
             }
         }
+        public static bool Loop = false;
         public static event EventHandler<string>? QueueUpdated;
         private static void MarkSongCompleted()
         {
             var song = QueueListHolder.VusicQueue.FirstOrDefault(x => x.FilePath == PlaybackState.CurrentlyPlayingPath);
             if (song != null)
             {
-                Debug.WriteLine("Can't hold it back anymore  " + song.FilePath);
+
                 song.IsCompleted = true;
             }
 
         }
         public static void PlayNext()
         {
-                     MarkSongCompleted();
-                 PlayVideoAtIndex(videoindex + 1);
-       
+            MarkSongCompleted();
+            PlayVideoAtIndex(videoindex + 1);
+
         }
-        public static bool Loop = false;
+        public static void PlayPrevious()
+        {
+            var queue = QueueListHolder.VusicQueue;
+            if (queue == null || queue.Count == 0) return;
+
+            // 1. Calculate the target (previous) index
+            int targetIndex = videoindex - 1;
+
+            // 2. Handle the beginning of the queue
+            if (targetIndex < 0)
+            {
+                if (Loop)
+                {
+                    targetIndex = queue.Count - 1; // Wrap to the very last song
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            // 3. CRITICAL: Unmark the target song so PlayVideoAtIndex doesn't skip it
+            queue[targetIndex].IsCompleted = false;
+
+            // 4. Play it
+            PlayVideoAtIndex(targetIndex);
+        }
         private static void PlayVideoAtIndex(int index)
         {
             var queue = QueueListHolder.VusicQueue;
@@ -95,7 +122,7 @@ namespace VusicPlayer
             {
                 if (Loop)
                 {
-                    foreach(var items in QueueListHolder.VusicQueue)
+                    foreach (var items in QueueListHolder.VusicQueue)
                     {
                         items.IsCompleted = false;
                     }

@@ -26,7 +26,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -494,7 +496,7 @@ namespace VusicPlayer
         {
             FileOpenPicker picker = new FileOpenPicker();
 
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App. VideoPlayerWindowInstance);
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.OceanDialogInstance);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             picker.FileTypeFilter.Add(".srt");
@@ -1398,7 +1400,7 @@ namespace VusicPlayer
 
         private void btnNewSubtitleCreate_Click(object sender, RoutedEventArgs e)
         {
-                SaveSubtitleFile();
+            SaveSubtitleFile();
             txtboxMaster.Text = "";
             txtSubFileName.Text = "Untitled";
         }
@@ -1432,7 +1434,7 @@ namespace VusicPlayer
                 }
             }
         }
-        
+
         private void tglbtnTextEditor_Checked(object sender, RoutedEventArgs e)
         {
             ToggleButton? tgl = sender as ToggleButton;
@@ -1453,6 +1455,11 @@ namespace VusicPlayer
                     stkTextEditor.Visibility = Visibility.Collapsed;
                     stkVisualEditor.Visibility = Visibility.Visible;
                     Grid.SetColumn(stkVisualEditor, 0);
+                    if (filepathname != "")
+                    {
+                        LoadSubtitleInVisualEditor(filepathname);
+                    }
+
                 }
                 else
                 {
@@ -1466,7 +1473,42 @@ namespace VusicPlayer
                 }
             }
         }
+        private async void LoadSubtitleInVisualEditor(string path)
+        {
+            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(path);
+            string content = await FileIO.ReadTextAsync(storageFile);
+            var blocks = content.Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
 
+            foreach (var block in blocks)
+            {
+                var lines = block.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+                if (lines.Length >= 3)
+                {
+                    // 1. Parse Index
+                    int.TryParse(lines[0], out int index);
+
+                    // 2. Split Timecodes (00:00:01,000 --> 00:00:04,500)
+                    var times = lines[1].Split(new[] { " --> " }, StringSplitOptions.None);
+                    string startTime = times.Length > 0 ? times[0] : "";
+                    string endTime = times.Length > 1 ? times[1] : "";
+
+                    // 3. Join text and Strip tags like <i>
+                    string rawText = string.Join(" ", lines.Skip(2));
+                    string cleanText = Regex.Replace(rawText, "<.*?>", string.Empty);
+
+                    Subtitles.Add(new SubtitleItem
+                    {
+                        Index = index,
+                        Start = startTime,
+                        End = endTime,
+                        Text = cleanText
+                    });
+                }
+            }
+            gvSubtitles.ItemsSource = Subtitles;
+        }
+        public ObservableCollection<SubtitleItem> Subtitles { get; set; } = new();
         private void tglbtnTextEditor_Unchecked(object sender, RoutedEventArgs e)
         {
 
@@ -1477,11 +1519,11 @@ namespace VusicPlayer
             var buttn = (Button)sender;
             if (buttn == null) return;
             string tag = buttn.Tag.ToString();
-            if(tag == "Undo")
+            if (tag == "Undo")
             {
                 txtboxMaster.Undo();
             }
-            else if(tag == "Redo")
+            else if (tag == "Redo")
             {
                 txtboxMaster.Redo();
             }
@@ -1489,10 +1531,10 @@ namespace VusicPlayer
             {
                 txtboxMaster.CopySelectionToClipboard();
             }
-            else if(tag == "Cut")
+            else if (tag == "Cut")
             {
                 txtboxMaster.CutSelectionToClipboard();
-              
+
             }
             else if (tag == "Paste")
             {
@@ -1522,24 +1564,24 @@ namespace VusicPlayer
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             if (App.VideoPlayerWindowInstance == null) { return; }
-            var dlg = VideoOptionsWindow.ShowDialog(grdSubtitleEditor, 900, 900, false);
+            var dlg = VideoOptionsWindow.ShowDialog(grdSubtitleEditor, 1300, 1300, false);
             dlg.CloseRequested += () =>
             {
                 dlg.HideDialog();
             };
         }
         string filepathname = "";
-        private async void  btnImportSubtitleCreate_Click(object sender, RoutedEventArgs e)
+        private async void btnImportSubtitleCreate_Click(object sender, RoutedEventArgs e)
         {
             var file = await PickSubtitles();
-            if(file != null)
+            if (file != null)
             {
                 filepathname = file.Path;
                 string content = await FileIO.ReadTextAsync(file);
                 txtboxMaster.Text = content;
                 txtSubFileName.Text = Path.GetFileName(filepathname);
             }
-        
+
         }
         string savedfiletext = "";
         private void txtboxMaster_TextChanged(object sender, TextChangedEventArgs e)
@@ -1565,10 +1607,10 @@ namespace VusicPlayer
             expReplace.IsExpanded = false;
         }
 
-       
+
         private void btnShowAll_Click_1(object sender, RoutedEventArgs e)
         {
-            if(btnShowAll.IsChecked == true)
+            if (btnShowAll.IsChecked == true)
             {
                 stkAllResults.Visibility = Visibility.Visible;
             }
@@ -1576,6 +1618,77 @@ namespace VusicPlayer
             {
                 stkAllResults.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void gvSubtitles_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = e.ClickedItem as SubtitleItem;
+            if (item == null) return;
+            string srtTime = item.Start.Replace(',', '.'); // TimeSpan expects a dot
+            TimeSpan time = TimeSpan.Parse(srtTime);
+            nmStHH.Value = time.Hours;
+            nmStMM.Value = time.Minutes;
+            nmStSS.Value = time.Seconds;
+            nmStMS.Value = time.Milliseconds;
+
+  string srtEndTime = item.End.Replace(',', '.'); // TimeSpan expects a dot
+            TimeSpan endTime = TimeSpan.Parse(srtEndTime);  
+            nmEnHH.Value = endTime.Hours;
+            nmEnMM.Value = endTime.Minutes;
+            nmEnSS.Value = endTime.Seconds;
+            nmEnMS.Value = endTime.Milliseconds;
+            txtSubtitleText.Text = item.Text;
+        }
+
+        private async void btnSetSubtitleVisual_Click(object sender, RoutedEventArgs e)
+        {
+            var ite = gvSubtitles.SelectedItem as SubtitleItem;
+            TimeSpan start = new TimeSpan(0, (int)nmStHH.Value, (int)nmStMM.Value, (int)nmStSS.Value, (int)nmStMS.Value);
+            TimeSpan end = new TimeSpan(0, (int)nmEnHH.Value, (int)nmEnMM.Value, (int)nmEnSS.Value, (int)nmEnMS.Value);
+            ite.Start = start.ToString(@"hh\:mm\:ss\,fff");
+            ite.End = end.ToString(@"hh\:mm\:ss\,fff");
+            
+            
+            ite.Text = txtSubtitleText.Text;
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in Subtitles)
+            {
+                sb.AppendLine(item.Index.ToString());
+                sb.AppendLine($"{item.Start} --> {item.End}");
+                sb.AppendLine(item.Text);
+                sb.AppendLine(); // The mandatory blank line
+            }
+            string content = sb.ToString();
+
+            try
+            {
+                // 2. Try to write to the original file
+                // Note: This requires the app to have cached permissions for the file
+                StorageFile storageFile = await StorageFile.GetFileFromPathAsync(filepathname); 
+                await FileIO.WriteTextAsync(storageFile, content);
+            }
+            catch (Exception ex)
+            {
+                // 3. If writing fails (e.g., Access Denied or Read-Only), trigger Save As
+                await SaveAsNewFileAsync(content);
+            }
+        }
+        private async Task SaveAsNewFileAsync(string content)
+        {
+            var savePicker = new FileSavePicker();
+
+            // Get the current window's HWND (required for WinUI 3 pickers)
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(App.OceanDialogInstance);
+            WinRT.Interop.InitializeWithWindow.Initialize(savePicker, hWnd);
+            savePicker.FileTypeChoices.Add("SubRip Subtitles", new List<string>() { ".srt" });
+            savePicker.SuggestedFileName = Path.GetFileName(filepathname);
+
+            StorageFile file = await savePicker.PickSaveFileAsync();
+            if (file != null)
+            {
+                await FileIO.WriteTextAsync(file, content);
+            }
+            filepathtemp = Path.GetTempPath();
         }
     }
 }

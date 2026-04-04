@@ -64,8 +64,9 @@ namespace VusicPlayer
                     }
                     else if (audioExtensions.Contains(extension))
                     {
-                        PlayerService.CreatePlayer();
+
                         var home = HomeWindow.ShowWindow();
+
                         StorageFile file2 = await StorageFile.GetFileFromPathAsync(filePath);
                         MusicProperties properties = await file2.Properties.GetMusicPropertiesAsync();
 
@@ -84,6 +85,7 @@ namespace VusicPlayer
                             FilePath = file.Path,
 
                         });
+                        home.Create();
                         QueueHandler.PlayMedia(SongCollection, false, false);
                         return;
                     }

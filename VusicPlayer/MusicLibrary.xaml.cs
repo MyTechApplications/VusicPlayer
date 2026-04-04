@@ -51,14 +51,12 @@ namespace VusicPlayer
         {
             InitializeComponent();
             GrdViewPlaylists.ItemsSource = MyItems;
-         //   CallValues();
             MyItems.CollectionChanged += MyItems_CollectionChanged;
             RecentMusicItems.CollectionChanged += RecentMusicItems_CollectionChanged;
         }
-
-
         private async void RecentMusicItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_isLoadingData) return;
             if (e.Action == NotifyCollectionChangedAction.Remove ||
         e.Action == NotifyCollectionChangedAction.Add ||
         e.Action == NotifyCollectionChangedAction.Move)
@@ -66,12 +64,11 @@ namespace VusicPlayer
                 var currentSettings = await SettingsHelper.LoadSettingsAsync();
                 currentSettings.RecentMusic = RecentMusicItems;
                 await SettingsHelper.SaveSettingsAsync(currentSettings);
-
             }
         }
-
         private async void MyItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (_isLoadingData) return;
             if (e.Action == NotifyCollectionChangedAction.Remove ||
         e.Action == NotifyCollectionChangedAction.Add ||
         e.Action == NotifyCollectionChangedAction.Move)
@@ -79,167 +76,178 @@ namespace VusicPlayer
                 var currentSettings = await SettingsHelper.LoadSettingsAsync();
                 currentSettings.SavedPlaylists = MyItems;
                 await SettingsHelper.SaveSettingsAsync(currentSettings);
-
             }
         }
-
-        private async void CallValues()
+        private bool _isLoadingData = false;
+        private async Task CallValues()
         {
-           
-            MyItems.Clear();
-            RecentMusicItems.Clear();
-            var settings = await SettingsHelper.LoadSettingsAsync();
-            var playlistitemss = settings.SavedPlaylists;
-            var recentmusicitems = settings.RecentMusic;
-            foreach (var item in playlistitemss)
+            _isLoadingData = true;
+            try
             {
-                string defaultThumbnail = Path.Combine(AppContext.BaseDirectory, "Assets", "playlistdefaultdark.png");
-
-                if (item.Thumbnail == null && item.SongsPaths?.Count > 0)
+                MyItems.Clear();
+                RecentMusicItems.Clear();
+                var settings = await SettingsHelper.LoadSettingsAsync();
+                var playlistitemss = settings.SavedPlaylists;
+                var recentmusicitems = settings.RecentMusic;
+                foreach (var item in playlistitemss)
                 {
-                    item.Thumbnail = new Uri(item.SongsPaths[0]).AbsoluteUri;
-                }
-                else if (item.Thumbnail == null)
-                {
-                    item.Thumbnail = new Uri(defaultThumbnail).AbsoluteUri;
-                }
-                MyItems.Add(item); // This sends a notification
-            }
-            foreach (var item in recentmusicitems)
-            {
-                item.Thumbnail = await GetFileThumbnailAsync(item.SongPath);
-                RecentMusicItems.Add(item);
-            }
-            grdViewRecentMusic.ItemsSource = RecentMusicItems;
-            if (GrdViewPlaylists.Items.Count == 0)
-            {
-                btnDeletePlaylists.Visibility = Visibility.Collapsed;
-                chckmultiple.IsChecked = false;
-                txtEmptyPlaylists.Visibility = Visibility.Visible;
-                GrdViewPlaylists.Visibility = Visibility.Collapsed;
-                chckmultiple.Visibility = Visibility.Collapsed;
-            }
-            if (grdViewRecentMusic.Items.Count == 0) // Check the bound collection count instead
-            {
-                btnDeleteRecents.Visibility = Visibility.Collapsed;
-                chckmultiplerecent.IsChecked = false;
-                txtEmptyRecents.Visibility = Visibility.Visible;
-                grdViewRecentMusic.Visibility = Visibility.Collapsed;
-                chckmultiplerecent.Visibility = Visibility.Collapsed;
-            }
-            GrdViewPlaylists.ItemsSource = MyItems;
+                    Uri thumbpath = item.Thumbnail ?? new Uri("ms-appx:///Assets/playlistdefaultdark.png");
+                    item.plthumb = new BitmapImage(thumbpath);
 
+
+                    MyItems.Add(item);
+                }
+                foreach (var item in recentmusicitems)
+                {
+                    item.Thumbnail = await FileThumbnailObtain.GetFileThumbnailAsync(item.SongPath);
+                    RecentMusicItems.Add(item);
+                }
+                grdViewRecentMusic.ItemsSource = RecentMusicItems;
+                GrdViewPlaylists.ItemsSource = MyItems;
+
+                if (GrdViewPlaylists.Items.Count == 0)
+                {
+                    btnDeletePlaylists.Visibility = Visibility.Collapsed;
+                    chckmultiple.IsChecked = false;
+                    txtEmptyPlaylists.Visibility = Visibility.Visible;
+                    GrdViewPlaylists.Visibility = Visibility.Collapsed;
+                    chckmultiple.Visibility = Visibility.Collapsed;
+                }
+                if (grdViewRecentMusic.Items.Count == 0) // Check the bound collection count instead
+                {
+                    btnDeleteRecents.Visibility = Visibility.Collapsed;
+                    chckmultiplerecent.IsChecked = false;
+                    txtEmptyRecents.Visibility = Visibility.Visible;
+                    grdViewRecentMusic.Visibility = Visibility.Collapsed;
+                    chckmultiplerecent.Visibility = Visibility.Collapsed;
+                }
+            }
+            finally
+            {
+                _isLoadingData = false;
+            }
         }
         public ObservableCollection<PlaylistProperties> MyItems { get; set; } = new();
         public ObservableCollection<RecentMusic> RecentMusicItems { get; set; } = new();
-        // Change your model property to this:
-        // public ImageSource Thumbnail { get; set; }
 
-        public async Task<BitmapImage> GetFileThumbnailAsync(string path)
-        {
-            // Define your fallback asset
-            Uri fallbackUri = new Uri("ms-appx:///Assets/appicon.png");
 
-            try
-            {
-                if (string.IsNullOrEmpty(path))
-                    return new BitmapImage(fallbackUri);
-                if (!File.Exists(path)) return new BitmapImage(fallbackUri); ;
-                StorageFile file = await StorageFile.GetFileFromPathAsync(path);
-
-                // Get thumbnail from the file's metadata
-                using var thumbnail = await file.GetScaledImageAsThumbnailAsync(
-                    ThumbnailMode.MusicView, // Better for audio files
-                    320,
-                    ThumbnailOptions.UseCurrentScale);
-
-                if (thumbnail != null)
-                {
-                    BitmapImage bitmapImage = new BitmapImage();
-                    // This connects the stream to the UI object
-                    await bitmapImage.SetSourceAsync(thumbnail);
-                    return bitmapImage;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"Thumbnail extraction failed: {ex.Message}", "MusicLibrary", Logger.LogLevelType.Error);
-            }
-
-            // If everything fails, return the app icon
-            return new BitmapImage(fallbackUri);
-        }
         private bool _isCreatingPlaylist = false;
         private async void btnNewPlaylist_Click(object sender, RoutedEventArgs e)
         {
             if (App.HomeWindowInstance == null) return;
+            AllSongs.CollectionChanged += AllSongs_CollectionChanged;
+            OceanContentDialog.ClearSubscribers();
 
-            PlaylistDialog.LoadPlaylistCreationDialog(true, new PlaylistProperties { PlaylistName="New Playlist"}, this.Frame);
-            OceanContentDialog.Show("Create New Playlist", "Create", "", "Cancel", OceanContentDialogDefault.Primary, contentsNewPlaylist, this.XamlRoot, 600, 760, OceanContentDialogType.Elevated, App.HomeWindowInstance, "addicon", "", "");
+            // 2. Now add back only the current listener
             OceanContentDialog.PrimaryRequested += Dlg_PrimaryRequested;
-
+            //           await PlaylistDialog.LoadPlaylistCreationDialog(true, new PlaylistProperties { PlaylistName = "New Playlist" }, this.Frame);
+            OceanContentDialog.Show("Create New Playlist", "Create", "", "Cancel", OceanContentDialogDefault.Primary, contentsNewPlaylist, this.XamlRoot, 600, 760, OceanContentDialogType.Elevated, App.HomeWindowInstance, "addicon", "", "");
         }
-        OceanDialog dlg2;
-        OceanPopup oceanPopup;
+
+        private void AllSongs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+
+            txtNullAddedSongs.Visibility = AllSongs.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            txtAddedSongs.Text = "Added Songs: " + $"{AllSongs.Count} {(AllSongs.Count == 1 ? "item" : "items")}";
+        }
+        private bool _isSavingPlaylist = false;
         private async void Dlg_PrimaryRequested()
         {
-            OceanContentDialog.HideDlg();
-            HomeWindow.ShowWindow();
-            PlaylistDialog.SavePlaylist();
-            DispatcherQueue.TryEnqueue(() => CallValues());
-
-        }
-        public async Task<StorageFile?> PickFileAsync(Window wind)
-        {
-
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(wind);
-
-            if (hwnd == IntPtr.Zero)
+            Debug.WriteLine($"CreationCalled | Object ID: {this.GetHashCode()} | Playlist: {txtEditPlaylistName.Text}");
+            if (_isSavingPlaylist) return;
+            try
             {
-                hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.CurrentActiveWindow);
+                Debug.WriteLine("CreationCalled");
+                var currentSettings = await SettingsHelper.LoadSettingsAsync();
+
+                string baseName = txtEditPlaylistName.Text.Trim();
+                if (string.IsNullOrEmpty(baseName)) baseName = "New Playlist";
+
+                string finalName = baseName;
+                int counter = 1;
+                while (currentSettings.SavedPlaylists.Any(p =>
+                    string.Equals(p.PlaylistName, finalName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    finalName = $"{baseName} ({counter++})";
+                }
+                Uri defaultPath = new Uri("ms-appx:///Assets/playlistdefaultdark.png");
+
+
+                if (playlistcoverpath != "")
+                {
+                    defaultPath = new Uri(playlistcoverpath);
+                }
+                else
+                {
+                    Uri darkIcon = new Uri("ms-appx:///Assets/playlistdefaultdark.png");
+
+                    // Set your initial default (e.g., based on current theme)
+                    defaultPath = darkIcon;
+                }
+                string playlistID = Guid.NewGuid().ToString("N");
+                var newPlaylist = new PlaylistProperties
+                {
+                    PlaylistName = finalName,
+                    PlaylistId = playlistID,
+                    PlaylistCount = $"{AllSongs.Count} {(AllSongs.Count == 1 ? "item" : "items")}",
+                    PlaylistNowPlaying = "",
+                    PlaylistGenre = txtEditGenre.Text,
+                    SongsPaths = AllSongs
+        .Select(s => s.FilePath)
+        .Where(path => path != null)
+        .ToHashSet()!,
+                    Thumbnail = defaultPath,
+                    DateCreation = DateTime.Now.Date,
+                };
+                currentSettings.SavedPlaylists.Add(newPlaylist);
+                await SettingsHelper.SaveSettingsAsync(currentSettings);
+                MyItems.Add(newPlaylist);
+            
+                OceanContentDialog.HideDlg();
+                HomeWindow.ShowWindow();
+             
+
+                UIUpdate();
             }
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            #region AudioFileTypes 
-            picker.FileTypeFilter.Add(".mp3");
-            picker.FileTypeFilter.Add(".wav");
-            picker.FileTypeFilter.Add(".ogg");
-            picker.FileTypeFilter.Add(".m4a");
-            picker.FileTypeFilter.Add(".aac");
-            picker.FileTypeFilter.Add(".wma");
-            picker.FileTypeFilter.Add(".flac");
-            picker.FileTypeFilter.Add(".ac3");
-            picker.FileTypeFilter.Add(".alac");
-            picker.FileTypeFilter.Add(".aiff");
-            picker.FileTypeFilter.Add(".opus");
-            picker.FileTypeFilter.Add(".ape");
-            picker.FileTypeFilter.Add(".wv");
-            picker.FileTypeFilter.Add(".tta");
-            picker.FileTypeFilter.Add(".dsf");
-            picker.FileTypeFilter.Add(".dff");
-            picker.FileTypeFilter.Add(".mp2");
-            picker.FileTypeFilter.Add(".amr");
-            picker.FileTypeFilter.Add(".au");
-            picker.FileTypeFilter.Add(".snd");
-            picker.FileTypeFilter.Add(".mka");
-            #endregion
-
-            var files = await picker.PickSingleFileAsync();
-            return files;
-        } 
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+                // Allow the button to be used again only after everything is done
+                _isSavingPlaylist = false;
+            }
+        }
         private async void btnOpenMusic_Click(object sender, RoutedEventArgs e)
         {
             if (App.HomeWindowInstance == null) return;
-            var files = await PickFileAsync(App.HomeWindowInstance);
+            var files = await PickFiles.PickAudioFileAsync(App.HomeWindowInstance, "Choose Audio");
             if (files != null)
             {
+           
 
-                ObservableCollection<string> str = new();
-                str.Add(files.Path);
-                if (App.MainWindowInstance is HomeWindow homeWindow)
+                if (files.Path != null)
                 {
-                    QueueService.PlayMedia(str);
+                    if (File.Exists(files.Path))
+                    {
+                        StorageFile file = await StorageFile.GetFileFromPathAsync(files.Path);
+                        MusicProperties properties = await file.Properties.GetMusicPropertiesAsync();
+
+                        string title = !string.IsNullOrWhiteSpace(properties.Title) ? properties.Title : file.DisplayName;
+                        string album = !string.IsNullOrWhiteSpace(properties.Album) ? properties.Album : "Unknown Album";
+                        string artist = !string.IsNullOrWhiteSpace(properties.Artist) ? properties.Artist : "Unknown Artist";
+                        ObservableCollection<SongModel> temp = new();
+                        temp.Add(new SongModel {
+                            Title = title,
+                            AlbumName = album,
+                            Artist = artist,
+                            SongDuration = properties.Duration,
+                            FilePath = file.Path,
+                        });
+                        PlayerService.CreatePlayer();
+                        QueueHandler.PlayMedia(temp, false, false);
+                    }
                 }
             }
 
@@ -255,27 +263,9 @@ namespace VusicPlayer
             await dlgConfirmDeletePlaylist.ShowAsync();
         }
 
-        private void txtPlaylistName_GotFocus(object sender, RoutedEventArgs e)
-        {
-
-        }
 
 
 
-        private void btnActualReset_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-        {
-
-        }
-        private async void removesongfromplaylistcreation_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-        BitmapImage? img;
-        private async void btnAddSongs_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        bool isdarkmode = true;
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             if (e.Parameter is string receivedparam)
@@ -289,11 +279,7 @@ namespace VusicPlayer
                     ttPlaylistDeleted.IsOpen = false;
                 }
             }
-            CallValues();
-        }
-        private async void dlgNewPlaylist_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-
+            await CallValues();
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -305,7 +291,7 @@ namespace VusicPlayer
             }
             else
             {
-                GrdViewPlaylists.SelectionMode = ListViewSelectionMode.Single; 
+                GrdViewPlaylists.SelectionMode = ListViewSelectionMode.Single;
                 btnDeletePlaylists.Visibility = Visibility.Collapsed;
             }
         }
@@ -313,57 +299,59 @@ namespace VusicPlayer
         private async void dlgConfirmDeletePlaylist_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             MyItems.Remove(sngtemp);
-            if (GrdViewPlaylists.Items.Count == 0)
-            {
-                txtEmptyPlaylists.Visibility = Visibility.Visible;
-                GrdViewPlaylists.Visibility = Visibility.Collapsed;
-                btnDeletePlaylists.Visibility = Visibility.Collapsed;
-                chckmultiple.IsChecked = false;
-                chckmultiple.Visibility = Visibility.Collapsed;
-            }
+            UIUpdate();
             var currentSettings = await SettingsHelper.LoadSettingsAsync();
             currentSettings.SavedPlaylists = MyItems;
             await SettingsHelper.SaveSettingsAsync(currentSettings);
         }
 
-        private void GrdViewPlaylists_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-        {
-
-        }
 
         private void chckmultiple_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (chckmultiple.IsChecked == true)
-            {
-                GrdViewPlaylists.SelectionMode = ListViewSelectionMode.Multiple;
-                btnDeletePlaylists.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                btnDeletePlaylists.Visibility = Visibility.Collapsed;
-                GrdViewPlaylists.SelectionMode = ListViewSelectionMode.Single;
-            }
+            bool isChecked = chckmultiple.IsChecked ?? false;
+
+            GrdViewPlaylists.SelectionMode = isChecked ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single;
+            btnDeletePlaylists.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
         }
 
 
-
+        private void UIUpdate()
+        {
+            if (MyItems.Count == 0)
+            {
+                btnDeletePlaylists.Visibility = Visibility.Collapsed;
+                chckmultiple.IsChecked = false;
+                chckSelectAllPlaylists.IsChecked = false;
+                txtEmptyPlaylists.Visibility = Visibility.Visible;
+                GrdViewPlaylists.Visibility = Visibility.Collapsed;
+                chckmultiple.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                chckSelectAllPlaylists.IsChecked = false;
+                chckmultiple.IsChecked = false;
+                txtEmptyPlaylists.Visibility = Visibility.Collapsed;
+                GrdViewPlaylists.Visibility = Visibility.Visible;
+                chckmultiple.Visibility = Visibility.Visible;
+            }
+            if (grdViewRecentMusic.Items.Count == 0)
+            {
+                txtEmptyRecents.Visibility = Visibility.Visible;
+                btnDeleteRecents.Visibility = Visibility.Collapsed;
+                grdViewRecentMusic.Visibility = Visibility.Collapsed;
+                chckmultiplerecent.IsChecked = false;
+                chckmultiplerecent.Visibility = Visibility.Collapsed;
+            }
+        }
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var selectedItems = GrdViewPlaylists.SelectedItems.Cast<PlaylistProperties>().ToList();
 
             foreach (var item in selectedItems)
             {
-                // 2. Remove from the ObservableCollection
                 MyItems.Remove(item);
             }
-            if (GrdViewPlaylists.Items.Count == 0)
-            {
-                txtEmptyPlaylists.Visibility = Visibility.Visible;
-                btnDeletePlaylists.Visibility = Visibility.Collapsed;
-                GrdViewPlaylists.Visibility = Visibility.Collapsed;
-                chckmultiple.IsChecked = false;
-                chckmultiple.Visibility = Visibility.Collapsed;
-            }
+            UIUpdate();
             var currentSettings = await SettingsHelper.LoadSettingsAsync();
             currentSettings.SavedPlaylists = MyItems;
             await SettingsHelper.SaveSettingsAsync(currentSettings);
@@ -382,43 +370,21 @@ namespace VusicPlayer
             }
         }
 
-        private async void btnAddPlaylistCover_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnRemovePlaylistCover_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
 
         private void chckmultiplerecent_Checked(object sender, RoutedEventArgs e)
         {
-            if (chckmultiplerecent.IsChecked == true)
-            {
-                grdViewRecentMusic.SelectionMode = ListViewSelectionMode.Multiple;
-                btnDeleteRecents.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                btnDeleteRecents.Visibility = Visibility.Collapsed;
-                grdViewRecentMusic.SelectionMode = ListViewSelectionMode.Single;
-            }
+            bool isMultiple = chckmultiplerecent.IsChecked ?? false;
+
+            grdViewRecentMusic.SelectionMode = isMultiple ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single;
+            btnDeleteRecents.Visibility = isMultiple ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void chckmultiplerecent_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (chckmultiplerecent.IsChecked == true)
-            {
-                grdViewRecentMusic.SelectionMode = ListViewSelectionMode.Multiple;
-                btnDeleteRecents.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                btnDeleteRecents.Visibility = Visibility.Collapsed;
-                grdViewRecentMusic.SelectionMode = ListViewSelectionMode.Single;
-            }
+            bool isMultiple = chckmultiplerecent.IsChecked ?? false;
+
+            grdViewRecentMusic.SelectionMode = isMultiple ? ListViewSelectionMode.Multiple : ListViewSelectionMode.Single;
+            btnDeleteRecents.Visibility = isMultiple ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
@@ -427,17 +393,9 @@ namespace VusicPlayer
 
             foreach (var item in selectedItems)
             {
-                // 2. Remove from the ObservableCollection
                 RecentMusicItems.Remove(item);
             }
-            if (grdViewRecentMusic.Items.Count == 0)
-            {
-                txtEmptyRecents.Visibility = Visibility.Visible;
-                btnDeleteRecents.Visibility = Visibility.Collapsed;
-                grdViewRecentMusic.Visibility = Visibility.Collapsed;
-                chckmultiplerecent.IsChecked = false;
-                chckmultiplerecent.Visibility = Visibility.Collapsed;
-            }
+            UIUpdate();
             var currentSettings = await SettingsHelper.LoadSettingsAsync();
             currentSettings.RecentMusic = RecentMusicItems;
             await SettingsHelper.SaveSettingsAsync(currentSettings);
@@ -445,11 +403,6 @@ namespace VusicPlayer
             {
                 f.Hide();
             }
-        }
-
-        private void RecentMusic_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-        {
-
         }
         RecentMusic temp = new();
         private void RecentMusic_ItemClick(object sender, ItemClickEventArgs e)
@@ -459,7 +412,6 @@ namespace VusicPlayer
                 var clickedRecent = e.ClickedItem as RecentMusic;
                 if (clickedRecent == null)
                 {
-                
                     return;
                 }
                 temp = clickedRecent;
@@ -467,16 +419,14 @@ namespace VusicPlayer
                 {
                     if (File.Exists(clickedRecent.SongPath))
                     {
-                        ObservableCollection<string> pt = new();
-                        pt.Add(clickedRecent.SongPath);
-                        QueueService.PlayMedia(pt);
+                        //UPDATE LOGIC HERE
                     }
                     else
                     {
-                      
+
                         txtMissingpath.Text = clickedRecent.SongPath;
-                       
-                        OceanContentDialog.Show("Missing File", "", "", "OK", OceanContentDialogDefault.Close, AccessDeniedGrid, this.XamlRoot, 500,460, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "");
+
+                        OceanContentDialog.Show("Missing File", "", "", "OK", OceanContentDialogDefault.Close, AccessDeniedGrid, this.XamlRoot, 500, 460, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "");
                     }
                 }
             }
@@ -526,15 +476,6 @@ namespace VusicPlayer
             }
         }
 
-        private void txtPlaylistName_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
-
-        private void MenuFlyoutItem_Click_3(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void mnftOpenPlaylist_Click(object sender, RoutedEventArgs e)
         {
@@ -585,7 +526,7 @@ namespace VusicPlayer
 
         private async void btnRelocate_Click(object sender, RoutedEventArgs e)
         {
-            if(App.OceanDialogInstance == null)
+            if (App.OceanDialogInstance == null)
             {
                 ifbMessagee.IsOpen = true;
                 ifbMessagee.Title = "Error";
@@ -594,7 +535,7 @@ namespace VusicPlayer
                 Logger.Log("Error code 0x0012oc. Refer the github page for more details.", "PlaylistCreation", Logger.LogLevelType.Error);
                 return;
             }
-            var file = await PickFileAsync(App.OceanDialogInstance);
+            var file = await PickFiles.PickAudioFileAsync(App.OceanDialogInstance, "Choose Audio");
 
             if (file != null)
             {
@@ -612,7 +553,7 @@ namespace VusicPlayer
                             Path.GetDirectoryName(file.Path) ?? string.Empty
                         ).Name
                     };
-                    newfile.Thumbnail = await GetFileThumbnailAsync(file.Path);
+                    newfile.Thumbnail = await FileThumbnailObtain.GetFileThumbnailAsync(file.Path);
                     RecentMusicItems.Insert(index, newfile);
                     ttPlaylistDeleted.Title = "File Relocated to";
                     ttPlaylistDeleted.Content = $"{file.Path}";
@@ -628,55 +569,164 @@ namespace VusicPlayer
 
         private void chckSelectAllPlaylists_Checked(object sender, RoutedEventArgs e)
         {
-            if (chckSelectAllPlaylists.IsChecked == true)
-            {
-                GrdViewPlaylists.SelectAll();
-            }
+            if (GrdViewPlaylists.Items.Count == 0) return;
 
+            if (chckSelectAllPlaylists.IsChecked ?? false)
+                GrdViewPlaylists.SelectAll();
             else
-            {
                 GrdViewPlaylists.SelectedItems.Clear();
-            }
         }
 
         private void chckSelectAllPlaylists_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (chckSelectAllPlaylists.IsChecked == true)
-            {
-                GrdViewPlaylists.SelectAll();
-            }
+            if (GrdViewPlaylists.Items.Count == 0) return;
 
+            if (chckSelectAllPlaylists.IsChecked ?? false)
+                GrdViewPlaylists.SelectAll();
             else
-            {
                 GrdViewPlaylists.SelectedItems.Clear();
-            }
         }
 
         private void chckSelectAllRecents_Checked(object sender, RoutedEventArgs e)
         {
-            if (chckSelectAllRecents.IsChecked == true)
-            {
-                grdViewRecentMusic.SelectAll();
-            }
+            if (grdViewRecentMusic.Items.Count == 0) return;
 
+            if (chckSelectAllRecents.IsChecked ?? false)
+                grdViewRecentMusic.SelectAll();
             else
-            {
                 grdViewRecentMusic.SelectedItems.Clear();
-            }
         }
 
         private void chckSelectAllRecents_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (chckSelectAllRecents.IsChecked == true)
-            {
-                grdViewRecentMusic.SelectAll();
-            }
+            if (grdViewRecentMusic.Items.Count == 0) return;
 
+            if (chckSelectAllRecents.IsChecked ?? false)
+                grdViewRecentMusic.SelectAll();
             else
-            {
                 grdViewRecentMusic.SelectedItems.Clear();
+        }
+        #region CreatePlaylistCodeBehind
+        public ObservableCollection<SongModel> AllSongs { get; set; } = new();
+        string playlistcoverpath = "";
+
+        private void btnActualReset_Click(object sender, RoutedEventArgs e)
+        {
+            txtEditPlaylistName.Text = "";
+
+            txtEditGenre.Text = "";
+            AllSongs.Clear();
+            imgPlaylistCov.Source = new BitmapImage(new Uri("ms-appx:///Assets/playlistdefaultdark.png"));
+            CoverOptions.Visibility = Visibility.Collapsed;
+            btnAddPlaylistCover.IsEnabled = true;
+        }
+
+        private void imgPlaylistCov_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            //SHOW LARGE VIEW OF IMAGE
+        }
+
+        private async void btnAddPlaylistCover_Click(object sender, RoutedEventArgs e)
+        {
+            if (App.OceanDialogInstance == null)
+            {
+                ifbMessagee.IsOpen = true;
+                ifbMessagee.Title = "Error";
+                ifbMessagee.Message = "An unexpected error occured. Check log details in Settings Page.";
+                ifbMessagee.Severity = InfoBarSeverity.Error;
+                Logger.Log("Error code 0x0012oc. Refer the github page for more details.", "PlaylistCreation", Logger.LogLevelType.Error);
+                return;
+            }
+            var file = await PickFiles.PickSingleImageFileAsync(App.OceanDialogInstance, "Choose Image");
+
+            if (file != null)
+            {
+                CoverOptions.Visibility = Visibility.Visible;
+                ToolTipService.SetToolTip(imgPlaylistCov, Path.GetFileName(file.Path));
+                imgPlaylistCov.Source = new BitmapImage(new Uri(file.Path));
+                playlistcoverpath = file.Path;
             }
         }
-    }
 
+        private void txtEditPlaylistName_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                textBox.DispatcherQueue.TryEnqueue(() =>
+                {
+                    textBox.SelectAll();
+                });
+            }
+        }
+
+        private async void btnAddSongs_Click(object sender, RoutedEventArgs e)
+        {
+            if (App.OceanDialogInstance == null)
+            {
+                mssgBar.IsOpen = true;
+                mssgBar.Title = "Error";
+                mssgBar.Message = "An unexpected error occured. Check log details in Settings Page.";
+                mssgBar.Severity = InfoBarSeverity.Error;
+                Logger.Log("Error code 0x0012oc. Refer the github page for more details.", "PlaylistCreation", Logger.LogLevelType.Error);
+                return;
+            }
+            var files = await PickFiles.PickMultipleAudioFilesAsync(App.OceanDialogInstance, "Select Files");
+            if (files == null) return;
+
+            foreach (var file in files)
+            {
+                if (!AllSongs.Any(s => s.FilePath == file.Path))
+                {
+                    var musicProps = await file.Properties.GetMusicPropertiesAsync();
+
+                    string duration = FormatTimeSpanDuration.Format(musicProps.Duration);
+                    AllSongs.Add(new SongModel
+                    {
+                        Title = Path.GetFileNameWithoutExtension(file.Path),
+                        SongDuration = musicProps.Duration,
+                        FilePath = file.Path
+
+                    });
+                }
+            }
+            lstViewPlaylistAddedSongs.StartBringIntoView();
+            lstViewPlaylistAddedSongs.ItemsSource = AllSongs;   
+        }
+
+        private void asbSearchSongs_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+
+        }
+
+        private void asbSearchSongs_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+
+        }
+
+        private void asbSearchSongs_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+
+        }
+
+        private void mnftRemoveSongFromPlaylistCreation_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.DataContext is SongModel song)
+            {
+                AllSongs.Remove(song);
+            }
+            if (lstViewPlaylistAddedSongs.Items.Count == 0)
+            {
+                txtNullAddedSongs.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void btnRemovePlaylistCover_Click(object sender, RoutedEventArgs e)
+        {
+            ToolTipService.SetToolTip(imgPlaylistCov, "");
+            CoverOptions.Visibility = Visibility.Collapsed;
+            btnAddPlaylistCover.IsEnabled = true;
+            imgPlaylistCov.Source = new BitmapImage(new Uri("ms-appx:///Assets/playlistdefaultdark.png"));
+        }
+    }
+        #endregion
 }

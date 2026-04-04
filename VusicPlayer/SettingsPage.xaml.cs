@@ -189,9 +189,21 @@ namespace VusicPlayer
             await SettingsHelper.SaveSettingsAsync(currentSettings);
         }
 
-        private void ToggleSubtitles_Toggled(object sender, RoutedEventArgs e)
+        private async void ToggleSubtitles_Toggled(object sender, RoutedEventArgs e)
         {
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            AppPersonalization personalization;
 
+            if (currentSettings.UserSettings.Count == 0)
+            {
+                personalization = new AppPersonalization();
+                currentSettings.UserSettings.Add(personalization);
+            }
+            else
+            {
+                personalization = currentSettings.UserSettings[0];
+            }
+            personalization.AlwaysEnableSubtitles = ToggleSubtitles.IsOn;   
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)

@@ -209,10 +209,12 @@ Margin="0,0,0,10">
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Grid.ContextFlyout>
-                                <MenuFlyout Opened="mnftContext_Opened" x:Name="mnftContext">
-                                    <MenuFlyoutItem Text="Play Song"  Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Remove Song" Name="removesongfromplaylistcreation" Click="removesongfromplaylistcreation_Click" Icon="Delete"></MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Song Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
+                                <MenuFlyout Opened="mnftContext_Opened" x:Name="mnftContext" >
+                                    <MenuFlyoutItem IsEnabled="False" Name="txtHeaderContext"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Play"  Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Play Next"  Name="mnftPlaySongNext" Click="mnftPlaySongNext_Click" Icon="Play"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Remove" Name="removesongfromplaylistcreation" Click="removesongfromplaylistcreation_Click" Icon="Delete"></MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="File Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE946;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
@@ -222,7 +224,7 @@ Margin="0,0,0,10">
                                             <FontIcon Glyph="&#xECC8;"></FontIcon>
                                         </MenuFlyoutSubItem.Icon>
                                     </MenuFlyoutSubItem>
-                                    <MenuFlyoutItem Text="Add to play queue"  Name="mnftAddtoQueue" Click="mnftAddtoQueue_Click" >
+                                    <MenuFlyoutItem Text="Add to Play Queue"  Name="mnftAddtoQueue" Click="mnftAddtoQueue_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE81E;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
@@ -242,10 +244,15 @@ Margin="0,0,0,10">
                                             <FontIcon Glyph="&#xE93C;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Add to Favourites"  Name="mnftAddToFavourites" Click="mnftAddToFavourites_Click" >
+                                    <MenuFlyoutItem Text="Add to Favourites" Tag="Favo"  Name="mnftAddToFavourites" Click="mnftAddToFavourites_Click" >
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE735;"></FontIcon>
+                                            <FontIcon Name="OutlineHeart" 
+Glyph="&#xEB51;" 
+FontFamily="{StaticResource SymbolThemeFontFamily}" 
+Foreground="Gray"
+                                          FontSize="16"/>
                                         </MenuFlyoutItem.Icon>
+                                           
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator></MenuFlyoutSeparator>
                                     <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftMoveup_Click" >
@@ -269,7 +276,7 @@ Margin="0,0,0,10">
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                                    <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftTools_Click" >
+                                    <MenuFlyoutItem Text="Tools"  Visibility="Collapsed" Name="mnftTools" Click="mnftTools_Click" >
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE713;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
@@ -304,7 +311,7 @@ Click="FavoriteButton_Click"
 Background="Transparent" 
 BorderThickness="0">
                                 <Grid>
-                                    <FontIcon Name="OutlineHeart" 
+                                    <FontIcon Name="OutlineHeart2" 
     Glyph="&#xEB51;" 
     FontFamily="{StaticResource SymbolThemeFontFamily}" 
     Foreground="Gray"

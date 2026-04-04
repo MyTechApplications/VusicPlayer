@@ -109,7 +109,7 @@ Stretch="UniformToFill"/>
                             <Button Name="btnPrev" Background="Transparent" x:Uid="sc1x014" BorderBrush="Transparent" Click="btnPrev_Click">
                                 <Image Name="imgPrev" Width="26" Source="/Assets/previous.png"/>
                             </Button>
-                            <Button Name="btnPlayPause" IsEnabled="True" Background="Transparent" ToolTipService.ToolTip="" BorderBrush="Transparent" Click="btnPlayPause_Click">
+                            <Button Name="btnPlayPause" IsEnabled="True" Background="Transparent" ToolTipService.ToolTip="Play" BorderBrush="Transparent" Click="btnPlayPause_Click">
                                 <Image Name="imgPlayPause" Width="26" Source="{x:Bind mediacontroller.Thumbnail, Mode=OneWay}"/>
                                 <Button.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="F10"></KeyboardAccelerator>
@@ -134,14 +134,14 @@ Stretch="UniformToFill"/>
                             <Button Name="btnSpeed" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Adjust Speed" >
                                 <Button.Flyout>
                                     <MenuFlyout>
-                                        <RadioMenuFlyoutItem Text="0.25" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                                        <RadioMenuFlyoutItem Text="0.50" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                                        <RadioMenuFlyoutItem Text="0.75" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                                        <RadioMenuFlyoutItem IsChecked="True" Text="1.00" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                                        <RadioMenuFlyoutItem Text="1.25" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                                        <RadioMenuFlyoutItem Text="1.50" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                                        <RadioMenuFlyoutItem Text="1.75" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
-                                        <RadioMenuFlyoutItem Text="2" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="0.25" Name="spquarter" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="0.50" Name="sphalf" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="0.75" Name="spthreefourth" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem IsChecked="True" Name="spone" Text="1.00" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="1.25" Name="sponequarter" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="1.50" Name="sponehalf" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="1.75" Name="sponethreefourth" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
+                                        <RadioMenuFlyoutItem Text="2" Name="sptwo" Click="btnSpeedfly_Click"></RadioMenuFlyoutItem>
                                         <RadioMenuFlyoutItem Text="Custom" Click="customSpeed_Click" Name="customSpeed">
                                             <RadioMenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE9E9;"></FontIcon>
@@ -300,8 +300,17 @@ Stretch="UniformToFill"/>
                                     </StackPanel>
                                 </Grid>
                             </ContentDialog>
-                            <Button ToolTipService.ToolTip="Effects and Tools" Background="Transparent" BorderBrush="Transparent"  Name="btnEffects" Margin="5, 0" Click="btnEffects_Click">
+                            <Button Visibility="Collapsed" ToolTipService.ToolTip="Effects and Tools" Background="Transparent" BorderBrush="Transparent"  Name="btnEffects" Margin="5, 0" Click="btnEffects_Click">
                                 <Image  Width="24" Source="/Assets/toolsicon.png"/>
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Text="Pitch" Name="mnftPitch" Click="mnftPitch_Click">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE946;"></FontIcon>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Button.Flyout>
                             </Button>
                             <Button ToolTipService.ToolTip="File Info" Background="Transparent" BorderBrush="Transparent"  Name="btnInfo" Click="btnInfo_Click">
                                 <Image  Width="24" Source="/Assets/infoicon.png"/>

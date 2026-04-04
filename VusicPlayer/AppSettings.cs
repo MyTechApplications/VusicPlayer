@@ -18,7 +18,8 @@ namespace VusicPlayer
         public ObservableCollection<AppPersonalization> UserSettings { get; set; } = new();
         public ObservableCollection<RecentMusic> RecentMusic { get; set; } = new();
         public ObservableCollection<QueueList> QueueSave { get; set; } = new();
-      //  public ObservableCollection<> Favourites { get; set; } = new();
+    
+     public ObservableCollection<FavouritesModel> Favourites { get; set; } = new();
         public bool ShowDefaultMessage { get; set; }
 
     }

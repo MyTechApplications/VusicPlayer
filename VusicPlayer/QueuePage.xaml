@@ -11,10 +11,165 @@
     xmlns:ui="using:CommunityToolkit.WinUI">
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <TeachingTip Name="ttCreatedInfo" IsOpen="False">
+            <StackPanel Orientation="Vertical" Spacing="8">
+                <TextBlock Text="Queue saved to Playlist " Name="txtCreatedInfo" Style="{StaticResource BaseTextBlockStyle}"></TextBlock>
+                <Button Name="btnViewPlaylist" Click="btnViewPlaylist_Click" Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Image Source="/Assets/play.png" Width="16"/>
+                        <TextBlock Text="View Playlist"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </TeachingTip>
+        <ContentDialog Name="dlgNewPlaylist"  Title="Create a new playlist" PrimaryButtonText="+ Create" DefaultButton="Primary" CloseButtonText="Cancel">
 
-        <TextBlock Text="This page is under construction. It will be available in future updates." Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Top"></TextBlock>
+            <Grid Name="contentsNewPlaylist">
+                <InfoBar Name="mssgBar" IsOpen="False"></InfoBar>
+                <ScrollViewer Name="scrollView">
+                    <StackPanel Padding="24" Spacing="24" MaxWidth="1000" HorizontalAlignment="Stretch">
 
-        <Grid Margin="50, 50">
+                        <Grid>
+                            <Button Name="btnReset" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                        Background="Transparent" BorderBrush="Transparent">
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <Button Name="btnActualReset" Content="Reset playlist creation" 
+                                    Click="btnActualReset_Click" Style="{StaticResource AccentButtonStyle}"/>
+                                    </Flyout>
+                                </Button.Flyout>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="/Assets/reseticon.png" Width="16" Height="16"/>
+                                    <TextBlock Text="Reset Fields" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <Grid ColumnSpacing="24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="12">
+                                <Border CornerRadius="8" Width="200" Height="200" 
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                    <Image Name="imgPlaylistCov" PointerPressed="imgPlaylistCov_PointerPressed" Source="/Assets/playlistdefaultdark.png" Stretch="UniformToFill" />
+                                </Border>
+                                <Button Name="btnAddPlaylistCover" Click="btnAddPlaylistCover_Click" HorizontalAlignment="Stretch">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Image Source="/Assets/reseticon.png" Width="16"/>
+                                        <TextBlock Text="Set Cover Art" />
+                                    </StackPanel>
+                                </Button>
+                                <Grid Name="CoverOptions" Visibility="Collapsed" ColumnSpacing="0" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Name="btnEditPlaylistCover" Visibility="Visible" Click="btnAddPlaylistCover_Click" ToolTipService.ToolTip="Change Cover" Grid.Column="0" HorizontalAlignment="Stretch">
+                                        <Image Width="14" Source="/Assets/refreshimgicon.png"/>
+                                    </Button>
+                                    <Button Name="btnRemovePlaylistCover" Margin="10, 0" Click="btnRemovePlaylistCover_Click" ToolTipService.ToolTip="Remove Cover" Grid.Column="1" HorizontalAlignment="Stretch">
+                                        <Image Width="14" Source="/Assets/removeicon.png"/>
+                                    </Button>
+
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="20" VerticalAlignment="Top">
+                                <TextBox Name="txtEditPlaylistName" 
+                             Header="Playlist Name" 
+                             PlaceholderText="Give your playlist a title" 
+                             Text="Queue" 
+                             GotFocus="txtEditPlaylistName_GotFocus"/>
+
+                                <TextBox Name="txtEditGenre" 
+                             Header="Genre" 
+                             PlaceholderText="e.g. Rock, Lo-Fi, Workout"/>
+                            </StackPanel>
+
+                        </Grid>
+                        <Grid>
+                            <TextBlock Name="txtAddedSongs" Text="Added Songs" 
+   Style="{StaticResource SubtitleTextBlockStyle}" 
+   FontWeight="SemiBold" VerticalAlignment="Center"/>
+
+                            <Button Name="btnAddSongs" Click="btnAddSongs_Click" 
+Style="{StaticResource AccentButtonStyle}" 
+HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="/Assets/addicon.png" Width="16"/>
+                                    <TextBlock Text="Add Songs"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <AutoSuggestBox Name="asbSearchSongs" TextChanged="asbSearchSongs_TextChanged" QuerySubmitted="asbSearchSongs_QuerySubmitted"  QueryIcon="Find" PlaceholderText="Find songs that you added..."></AutoSuggestBox>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Name="btnSortItemsInPlaylistDialog">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="/Assets/sorticon.png" Width="16"/>
+                                    <TextBlock Text="Sort items"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Name="txtNullAddedSongs" Text="No songs have been added yet!" 
+                       Visibility="Visible" FontStyle="Italic" 
+                       HorizontalAlignment="Center" Margin="0,40"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+
+
+                        <ListView Name="lstViewPlaylistAddedSongs" 
+                      CanDragItems="True" 
+                      CanReorderItems="True" 
+                      AllowDrop="True"
+                      SelectionMode="Single"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      CornerRadius="8"
+                      BorderThickness="1"
+                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="12,8" ColumnSpacing="16" Background="Transparent">
+                                        <Grid.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="Remove Item" Click="mnftRemoveSongFromPlaylistCreation_Click" Name="mnftRemoveSongFromPlaylistCreation" Icon="Delete"/>
+                                            </MenuFlyout>
+                                        </Grid.ContextFlyout>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="&#xEC4F;" FontFamily="Segoe Fluent Icons" 
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       Grid.Column="0" VerticalAlignment="Center"/>
+
+                                        <TextBlock ToolTipService.ToolTip="{Binding Title}" Text="{Binding Title}" Grid.Column="1" 
+                                       VerticalAlignment="Center" FontWeight="SemiBold" 
+                                       TextTrimming="CharacterEllipsis"/>
+
+                                        <TextBlock Text="{Binding FormattedDuration}" Grid.Column="2" 
+                                       VerticalAlignment="Center" 
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+
+                    </StackPanel>
+
+                </ScrollViewer>
+
+            </Grid>
+        </ContentDialog>
+
+        <TextBlock Visibility="Collapsed" Text="This page is under construction. It will be available in future updates." Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Top"></TextBlock>
+        <InfoBar Name="mssgBarMain" IsOpen="False" Margin="50, 10"></InfoBar>
+        <Grid Margin="50, 10">
 
 
             <Grid.ColumnDefinitions>
@@ -41,8 +196,8 @@
                             <StackPanel Margin="30, 15" Padding="15"  CornerRadius="20" Spacing="20" Orientation="Vertical" HorizontalAlignment="Center">
                                 <StackPanel.Background>
                                     <AcrylicBrush TintColor="Black" 
-                      TintOpacity="0.1" 
-                                         
+                      TintOpacity="0.05" 
+                                         Opacity="0.8"
                       FallbackColor="Black" 
                       AlwaysUseFallback="False"/>
                                 </StackPanel.Background>
@@ -83,8 +238,8 @@
                                             <StackPanel.Background>
                                                 <AcrylicBrush TintColor="Black" 
 TintOpacity="0.3" 
-                   
-FallbackColor="Black" 
+           
+FallbackColor="Transparent" 
 AlwaysUseFallback="False"/>
                                             </StackPanel.Background>
                                             <Button Name="btnPrev" IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent" Click="btnPrev_Click">
@@ -138,10 +293,28 @@ AlwaysUseFallback="False"/>
                                             </ToggleButton>
                                             <Button Name="btnOptions" IsEnabled="False"  CornerRadius="10" Background="Transparent" BorderBrush="Transparent">
                                                 <Image Name="threedot" Width="26" Source="/Assets/options.png"/>
+                                                <Button.Flyout>
+                                                    <MenuFlyout>
+                                                        <MenuFlyoutItem Text="Pitch" Name="mnftPitch" Click="mnftPitch_Click">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE946;"></FontIcon>
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                    </MenuFlyout>
+                                                </Button.Flyout>
                                             </Button>
                                         </StackPanel>
 
                                     </StackPanel>
+                                    <TeachingTip Name="ttPitch" IsOpen="False" Target="{x:Bind btnOptions}">
+                                        <StackPanel Orientation="Vertical" Spacing="5">
+                                            <TextBlock Text="Pitch" Style="{StaticResource BaseTextBlockStyle}"></TextBlock>
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <local:SliderReuse Width="200" IsTooltipEnabled="False" x:Name="sldPitch" Value="50" Maximum="100" ValueChanged="sldPitch_ValueChanged"></local:SliderReuse>
+                                                <TextBlock Name="txtPitchValue" ></TextBlock>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </TeachingTip>
                                 </Grid>
                             </StackPanel>
                         </ScrollViewer>
@@ -263,6 +436,7 @@ AlwaysUseFallback="False"/>
                FontSize="18" Name="txtUpNext"
                FontWeight="SemiBold"
                Opacity="0.85"/>
+                                
                                 <ToggleButton Checked="btnViewQueue_Checked" Unchecked="btnViewQueue_Unchecked"  Background="Transparent" Name="btnViewQueue"
 >
                                     <StackPanel Orientation="Horizontal" Spacing="5">
@@ -270,10 +444,354 @@ AlwaysUseFallback="False"/>
                                         <TextBlock Text="View full queue"/>
                                     </StackPanel>
                                 </ToggleButton>
+                                <Button IsEnabled="True" Background="Transparent" Name="btnAddtoQueue" Click="btnOpenMediaFile_Click"
+ToolTipService.ToolTip="Add music to queue">
+                                    <Image Width="20" Source="/Assets/addicon.png"/>
+                                </Button>
+
                             </StackPanel>
 
 
                             <!-- QUEUE LIST -->
+                            <ContentDialog  Title="Edit Playlist Info" PrimaryButtonText="Save" DefaultButton="Primary" CloseButtonText="Cancel">
+
+                                <Grid Name="MassEditgrd">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Grid.Column="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="Selected Files" Style="{StaticResource SubtitleTextBlockStyle}" Grid.Row="0"></TextBlock>
+                                        <ListView SelectionMode="Multiple" Margin="0, 20" Grid.Row="1" x:Name="lstViewEdit">
+                                            <ListView.ItemTemplate>
+
+                                                <DataTemplate >
+                                                    <Grid Margin="0, 2" VerticalAlignment="Stretch" Background="Transparent" HorizontalAlignment="Stretch">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.ContextFlyout>
+                                                            <MenuFlyout >
+                                                                <MenuFlyoutItem Text="Select item"  Name="mnftSelectitem" Click="mnftSelectitem_Click">
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE946;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Unselect item" Name="mnftUnselectItem" Click="mnftUnselectItem_Click">
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE946;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Set as album name" Name="mnftSetAlbumName" Click="mnftSetAlbumName_Click">
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE946;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Set as artist name" Name="mnftSetArtistName" Click="mnftSetArtistName_Click">
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE946;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                            </MenuFlyout>
+                                                        </Grid.ContextFlyout>
+                                                        <Button Padding="0" MinHeight="0" MinWidth="0" Margin="0, 0"  Grid.Column="0" Content="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Visibility="Visible" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" >
+                                                            <Button.Resources>
+                                                                <Thickness x:Key="ButtonPadding">0</Thickness>
+                                                            </Button.Resources>
+                                                        </Button>
+                                                        <HyperlinkButton Click="txtTitle_Click" ToolTipService.ToolTip="{Binding Title}" Grid.Column="1"  Visibility="Visible"  Margin="0, 0">
+                                                            <TextBlock Text="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
+                                                        </HyperlinkButton>
+                                                        <HyperlinkButton Grid.Column="2"  ToolTipService.ToolTip="{Binding Artist}" Visibility="Visible"  Margin="0, 0">
+                                                            <TextBlock Text="{Binding Artist}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                                                        </HyperlinkButton>
+                                                        <HyperlinkButton Grid.Column="3" ToolTipService.ToolTip="{Binding AlbumName}"   Visibility="Visible"  Margin="0, 0">
+                                                            <TextBlock Text="{Binding AlbumName}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                                                        </HyperlinkButton>
+                                                        <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" ToolTipService.ToolTip="{Binding FormattedDuration}"  Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 20"/>
+
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+                                    <Grid Grid.Column="1" Margin="30, 0">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Grid.Row="0" Text="Edit Properties"></TextBlock>
+                                            <InfoBar x:Name="FileStatusInfoBar" Grid.Row="1"
+Title="Action Required"
+Message="Checking file status..."
+Severity="Warning"
+IsOpen="False"
+Margin="0,0,0,10">
+                                                <InfoBar.ActionButton>
+                                                    <Button x:Name="btnFixFile" Content="Fix" Click="btnFixFile_Click" />
+                                                </InfoBar.ActionButton>
+                                            </InfoBar>
+                                            <TabView VerticalAlignment="Stretch" Margin="0, 30" IsAddTabButtonVisible="False"  Grid.Row="2" SelectionChanged="TabView_SelectionChanged">
+                                                <TabViewItem  IsClosable="False" Name="tbviArtist" Header="Edit Artist">
+                                                    <StackPanel VerticalAlignment="Stretch" Margin="0, 30" Orientation="Vertical" Spacing="20">
+
+                                                        <TextBox Name="txtEditArtist" PlaceholderText="Artist name..."></TextBox>
+                                                        <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="This property will be applied to all the files selected."></TextBlock>
+                                                    </StackPanel>
+                                                </TabViewItem>
+                                                <TabViewItem  IsClosable="False" Header="Edit Album" Name="tbviAlbum">
+                                                    <StackPanel Margin="0, 30"  Orientation="Vertical" Spacing="20">
+
+                                                        <TextBox Name="txtEditAlbum" PlaceholderText="Album name..."></TextBox>
+                                                        <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="This property will be applied to all the files selected."></TextBlock>
+                                                    </StackPanel>
+                                                </TabViewItem>
+                                                <TabViewItem IsClosable="False" Header="Add to Playlist" Name="tbviAddToPlaylist">
+                                                    <ScrollViewer>
+                                                        <StackPanel Margin="0, 30" Orientation="Vertical" Spacing="5">
+                                                            <Button Click="Button_Click_1">
+                                                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                                                    <Image Source="/Assets/addicon.png" Width="20"></Image>
+                                                                    <TextBlock Text="Create New Playlist" ></TextBlock>
+                                                                </StackPanel>
+                                                            </Button>
+                                                            <ListView SelectionMode="Multiple" ItemClick="lstViewAddToPlaylists_ItemClick" Name="lstViewAddToPlaylists"></ListView>
+                                                            <TeachingTip Name="ttInfo" IsOpen="False"></TeachingTip>
+                                                            <Button Style="{StaticResource AccentButtonStyle}" Content="Add to selected playlist(s)" Click="Button_Click_2"></Button>
+                                                            <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="This property will be applied to all the files selected."></TextBlock>
+
+                                                        </StackPanel>
+                                                    </ScrollViewer>
+                                                </TabViewItem>
+                                            </TabView>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+
+                            </ContentDialog>
+
+                            <ScrollView VerticalAlignment="Stretch" Margin="10, 0" Name="ListPanel"  Grid.Row="4">
+                                <StackPanel  Orientation="Vertical">
+
+                                    <InfoBar IsOpen="False" Severity="Warning" Name="iBMissingFiles" Title="Missing files">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock x:Name="infoBarMessage" Text="Some files could not be located." Margin="0,0,8,0"/>
+                                            <Button Content="Relocate" Click="Button_Click_1"/>
+                                        </StackPanel>
+                                    </InfoBar>
+                                    
+                                    <StackPanel Orientation="Vertical" Spacing="10">
+                                        <StackPanel Orientation="Horizontal" Visibility="Collapsed" Spacing="10" Name="stkMultiOptions">
+                                            <Button Name="btnRemoveSelections" ToolTipService.ToolTip="Remove from playlist" Margin="0, 10" >
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                                                </StackPanel>
+                                                <Button.Flyout>
+                                                    <Flyout>
+                                                        <StackPanel Orientation="Vertical" Spacing="10">
+                                                            <TextBlock Text="Confirm removing the selected items from the playlist."></TextBlock>
+                                                            <Button Content="Remove" Click="btnRemoveSelections_Click"></Button>
+                                                        </StackPanel>
+                                                    </Flyout>
+                                                </Button.Flyout>
+                                            </Button>
+                                            <Button Name="btnEditAlbumMass" ToolTipService.ToolTip="Edit Album property" Margin="0, 10" Click="btnEditAlbumMass_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Name="btnEditArtistMass" ToolTipService.ToolTip="Edit Artist property" Margin="0, 10" Click="btnEditArtistMass_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Name="btnAddtoPlaylistMass" ToolTipService.ToolTip="Remove from playlist" Margin="0, 10" Click="btnAddtoPlaylistMass_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                                                </StackPanel>
+                                            </Button>
+
+                                            <Button Name="btnSelectAll" ToolTipService.ToolTip="Select All" Margin="0, 10" Click="btnSelectAll_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Name="btnClearSelection" ToolTipService.ToolTip="Clear Selection" Margin="0, 10" Click="btnClearSelection_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Name="btnRemoveSelectionsFromFavourites" ToolTipService.ToolTip="Remove Selection from Favourites" Margin="0, 10" Click="btnRemoveSelectionsFromFavourites_Click">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/Assets/openfolder.png" Width="20"></Image>
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                        <ListView   Margin="0, 0" CanDragItems="True" Visibility="Visible" CanReorderItems="True" AllowDrop="True"
+    SelectionMode="Multiple" SelectionChanged="lstViewPlaylist_SelectionChanged" ItemClick="lstViewPlaylist_ItemClick" Name="lstViewPlaylist" >
+
+                                            <ListView.ItemTemplate>
+
+                                                <DataTemplate >
+                                                    <Grid Margin="0, 5" VerticalAlignment="Stretch" Background="Transparent" HorizontalAlignment="Stretch">
+
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.ContextFlyout>
+                                                            <MenuFlyout Opened="mnftContext_Opened" x:Name="mnftContext" >
+                                                                <MenuFlyoutItem IsEnabled="False" Name="txtHeaderContext">
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE946;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Play"  Name="mnftPlaySong" Click="mnftPlaySong_Click" Icon="Play"></MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Play Next"  Name="mnftPlaySongNext" Click="mnftPlaySongNext_Click" Icon="Play"></MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Remove" Name="removesongfromplaylistcreation" Click="removesongfromplaylistcreation_Click" Icon="Delete"></MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="File Details"  Name="mnftSongDetails" Click="mnftSongDetails_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE946;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutSubItem Text="Add to Playlist"  x:Name="mnftAddtoPlaylist" Loaded="mnftAddtoPlaylist_Loaded">
+                                                                    <MenuFlyoutSubItem.Icon>
+                                                                        <FontIcon Glyph="&#xECC8;"></FontIcon>
+                                                                    </MenuFlyoutSubItem.Icon>
+                                                                </MenuFlyoutSubItem>
+                                                                <MenuFlyoutItem Text="Add to Play Queue"  Name="mnftAddtoQueue" Click="mnftAddtoQueue_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE81E;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Edit info"  Name="mnftEditInfo" Click="mnftEditInfo_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE70F;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Go to artist"  Name="mnftGoToArtist" Click="mnftGoToArtist_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE77B;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Go to album"  Name="mnftGoToAlbum" Click="mnftGoToAlbum_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE93C;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="{Binding IsFavourite, Converter={StaticResource FavToolTipConverter}}" Tag="Favo"  Name="mnftAddToFavourites" Click="mnftAddToFavourites_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Name="OutlineHeart" 
+Glyph="{Binding IsFavourite, Converter={StaticResource FavGlyph}}" 
+FontFamily="{StaticResource SymbolThemeFontFamily}" 
+Foreground="{Binding IsFavourite, Converter={StaticResource FavColor}}"
+                                          FontSize="16"/>
+                                                                    </MenuFlyoutItem.Icon>
+
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                                                <MenuFlyoutItem Text="Move up"  Name="mnftMoveup" Click="mnftMoveup_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE70E;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Move down"  Name="mnftMovedown" Click="mnftMovedown_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE70D;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Move to top"  Name="mnftMovetotop" Click="mnftMovetotop_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE74A;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutItem Text="Move to bottom"  Name="mnftMovetobottom" Click="mnftMovetobottom_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE74B;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                                <MenuFlyoutSeparator></MenuFlyoutSeparator>
+                                                                <MenuFlyoutItem Visibility="Collapsed" Text="Tools"  Name="mnftTools" Click="mnftTools_Click" >
+                                                                    <MenuFlyoutItem.Icon>
+                                                                        <FontIcon Glyph="&#xE713;"></FontIcon>
+                                                                    </MenuFlyoutItem.Icon>
+                                                                </MenuFlyoutItem>
+                                                            </MenuFlyout>
+                                                        </Grid.ContextFlyout>
+                                                        <Button Padding="0" MinHeight="0" MinWidth="0" Margin="0, 0" Width="35" Grid.Column="0" Content="{Binding Glyph}"  FontFamily="Segoe Fluent Icons" Click="Button_Click" Visibility="Visible" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" >
+                                                            <Button.Resources>
+                                                                <Thickness x:Key="ButtonPadding">0</Thickness>
+                                                            </Button.Resources>
+                                                        </Button>
+                                                        <HyperlinkButton Click="txtTitle_Click" Grid.Column="1" Name="txtTitle"   Visibility="Visible"  Margin="0, 0">
+                                                            <Grid>
+                                                                <TextBlock Text="{Binding Title}"    ToolTipService.ToolTip="{Binding Title}" Foreground="{Binding TitleColor, Mode=OneWay}"></TextBlock>
+                                                                <Border Height="2" 
+            Background="Cyan" 
+            VerticalAlignment="Center" 
+            Margin="0,2,0,0"
+                                            CornerRadius="4"
+            Visibility="{Binding VisibilityOfStrikethrough}" />
+                                                            </Grid>
+                                                        </HyperlinkButton>
+                                                        <HyperlinkButton Grid.Column="2" Name="txtArtistHyp" ToolTipService.ToolTip="{Binding Artist}" Click="txtArtistHyp_Click"   Visibility="Visible"  Margin="0, 0">
+                                                            <TextBlock Text="{Binding Artist}"  FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                                                        </HyperlinkButton>
+                                                        <HyperlinkButton ToolTipService.ToolTip="{Binding AlbumName}" Grid.Column="3" Name="txtAlbumHyp" Click="txtAlbumHyp_Click"   Visibility="Visible"  Margin="10, 0">
+                                                            <TextBlock Text="{Binding AlbumName}"   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
+                                                        </HyperlinkButton>
+                                                        <TextBlock ToolTipService.ToolTip="{Binding FormattedDuration}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Grid.Column="4" Text="{Binding FormattedDuration}" Visibility="Visible" TextWrapping="Wrap" Margin="0, 20"/>
+                                                        <Button ToolTipService.ToolTip="{Binding FavString}" Grid.Column="5" Margin="30, 0" x:Name="btnFavourite" 
+Click="btnFavourite_Click"
+Background="Transparent" 
+BorderThickness="0"
+                                            DataContextChanged="btnFavourite_DataContextChanged">
+                                                            <Grid>
+                                                                <FontIcon Name="OutlineHeart2" 
+    Glyph="&#xEB51;" 
+    FontFamily="{StaticResource SymbolThemeFontFamily}" 
+    Foreground="Gray"
+                                              FontSize="16"/>
+
+                                                                <FontIcon Name="FillHeart" 
+    Glyph="&#xEB52;" Opacity="{Binding FavOpacity, Mode=OneWay}"
+    FontFamily="{StaticResource SymbolThemeFontFamily}" 
+    Foreground="Red" 
+    RenderTransformOrigin="0.5,0.5"  FontSize="16">
+                                                                    <FontIcon.RenderTransform>
+                                                                        <ScaleTransform ScaleX="{Binding FavOpacity, Mode=OneWay}" 
+                        ScaleY="{Binding FavOpacity, Mode=OneWay}"/>
+                                                                    </FontIcon.RenderTransform>
+                                                                </FontIcon>
+                                                            </Grid>
+                                                        </Button>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollView>
+
                             <local:ListViewMedia x:Name="lstViewQueue" Grid.Row="4"></local:ListViewMedia>
                             <Grid  Grid.Row="3"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="grdNoSearchResults" Visibility="Collapsed">
                                 <Grid.RowDefinitions>
@@ -293,7 +811,7 @@ AlwaysUseFallback="False"/>
                                     <TextBlock Text="Your play queue is empty!" VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}"></TextBlock>
                                 </StackPanel>
 
-                                <Button CornerRadius="10" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center">
+                                <Button CornerRadius="10" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Click="btnOpenMediaFile_Click" Name="btnOpenMediaFile">
                                     <Button.Background>
                                         <AcrylicBrush TintColor="Black" 
 TintOpacity="0.4" 
@@ -301,10 +819,15 @@ TintOpacity="0.4"
 FallbackColor="Black" 
 AlwaysUseFallback="False"/>
                                     </Button.Background>
+                                    <Button.KeyboardAccelerators>
+                                        <KeyboardAccelerator Modifiers="Control" Key="O"></KeyboardAccelerator>
+                                    </Button.KeyboardAccelerators>
                                     <StackPanel  Orientation="Horizontal" Spacing="10">
 
                                         <Image Width="26" Source="/Assets/Square44x44Logo.png"></Image>
-                                        <TextBlock Foreground="White" Text="Open Media" Margin="0, 5"></TextBlock>
+                                        <TextBlock Foreground="White" Text="Open Media" Margin="0, 5">
+                                            
+                                        </TextBlock>
                                     </StackPanel>
                                 </Button>
                             </StackPanel>

@@ -11,14 +11,15 @@ namespace VusicPlayer
 {
     public class RecentMusic : INotifyPropertyChanged
     {
-        public string SongName { get; set; }
-        public string SongPath { get; set; }
-        public string FolderName { get; set; }
+        public string SongName { get; set; } = "";
+        public string SongPath { get; set; } = "";
+        public int PlayCount   { get; set; } = 0;
+        public string FolderName { get; set; } = "";
  
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         [JsonIgnore]
-        public BitmapImage Thumbnail { get; set; }
+        public BitmapImage? Thumbnail { get; set; } = null;
     }
 }

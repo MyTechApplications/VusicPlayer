@@ -362,7 +362,12 @@ namespace VusicPlayer
         
             appWindow.Resize(new Windows.Graphics.SizeInt32(400, 260));
         }
-
+        public void ClearInternalEvents()
+        {
+            PrimaryRequested = null;
+            SecondaryRequested = null;
+            CloseRequested = null;
+        }
         private void DragRegion_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             e.Handled = true;

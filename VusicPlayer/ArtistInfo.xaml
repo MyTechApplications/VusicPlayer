@@ -124,7 +124,7 @@ CornerRadius="16"
                         <Image Width="25" Source="/Assets/shuffleicon.png" />
                     </ToggleButton>
 
-                    <Button Name="btnAddSongs" Margin="5"
+                    <Button Name="btnAddSongs" Margin="5" Background="Transparent" BorderBrush="Transparent" 
             ToolTipService.ToolTip="Add songs to this Artist" Click="btnAddSongs_Click">
                         <StackPanel Orientation="Horizontal">
                             <Image Width="25" Source="/Assets/addicon.png" />
@@ -238,15 +238,13 @@ ToolTipService.ToolTip="Set Artist Cover">
                 <InfoBar Name="ifbError" Visibility="Collapsed" CloseButtonClick="ifbError_CloseButtonClick"></InfoBar>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Artist Discography" ></TextBlock>
-                    <Button Margin="20, 0" BorderBrush="Transparent" Style="{StaticResource AccentButtonStyle}" Name="btnRefresh" Click="btnRefresh_Click" ToolTipService.ToolTip="Refresh Album">
-                        <FontIcon Glyph="&#xE72C;"></FontIcon>
+                    <Button Margin="20, 0" Background="Transparent" BorderBrush="Transparent"  Name="btnRefresh" Click="btnRefresh_Click" ToolTipService.ToolTip="Refresh Album">
+                        <FontIcon Glyph="&#xE72C;" FontSize="16"></FontIcon>
                     </Button>
                 </StackPanel>
                 <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Your most played"></TextBlock>
                 <TextBlock Text="Play songs of this artist to show them here!" Name="txtEmptyMostPlayed" Visibility="Visible"></TextBlock>
-
-                <local:ListViewMedia x:Name="lstViewMostPlayed"></local:ListViewMedia>
-
+                <local:ListViewMasterMedia AllowRearranging="False" x:Name="lstViewMasterMostPlayed"></local:ListViewMasterMedia>
                 <StackPanel Orientation="Horizontal" Spacing="20">
                     <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Albums"></TextBlock>
                     <CheckBox Content="Select" Margin="0, 5" Checked="chckSelectAlbums_Checked" Unchecked="chckSelectAlbums_Unchecked" Name="chckSelectAlbums"></CheckBox>

@@ -127,6 +127,9 @@
                         </StackPanel>
                     </local:OceanButton>
                     <local:OceanButton  CornerRadius="8"  x:Name="btnClose" Click="btnClose_Click">
+                            <local:OceanButton.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="Escape"></KeyboardAccelerator>
+                            </local:OceanButton.KeyboardAccelerators>
                         <StackPanel Orientation="Horizontal">
                             <Image Width="20" Name="imgClose" Visibility="Collapsed"></Image>
                             <TextBlock FontSize="16" Name="txtClose" Text="Cancel" Margin="5, 0"></TextBlock>

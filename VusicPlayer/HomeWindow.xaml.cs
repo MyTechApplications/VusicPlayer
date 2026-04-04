@@ -67,9 +67,9 @@ namespace VusicPlayer
             sldMain.IsEnabled = true;
             txtPreviewBuild.Text = $"Vusic Player {Strings.VersionText} {Appversionstrings.AppVersion + Environment.NewLine} {Appversionstrings.VersionType} {Strings.BuildText} {Appversionstrings.BuildNumber}";
             //  LoadTheme();
-            if (App.MainWindowInstance != null)
+            if (App.HomeWindowInstance != null)
             {
-                var rootElement = (FrameworkElement)App.MainWindowInstance.Content;
+                var rootElement = (FrameworkElement)App.HomeWindowInstance.Content;
                 rootElement.RequestedTheme = ElementTheme.Dark;
             }
             TrySetAcrylicBackdrop(true); DispatcherQueue.EnsureSystemDispatcherQueue();
@@ -89,12 +89,11 @@ namespace VusicPlayer
 
             rootgrid.Visibility = Visibility.Collapsed;
 
-
             this.DispatcherQueue.TryEnqueue(async () =>
             {
                 //  await CheckAndDownloadUpdate();
 
-                //     await ScanAllFoldersAsync();
+                  //  await ScanAllFoldersAsync();
             });
             Engine.Start(new EngineConfig()
             {
@@ -223,8 +222,15 @@ namespace VusicPlayer
 
         }
 
-        private void Window_Closed(object sender, WindowEventArgs args)
+        private async void Window_Closed(object sender, WindowEventArgs args)
         {
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            var playlsits = currentSettings.SavedPlaylists;
+            foreach(var item in playlsits)
+            {
+                item.PlaylistNowPlaying = "";
+            }
+            await SettingsHelper.SaveSettingsAsync(currentSettings);
             configurationSource = null;
             if (PlayerService.MasterPlayer != null)
             {
@@ -399,7 +405,10 @@ namespace VusicPlayer
             }
 
         }
-
+        public async void Create()
+        {
+            PlayerService.CreatePlayer();
+        }
 
         private async void PlayVideoPath(string path)
         {
@@ -487,7 +496,7 @@ namespace VusicPlayer
             App.MainWindowInstance = instance;
             App.MainWindowInstance2 = instance;
             App.HomeWindowInstance = instance;
-            //  instance.CheckForFileArguments();
+         //    instance.CheckForFileArguments();
             return instance;
         }
 
@@ -521,6 +530,7 @@ namespace VusicPlayer
 
         private async void FrmMain_Navigated(object sender, NavigationEventArgs e)
         {
+            MusicPlayerMaster.Visibility = Visibility.Visible;
 
             if (e.SourcePageType == typeof(HomePage))
                 nvgMain.Header = "Home";
@@ -532,7 +542,11 @@ namespace VusicPlayer
                 nvgMain.Header = "Video Library";
 
             else if (e.SourcePageType == typeof(QueuePage))
+            {
+                MusicPlayerMaster.Visibility = Visibility.Collapsed;
+
                 nvgMain.Header = "Play Queue";
+            }
 
             else if (e.SourcePageType == typeof(SettingsPage))
                 nvgMain.Header = "App Settings";
@@ -589,12 +603,12 @@ namespace VusicPlayer
             if (PlayerService.MasterPlayer.IsPlaying)
             {
                 PlayerService.Pause();
-              
+              ToolTipService.SetToolTip(btnPlayPause, "Play");
             }
             else
             {
                 PlayerService.Play();
-              
+              ToolTipService.SetToolTip(btnPlayPause, "Pause");
             }
 
         }
@@ -610,12 +624,12 @@ namespace VusicPlayer
         }
         private void btnPrev_Click(object sender, RoutedEventArgs e)
         {
-            QueueService.PlayPrevious();
+            QueueHandler.PlayPrevious();
         }
 
         private void btnNext_Click(object sender, RoutedEventArgs e)
         {
-            QueueService.PlayNext();
+            QueueHandler.PlayNext();
         }
 
 
@@ -651,6 +665,22 @@ namespace VusicPlayer
         string videospeed = "1";
         private void btnSpeedfly_Click(object sender, RoutedEventArgs e)
         {
+            ttSpeedCustom.IsOpen = false;
+            var menuflyoutitem = (RadioMenuFlyoutItem)sender;
+
+            string speed = menuflyoutitem.Text;
+            videospeed = speed;
+            if (PlayerService.MasterPlayer != null)
+            {
+                if (menuflyoutitem != null)
+                {
+
+                    if (double.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out double speedfloat))
+                    {
+                        PlayerService.MasterPlayer.Speed = speedfloat;
+                    }
+                }
+            }
             //ttSpeedCustom.IsOpen = false;
             //var menuflyoutitem = (RadioMenuFlyoutItem)sender;
 
@@ -659,17 +689,11 @@ namespace VusicPlayer
             //if (player != null && maintimer != null)
             //{
 
-            //    if (menuflyoutitem != null)
-            //    {
 
-            //        if (double.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out double speedfloat))
-            //        {
-            //            player.Speed = speedfloat;
-            //        }
-            //    }
+                //    }
 
-            //}
-        }
+                //}
+            }
 
         private void customSpeed_Click(object sender, RoutedEventArgs e)
         {
@@ -679,7 +703,7 @@ namespace VusicPlayer
 
         private async void btnEffects_Click(object sender, RoutedEventArgs e)
         {
-            await dlgEffects.ShowAsync();
+      
         }
 
         private async void btnInfo_Click(object sender, RoutedEventArgs e)
@@ -777,20 +801,51 @@ namespace VusicPlayer
         }
         private void btnSetCustomSpeed_Click(object sender, RoutedEventArgs e)
         {
-            //if (player != null && maintimer != null)
-            //{
+            if (PlayerService.MasterPlayer != null)
+            {
 
 
-            //    if (!double.IsNaN(nmbSpeedCustom.Value))
-            //    {
-            //        string speed = nmbSpeedCustom.Value.ToString();
-            //        videospeed = speed;
-            //        if (double.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out double speedfloat))
-            //        {
-            //            player.Speed = speedfloat;
-            //        }
-            //    }
-            //}
+                if (!double.IsNaN(nmbSpeedCustom.Value))
+                {
+                    string speed = nmbSpeedCustom.Value.ToString();
+                    videospeed = speed;
+                    
+                    if (double.TryParse(speed, System.Globalization.CultureInfo.InvariantCulture, out double speedfloat))
+                    {
+                        PlayerService.MasterPlayer.Speed = speedfloat;
+                        switch (speedfloat)
+                        {
+                            case 0.25:
+                                spquarter.IsChecked = true;
+                                break;
+                            case 0.5:
+                                sphalf.IsChecked = true;
+                                break;
+                            case 0.75:
+                                spthreefourth.IsChecked = true;
+                                break;
+                            case 1.0:
+                                spone.IsChecked = true;
+                                break;
+                            case 1.25:
+                                sponequarter.IsChecked = true;
+                                break;
+                            case 1.5:
+                                sponehalf.IsChecked = true;
+                                break;
+                            case 1.75:
+                                sponethreefourth.IsChecked = true;
+                                break;
+                            case 2.0:
+                                sptwo.IsChecked = true;
+                                break;
+                            default:
+                                // Optional: Log if an unsupported speed is passed
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -1211,6 +1266,11 @@ namespace VusicPlayer
         private void sldMain_DragCompleted()
         {
             PlayerService.SldMain_DragCompleted(sldMain); 
+        }
+
+        private void mnftPitch_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

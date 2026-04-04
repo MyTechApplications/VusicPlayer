@@ -107,9 +107,33 @@ namespace VusicPlayer
                 UIController.AlbumDisplayName = album;
                 UIController.ArtistDisplayName = artist;
                 await LoadMediaAsync(path);
+            
                 MasterPlayer?.Open(path);
                 Play();
-            
+            var settings = await SettingsHelper.LoadSettingsAsync();
+            var existingSong = settings.RecentMusic.FirstOrDefault(x => x.SongPath == path);
+            if (existingSong == null)
+            {
+                
+                var newRecent = new RecentMusic
+                {
+                    SongName = Path.GetFileName(path),
+                    SongPath = path,
+                    FolderName = new DirectoryInfo(Path.GetDirectoryName(path) ?? string.Empty).Name,
+                    PlayCount = 1 
+                };
+                settings.RecentMusic.Insert(0, newRecent);
+            }
+            else
+            {
+                existingSong.PlayCount++;
+                settings.RecentMusic.Remove(existingSong);
+                settings.RecentMusic.Insert(0, existingSong);
+            }
+        
+
+            await SettingsHelper.SaveSettingsAsync(settings);
+
         }
         private static void MasterPlayer_PlaybackStopped(object? sender, PlaybackStoppedArgs e)
         {
@@ -229,6 +253,7 @@ namespace VusicPlayer
         {
             if (MasterPlayer == null) return;
             MasterPlayer.Play();
+            CurrentPlayState?.Invoke("Play");
             App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(async () =>
             {
                 var bitm = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
@@ -238,10 +263,12 @@ namespace VusicPlayer
 
             });
         }
+        public static event Action<string?>? CurrentPlayState;
         public static void Pause()
         {
             if (MasterPlayer == null) return;
             MasterPlayer.Pause();
+            CurrentPlayState?.Invoke("Paused");
             App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(async () =>
             {
                 var bitm = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));

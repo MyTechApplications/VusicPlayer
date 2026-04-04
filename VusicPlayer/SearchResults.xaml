@@ -93,7 +93,7 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator></MenuFlyoutSeparator>
-                                <MenuFlyoutItem Text="Tools"  Name="mnftTools" Click="mnftSongDetails_Click" >
+                                <MenuFlyoutItem Text="Tools"  Name="mnftTools" Visibility="Collapsed" Click="mnftSongDetails_Click" >
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE713;"></FontIcon>
                                     </MenuFlyoutItem.Icon>

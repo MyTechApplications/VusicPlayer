@@ -16,6 +16,7 @@ using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -45,12 +46,12 @@ namespace VusicPlayer
             lstViewPlaylistAddedSongs.ItemsSource = AllSongs;
             btnEditPlaylistCover.IsEnabled = false;
 
-            CoverOptions.Visibility = Visibility.Visible;
+            
         }
         #endregion
 
         #region Loading
-        public async void LoadPlaylistCreationDialog(bool IsCreationOfPlaylist, PlaylistProperties playlistProperties, Frame frm)
+        public async Task LoadPlaylistCreationDialog(bool IsCreationOfPlaylist, PlaylistProperties playlistProperties, Frame frm)
         {
             if (IsCreationOfPlaylist == false)
             {
@@ -61,7 +62,9 @@ namespace VusicPlayer
                 txtEditGenre.Text = playlistProperties.PlaylistGenre;
                 if (playlistProperties.Thumbnail != null)
                 {
-                    imgPlaylistCov.Source = new BitmapImage(new Uri(playlistProperties.Thumbnail));
+                    this.DispatcherQueue.TryEnqueue(() => {
+                        imgPlaylistCov.Source = new BitmapImage(playlistProperties.Thumbnail);
+                    });
                 }
 
                 txtAddedSongs.Text = $"Added Songs: {playlistProperties.PlaylistCount}";
@@ -88,69 +91,79 @@ namespace VusicPlayer
                         });
                     }
                 }
-
+                playlistcov = correspondPlaylist.Thumbnail!.ToString();
             }
         }
         #endregion
 
         #region Saving
-        public async void SavePlaylist()
+        public async void SavePla()
         {
-            var currentSettings = await SettingsHelper.LoadSettingsAsync();
-            if (correspondPlaylist != null)
+            Modifiedplaylist.Name = txtEditPlaylistName.Text;
+            Modifiedplaylist.Genre = txtEditGenre.Text;
+            Modifiedplaylist.Thumbnail = playlistcov;
+            Modifiedplaylist.SongsPaths = correspondPlaylist.SongsPaths;
+            if (txtEditPlaylistName.Text == "")
             {
-                var playlistInMasterList = currentSettings.SavedPlaylists
-               .FirstOrDefault(p => p.PlaylistName == correspondPlaylist.PlaylistName);
-                if (playlistInMasterList != null)
+                mssgBar.IsOpen = true;
+                mssgBar.Title = "Error";
+                mssgBar.Message = "Playlist name cannot be empty.";
+                mssgBar.Severity = InfoBarSeverity.Error;
+                return;
+            }
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+
+            var playlistInMasterList = currentSettings.SavedPlaylists
+           .FirstOrDefault(p => p.PlaylistId == correspondPlaylist.PlaylistId);
+            if(playlistInMasterList != null)
+            {
+                string playlistname = correspondPlaylist.PlaylistName ?? "Unknown Playlist";
+                string Genre = correspondPlaylist.PlaylistGenre ?? "";
+                playlistInMasterList.PlaylistName =
+     string.IsNullOrEmpty(txtEditPlaylistName.Text)
+         ? playlistname
+         : txtEditPlaylistName.Text;
+
+                playlistcov = playlistInMasterList.Thumbnail!.ToString();
+
+                playlistInMasterList.PlaylistGenre = txtEditGenre.Text;
+                Uri defaultPath = new Uri(playlistcov);
+
+
+                if (playlistcov != "")
                 {
-                    if (playlistInMasterList != null && correspondPlaylist != null)
-                    {
-                        string playlistname = correspondPlaylist.PlaylistName ?? "Unknown Playlist";
-                        string Genre = correspondPlaylist.PlaylistGenre ?? "";
-                        playlistInMasterList.PlaylistName =
-             string.IsNullOrEmpty(txtEditPlaylistName.Text)
-                 ? playlistname
-                 : txtEditPlaylistName.Text;
-
-                        playlistInMasterList.PlaylistGenre = txtEditGenre.Text;
-
-                        if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
-                        {
-                            playlistInMasterList.Thumbnail = bitmap.UriSource.AbsoluteUri;
-                        }
-                        else
-                        {
-                            playlistInMasterList.Thumbnail = "ms-appx:///Assets/playlistdefaultdark.png";
-
-                        }
-                        playlistInMasterList.SongsPaths?.Clear();
-                        foreach (var item in AllSongs)
-                        {
-                            if (item.FilePath != null)
-                            {
-                                playlistInMasterList.SongsPaths?.Add(item.FilePath);
-                            }
-                        }
-                        MainFrameNavig.Navigate(typeof(Playlist), playlistInMasterList);
-                        await SettingsHelper.SaveSettingsAsync(currentSettings);
-                    }
+                    defaultPath = new Uri(playlistcov);
                 }
                 else
                 {
-                    CreateNewPlaylistInData();
+                    Uri darkIcon = new Uri("ms-appx:///Assets/playlistdefaultdark.png");
+
+                    defaultPath = darkIcon;
                 }
+                if (playlistcov != "")
+                {
+                    defaultPath = new Uri(playlistcov);
+                }
+
+                playlistInMasterList.Thumbnail = defaultPath;
+
+                playlistInMasterList.SongsPaths?.Clear();
+                foreach (var item in AllSongs)
+                {
+                    if (item.FilePath != null)
+                    {
+                        playlistInMasterList.SongsPaths?.Add(item.FilePath);
+                    }
+                }
+                playlistInMasterList.PlaylistCount = $"{AllSongs.Count} {(AllSongs.Count == 1 ? "item" : "items")}";
+                await SettingsHelper.SaveSettingsAsync(currentSettings);
             }
-            else
-            {
-                CreateNewPlaylistInData();
-            }
+          
         }
-        private async void CreateNewPlaylistInData()
+        string playlistcov = "";
+        public  async Task<PlaylistProperties> CreateNewPlaylistInData()
         {
-          foreach(var item in AllSongs)
-            {
-                Debug.WriteLine("Pathsss:  " + item.FilePath);
-            }
+            Debug.WriteLine("CreationCalled");
             var currentSettings = await SettingsHelper.LoadSettingsAsync();
 
             string baseName = txtEditPlaylistName.Text.Trim();
@@ -163,36 +176,38 @@ namespace VusicPlayer
             {
                 finalName = $"{baseName} ({counter++})";
             }
-            string defaultPath;
-            string darkIcon = "ms-appx:///Assets/playlistdefaultdark.png";
+            Uri defaultPath = new Uri("ms-appx:///Assets/playlistdefaultdark.png");
+       
 
-            // Set your initial default (e.g., based on current theme)
-            defaultPath = darkIcon;
-
-            if (imgPlaylistCov.Source != null)
+            if (playlistcov != "")
             {
-                if (imgPlaylistCov.Source is BitmapImage bitmap && bitmap.UriSource != null)
-                {
-                    defaultPath = bitmap.UriSource.ToString();
-                }
+               defaultPath = new Uri(playlistcov);
+           }
+            else
+            {
+                  Uri darkIcon = new Uri("ms-appx:///Assets/playlistdefaultdark.png");
+
+                // Set your initial default (e.g., based on current theme)
+                defaultPath = darkIcon;
             }
+            string playlistID = Guid.NewGuid().ToString("N");
             var newPlaylist = new PlaylistProperties
             {
                 PlaylistName = finalName,
-
+                PlaylistId = playlistID,
                 PlaylistCount = $"{AllSongs.Count} {(AllSongs.Count == 1 ? "item" : "items")}",
                 PlaylistNowPlaying = "",
                 PlaylistGenre = txtEditGenre.Text,
                 SongsPaths = AllSongs
     .Select(s => s.FilePath)
     .Where(path => path != null)
-    .ToList()!,
+    .ToHashSet()!,
                 Thumbnail = defaultPath,
                 DateCreation = DateTime.Now.Date,
             };
             currentSettings.SavedPlaylists.Add(newPlaylist);
             await SettingsHelper.SaveSettingsAsync(currentSettings);
-
+            return newPlaylist;
         }
         #endregion
 
@@ -218,9 +233,8 @@ namespace VusicPlayer
             CoverOptions.Visibility = Visibility.Collapsed;
             btnAddPlaylistCover.IsEnabled = true;
         }
-        private async void btnAddSongs_Click(object sender, RoutedEventArgs e)
+        public async Task btnAddSongsClick()
         {
-
             if (App.OceanDialogInstance == null)
             {
                 mssgBar.IsOpen = true;
@@ -232,8 +246,7 @@ namespace VusicPlayer
             }
 
             var picker = new FileOpenPicker();
-            btnAddPlaylistCover.IsEnabled = false;
-            btnAddSongs.IsEnabled = false;
+        
             var hwnd = WindowNative.GetWindowHandle(App.OceanDialogInstance);
             InitializeWithWindow.Initialize(picker, hwnd);
 
@@ -253,7 +266,7 @@ namespace VusicPlayer
                     var musicProps = await file.Properties.GetMusicPropertiesAsync();
 
                     string duration = FormatDuration(musicProps.Duration);
-
+                    correspondPlaylist.SongsPaths?.Add(file.Path);
                     AllSongs.Add(new SongModel
                     {
                         Title = musicProps.Title,
@@ -263,47 +276,30 @@ namespace VusicPlayer
                     });
                 }
             }
+            lstViewPlaylistAddedSongs.StartBringIntoView();
+       lstViewPlaylistAddedSongs.ScrollIntoView(AllSongs.LastOrDefault());
+        }
+        public async void btnAddSongs_Click(object sender, RoutedEventArgs e)
+        {
+
+   
+        await    btnAddSongsClick();
             btnAddPlaylistCover.IsEnabled = true;
             btnAddSongs.IsEnabled = true;
         }
 
         private async void btnAddPlaylistCover_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            btnAddPlaylistCover.IsEnabled = false;
-            btnAddSongs.IsEnabled = false;
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.OceanDialogInstance);
-
-            if (hwnd == IntPtr.Zero)
-            {
-                hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.HomeWindowInstance);
-            }
-            picker.CommitButtonText = "Choose Playlist Cover";
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            picker.FileTypeFilter.Add(".png");
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".ico");
-
-            var file = await picker.PickSingleFileAsync();
-
-            if (file != null)
-            {
-                CoverOptions.Visibility = Visibility.Visible;
-                btnAddPlaylistCover.IsEnabled = false;
-                ToolTipService.SetToolTip(imgPlaylistCov, Path.GetFileName(file.Path));
-                imgPlaylistCov.Source = new BitmapImage(new Uri(file.Path));
-            }
-            btnAddPlaylistCover.IsEnabled = true;
-            btnAddSongs.IsEnabled = true;
+          
+            
+          
         }
         private void btnRemovePlaylistCover_Click(object sender, RoutedEventArgs e)
         {
             ToolTipService.SetToolTip(imgPlaylistCov, "");
             CoverOptions.Visibility = Visibility.Collapsed;
             btnAddPlaylistCover.IsEnabled = true;
-            imgPlaylistCov.Source = null;
+            imgPlaylistCov.Source = new BitmapImage(new Uri("ms-appx:///Assets/playlistdefaultdark.png"));
         }
         private void txtEditPlaylistName_GotFocus(object sender, RoutedEventArgs e)
         {

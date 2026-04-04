@@ -192,7 +192,9 @@ public sealed partial class FoldersPage : Page
             double startPosition = savedProgress?.CurrentDuration ?? 0;
             bool isNewVideo = savedProgress == null;
 
-            var playerWindow = new MainWindow(loadedVideos, clickedItem.FilePath, startPosition, isNewVideo);
+            ObservableCollection<VideoItem> videoItems = new();
+         videoItems.Add(clickedItem);
+            var playerWindow = new MainWindow(videoItems , clickedItem.FilePath, startPosition, isNewVideo);
             playerWindow.Activate();
             App.VideoPlayerWindowInstance = playerWindow;
             HomeWindow.HideWindow();

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -76,46 +77,106 @@ public sealed partial class Album : Page, IUpdateableMusicPage
                 textBox.SelectAll();
             });
         }
-    } 
+    }
+    public bool IsFileReady(string path)
+    {
+        try
+        {
+            // Try to open the file with Exclusive access
+            using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                return true;
+            }
+        }
+        catch (IOException)
+        {
+            return false; // File is locked by another process
+        }
+    }
     private async void btnRenameAlbum_Click(object sender, RoutedEventArgs e)
     {
-        /*    if (string.IsNullOrWhiteSpace(txtRename.Text))
+        if(txtRename.Text == "")
+        {
+            txtRename.Text = txtAlbumName.Text;
+            return;
+        }
+        foreach (SongModel item in lstViewPlaylist.Items)
+        {
+            try
             {
-                txtRename.Text = txtAlbumName.Text;
-            }
-
-            txtAlbumName.Text = txtRename.Text;
-
-            List<string> failedFiles = new List<string>();
-            int successCount = 0;
-
-            foreach (var item in FoundSongs)
-            {
-                try
+                if (IsFileReady(item.FilePath))
                 {
-                    StorageFile file = await StorageFile.GetFileFromPathAsync(item.FilePath);
-                    var propertiesToSave = new Dictionary<string, object>
-            {
-                { "System.Music.AlbumTitle", txtAlbumName.Text }
-            };
-
-                    await file.Properties.SavePropertiesAsync(propertiesToSave);
-                    successCount++;
+                    var file = TagLib.File.Create(item.FilePath);
+                    file.Tag.Album = txtRename.Text;
+                    file.Save();
+                    item.AlbumName = txtRename.Text;
+                    var settings = await SettingsHelper.LoadSettingsAsync();
+                    var albumcurrent = settings.AlbumsList.FirstOrDefault(p => p.Name == txtAlbumName.Text);
+                    if (albumcurrent != null)
+                    {
+                        albumcurrent.Name = txtRename.Text;
+                        await SettingsHelper.SaveSettingsAsync(settings);
+                    }
+                    txtAlbumName.Text = txtRename.Text;
+                    currentAlbumname = txtRename.Text;
                 }
-                catch (Exception ex)
+                else
                 {
-                    // Add the file name or path to our failure list
-                    failedFiles.Add(item.Title ?? item.FilePath);
-                    Logger.Log($"Skipped {item.FilePath}: {ex.Message}");
+                    FileStatusInfoBar.IsOpen = true;
+                    FileStatusInfoBar.Title = "Error";
+                    FileStatusInfoBar.Severity = InfoBarSeverity.Error;
+                    FileStatusInfoBar.Message = "The file is in use by another process.";
+
                 }
             }
-
-            // 2. Show the result to the user
-            if (failedFiles.Count > 0)
+            catch (Exception ex)
             {
-                ShowCompletionNotification(successCount, failedFiles);
-            }   SearchFiles();
-       */
+                FileStatusInfoBar.Message = "The file is in use by another process. Check log details under App Settings";
+                FileStatusInfoBar.IsOpen = true;
+                FileStatusInfoBar.Title = "Error";
+                FileStatusInfoBar.Severity = InfoBarSeverity.Error;
+                Logger.Log(ex.Message, "ListViewMedia.AlbumSetMultiple", Logger.LogLevelType.Error);
+            }
+            /*    if (string.IsNullOrWhiteSpace(txtRename.Text))
+                {
+                    txtRename.Text = txtAlbumName.Text;
+                }
+
+                txtAlbumName.Text = txtRename.Text;
+
+                List<string> failedFiles = new List<string>();
+                int successCount = 0;
+
+                foreach (var item in FoundSongs)
+                {
+                    try
+                    {
+                        StorageFile file = await StorageFile.GetFileFromPathAsync(item.FilePath);
+                        var propertiesToSave = new Dictionary<string, object>
+                {
+                    { "System.Music.AlbumTitle", txtAlbumName.Text }
+                };
+
+                        await file.Properties.SavePropertiesAsync(propertiesToSave);
+                        successCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Add the file name or path to our failure list
+                        failedFiles.Add(item.Title ?? item.FilePath);
+                        Logger.Log($"Skipped {item.FilePath}: {ex.Message}");
+                    }
+                }
+
+                // 2. Show the result to the user
+                if (failedFiles.Count > 0)
+                {
+                    ShowCompletionNotification(successCount, failedFiles);
+                }   SearchFiles();
+           */
+        }
+        flyoutRename.Hide();
+     
     }
     private void ShowCompletionNotification(int successCount, List<string> failedFiles)
     {
@@ -180,6 +241,20 @@ public sealed partial class Album : Page, IUpdateableMusicPage
             txtAlbumHeader.Visibility = Visibility.Collapsed;
         }
     }
+    ObservableCollection<string> AlbumsList { get; set; } = new();
+
+    private void LoadArtists()
+    {
+        foreach (var song in FoundSongs)
+        {
+            string artistName = !string.IsNullOrWhiteSpace(song.Artist) ? song.Artist : "Unknown Artist";
+            uniqueArtists.Add(artistName);
+        }
+        foreach (var name in uniqueArtists)
+        {
+            var artistdisplays = new ArtistShow { ArtistName = name };
+        }
+    }
     private async Task LoadExistingThumbnailAsync()
     {
         // Define the fallback URI
@@ -197,6 +272,7 @@ public sealed partial class Album : Page, IUpdateableMusicPage
             {
                 // Attempt to load the user's custom thumbnail
                 imgAlbumCover.Source = new BitmapImage(new Uri(existingAlbum.Thumbnail));
+                tempalbumcoverstring = existingAlbum.Thumbnail;
             }
             catch (Exception ex)
             {
@@ -210,28 +286,18 @@ public sealed partial class Album : Page, IUpdateableMusicPage
             imgAlbumCover.Source = new BitmapImage(fallbackUri);
         }
     }
+    string? tempalbumcoverstring;
     ObservableCollection<string> paths = new();
     HashSet<string> uniqueArtists = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     public ObservableCollection<SongModel> FoundSongs { get; set; } = new ObservableCollection<SongModel>();
     private void btnPlayAll_Click(object sender, RoutedEventArgs e)
     {
-        if (paths.Count != 0)
+        foreach (var item in FoundSongs)
         {
-            paths.Clear();
+            item.IsCompleted = false;
         }
-        paths = new();
-        foreach (var itm in FoundSongs)
-        {
-            if (itm.FilePath != null)
-            {
-                paths.Add(itm.FilePath);
-
-            }
-        }
-        if (App.MainWindowInstance is HomeWindow homeWindow)
-        {
-            QueueService.PlayMedia(paths);
-        }
+        PlayerService.CreatePlayer();
+        QueueHandler.PlayMedia(FoundSongs, btnShuffle.IsChecked ?? false, false);
 
     }
     TimeSpan ts;
@@ -312,6 +378,9 @@ public sealed partial class Album : Page, IUpdateableMusicPage
 
             foreach (var file in allFoundFiles)
             {
+                var tagFile = TagLib.File.Create(file.Path);
+                var tag = tagFile.Tag;
+
                 var props = await file.Properties.GetMusicPropertiesAsync();
                 ts += props.Duration;
                 string artistName = !string.IsNullOrWhiteSpace(props.AlbumArtist)
@@ -328,7 +397,13 @@ public sealed partial class Album : Page, IUpdateableMusicPage
                     SongDuration = props.Duration,
                     FilePath = file.Path
                 });
-
+                string albumName = string.IsNullOrWhiteSpace(tag.Album)
+                     ? "Unknown Album"
+                     : tag.Album;
+                string artists = (tag.AlbumArtists != null && tag.AlbumArtists.Length > 0)
+? string.Join(", ", tag.AlbumArtists)
+: "Unknown Artist";
+                AlbumsList.Add(albumName);
                 // Update Progress
                 processedCount++;
                 prgProgress.Value = processedCount;
@@ -342,21 +417,114 @@ public sealed partial class Album : Page, IUpdateableMusicPage
         // 3. Finalize UI
         var sortedArtists = uniqueArtists.OrderBy(a => a);
         txtArtistsInvolved.Text = "• " + string.Join(", ", sortedArtists);
+        ArtistShows.Clear();
+        foreach (var artist in uniqueArtists)
+        {
 
+            Uri fallbackUri = new Uri("ms-appx:///Assets/defaultartist.png");
+
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            var existingAlbum = currentSettings.ArtistsList?
+                .FirstOrDefault(a => a.Name == artist);
+            string thumbnail = "ms-appx:///Assets/defaultartist.png";
+
+            if (existingAlbum != null)
+            {
+                thumbnail = existingAlbum.Thumbnail;
+            }
+
+
+            var ArtistSe = new ArtistShow { ArtistName = artist, ArtistThumbnailImage = new BitmapImage(new Uri(thumbnail)), ArtistThumbnail = thumbnail };
+            ArtistShows.Add(ArtistSe);
+        }
+
+
+        grdViewArtists.ItemsSource = ArtistShows;
+        if (ArtistShows.Count == 0)
+        {
+            grdViewArtists.Visibility = Visibility.Collapsed;
+            txtArtistsHeader.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            grdViewArtists.Visibility = Visibility.Visible;
+            txtArtistsHeader.Visibility = Visibility.Visible;
+
+        }
         // Optional: Hide progress bar after a short delay
         await Task.Delay(500);
         ttProgress.IsOpen = false;
         UpdateCurrentListhere(PlaybackState.CurrentlyPlayingPath);
     }
+    private ObservableCollection<ArtistShow> ArtistShows { get; set; } = new ObservableCollection<ArtistShow>();
 
     private void btnShuffle_Click(object sender, RoutedEventArgs e)
     {
 
     }
+    ObservableCollection<SongModel> original = new();
 
-    private void btnAddSongs_Click(object sender, RoutedEventArgs e)
+    private void Shuffle()
     {
 
+        if (btnShuffle.IsChecked == true)
+        {
+            original.Clear();
+            foreach (var item in QueueListHolder.VusicQueue)
+            {
+                original.Add(item);
+            }
+            QueueHandler.ShuffleList();
+        }
+        else
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                QueueListHolder.VusicQueue.Clear();
+                foreach (var item in original)
+                {
+                    QueueListHolder.VusicQueue.Add(item);
+                }
+            });
+            QueueHandler.ResetVideoIndex();
+        }
+    }
+    private async void btnAddSongs_Click(object sender, RoutedEventArgs e)
+    {
+        if (App.HomeWindowInstance == null)
+        {
+            FileStatusInfoBar.IsOpen = true;
+            FileStatusInfoBar.Title = "Error";
+            FileStatusInfoBar.Message = "An unexpected error occured. Check log details in App Settings Page.";
+            FileStatusInfoBar.Severity = InfoBarSeverity.Error;
+            Logger.Log("Error code 0x0012oc. Refer the github page for more details.", "PlaylistCreation", Logger.LogLevelType.Error);
+            return;
+        }
+        var files = await PickFiles.PickMultipleAudioFilesAsync(App.HomeWindowInstance, "Add items");
+        if (files == null) return;
+
+        foreach (var file in files)
+        {
+            if (!FoundSongs.Any(s => s.FilePath == file.Path))
+            {
+                var musicProps = await file.Properties.GetMusicPropertiesAsync();
+                if (IsFileReady(file.Path))
+                {
+                    var file2 = TagLib.File.Create(file.Path);
+                    file2.Tag.Album = txtAlbumName.Text;
+                    file2.Save();
+                }
+                string duration = FormatTimeSpanDuration.Format(musicProps.Duration);
+                FoundSongs.Add(new SongModel
+                {
+                    Title = musicProps.Title,
+                    SongDuration = musicProps.Duration,
+                    FilePath = file.Path,
+                    AlbumName = txtAlbumName.Text,
+                    Artist = musicProps.Artist
+                });
+            }
+        }
     }
     private void PlaySelection()
     {
@@ -374,7 +542,47 @@ public sealed partial class Album : Page, IUpdateableMusicPage
             }
         }
     }
+    private void mnftGoToAlbum_Click(object sender, RoutedEventArgs e)
+    {
 
+    }
+
+    private void mnftGoToArtist_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftAddtoQueue_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftSongDetails_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftAddtoPlaylist_Loaded(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftPlaySongNext_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+
+
+    private void mnftContext_Opened(object sender, object e)
+    {
+
+    }
+
+    private void lstViewPlaylist_ItemClick(object sender, ItemClickEventArgs e)
+    {
+
+    }
     private void txtArtistHyp_Click(object sender, RoutedEventArgs e)
     {
         var clickedArtist = sender as HyperlinkButton;
@@ -387,6 +595,22 @@ public sealed partial class Album : Page, IUpdateableMusicPage
         }
     }
     SongModel selectedSong = new();
+    private void txtAlbumHyp_Click(object sender, RoutedEventArgs e)
+    {
+
+        GoToAlbum(sender);
+    }
+    private void GoToAlbum(object sender)
+    {
+
+        if (sender is FrameworkElement clickedElement)
+        {
+            if (clickedElement.DataContext is SongModel clickedItem)
+            {
+                this.Frame.Navigate(typeof(Album), clickedItem);
+            }
+        }
+    }
     private void mnftPlaySong_Click(object sender, RoutedEventArgs e)
     {
         var menuFlyoutItem = sender as MenuFlyoutItem;
@@ -406,15 +630,7 @@ public sealed partial class Album : Page, IUpdateableMusicPage
 
     }
 
-    private void mnftSongDetails_Click(object sender, RoutedEventArgs e)
-    {
 
-    }
-
-    private void lstViewPlaylist_ItemClick(object sender, ItemClickEventArgs e)
-    {
-
-    }
 
     private void lstViewPlaylist_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
@@ -451,7 +667,7 @@ public sealed partial class Album : Page, IUpdateableMusicPage
             // If for some reason the main window is gone, try the current active one
             hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.CurrentActiveWindow);
         }
-        picker.CommitButtonText = "Choose";
+        picker.CommitButtonText = "Choose Album Cover";
         // 2. Initialize the picker with the handle
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
@@ -493,6 +709,7 @@ public sealed partial class Album : Page, IUpdateableMusicPage
     }
     private async void RefreshStuff()
     {
+        ArtistShows.Clear();
         ts = TimeSpan.Zero;
         txtAlbumName.Text = selectedSongs.AlbumName;
         currentAlbumname = selectedSongs.AlbumName;
@@ -537,6 +754,161 @@ public sealed partial class Album : Page, IUpdateableMusicPage
     private void Button_Click(object sender, RoutedEventArgs e)
     {
         txtRename.Text = txtAlbumName.Text;
+    }
+    private void mnftTools_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftMovetobottom_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftMovetotop_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftMovedown_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void mnftMoveup_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+    {
+        var hypbtn = sender as HyperlinkButton;
+        var selectedartist = hypbtn?.DataContext as ArtistShow;
+        if (selectedartist != null)
+        {
+            var songmodel = new SongModel { Artist = selectedartist.ArtistName };
+            this.Frame?.Navigate(typeof(ArtistInfo), songmodel);
+        }
+    }
+    private async void btnFavourite_Click(object sender, RoutedEventArgs e)
+    {
+        var btn = sender as Button;
+        var song = btn?.DataContext as SongModel;
+        if (btn == null) return;
+        if (song != null)
+        {
+            // 1. Toggle the data
+            song.IsFavourite = !song.IsFavourite;
+
+            // 2. Update your Settings/Database
+            var settings = await SettingsHelper.LoadSettingsAsync();
+            var favourites = settings.Favourites;
+            var alreadyexisting = favourites.FirstOrDefault(f => f.FilePath == song.FilePath);
+            if (alreadyexisting != null)
+            {
+                favourites.Remove(alreadyexisting);
+                ToolTipService.SetToolTip(btn, "Add to favourites");
+                song.FavOpacity = 0;
+                song.FavString = "Add to Favourites";
+            }
+            else
+            {
+                favourites.Add(new FavouritesModel { FilePath = song.FilePath });
+                ToolTipService.SetToolTip(btn, "Remove from favourites");
+                song.FavOpacity = 1;
+                song.FavString = "Remove from Favourites";
+            }
+            await SettingsHelper.SaveSettingsAsync(settings);
+
+            // 3. Trigger animation
+            var fillHeart = btn.FindName("FillHeart") as FontIcon;
+            if (fillHeart == null) return;
+            if (song.IsFavourite)
+                AnimateHeart.AnimateHeartIcon(fillHeart, 1.0, 1.0);
+            else
+                AnimateHeart.AnimateHeartIcon(fillHeart, 0.0, 0.0);
+        }
+    }
+    private async void mnftAddToFavourites_Click(object sender, RoutedEventArgs e)
+    {
+        var menuItem = sender as MenuFlyoutItem;
+        var song = menuItem?.DataContext as SongModel;
+
+        if (song != null)
+        {
+            // 1. Toggle the data
+
+            song.IsFavourite = !song.IsFavourite;
+            song.FavOpacity = song.IsFavourite ? 1 : 0;
+            song.FavString = song.IsFavourite ? "Remove from Favourites" : "Add to Favourites";
+
+            var settings = await SettingsHelper.LoadSettingsAsync();
+            var favourites = settings.Favourites;
+            var alreadyexisting = favourites.FirstOrDefault(f => f.FilePath == song.FilePath);
+            if (alreadyexisting != null)
+            {
+                favourites.Remove(alreadyexisting);
+            }
+            else
+            {
+                favourites.Add(new FavouritesModel { FilePath = song.FilePath });
+            }
+            await SettingsHelper.SaveSettingsAsync(settings);
+
+
+        }
+    }
+
+
+    private void btnFavourite_DataContextChanged(FrameworkElement sender, Microsoft.UI.Xaml.DataContextChangedEventArgs args)
+    {
+        //var song = args.NewValue as SongModel;
+        //var btn = sender as Button;
+        //var fillHeart = btn?.FindName("FillHeart") as FontIcon;
+
+        //if (song != null && fillHeart != null)
+        //{
+        //    // Instant update without animation to prevent "flickering" hearts 
+        //    // while scrolling fast
+        //    fillHeart.Opacity = song.IsFavourite ? 1.0 : 0.0;
+        //    var transform = fillHeart.RenderTransform as Microsoft.UI.Xaml.Media.ScaleTransform;
+        //    if (transform != null)
+        //    {
+        //        transform.ScaleX = song.IsFavourite ? 1.0 : 0.0;
+        //        transform.ScaleY = song.IsFavourite ? 1.0 : 0.0;
+        //    }
+    }
+
+    private void imgAlbumCover_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(tempalbumcoverstring))
+        {
+            return;
+        }
+        TempImagePath.Path = tempalbumcoverstring;
+        EnlargeImage enlargeImage = new EnlargeImage();
+        enlargeImage.Activate();
+    }
+
+    private void ppArtist_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (sender is PersonPicture personPicture && personPicture.DataContext is ArtistShow artistShow)
+        {
+            TempImagePath.Path = artistShow.ArtistThumbnail;
+            EnlargeImage enlargeImage = new EnlargeImage();
+            enlargeImage.Activate();
+        }
+
+    }
+
+    private void btnShuffle_Checked(object sender, RoutedEventArgs e)
+    {
+        Shuffle();
+    }
+
+    private void btnShuffle_Unchecked(object sender, RoutedEventArgs e)
+    {
+        Shuffle();
     }
 }
 

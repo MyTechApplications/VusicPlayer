@@ -8,7 +8,21 @@ namespace VusicPlayer
 {
     public static class PlaybackState
     {
-        public static string? CurrentlyPlayingPath { get; set; }
+        private static string? _currentlyPlayingPath;
+        public static string? CurrentlyPlayingPath
+        {
+            get => _currentlyPlayingPath;
+            set
+            {
+                if (_currentlyPlayingPath != value)
+                {
+                    _currentlyPlayingPath = value;
+                    CurrentlyPlayingChanged?.Invoke(value);
+                }
+            }
+        }
+
+        public static event Action<string?>? CurrentlyPlayingChanged; 
         public static PlaylistProperties? currentPlaylist { get; set; }
         public static bool? IsShuffleEnabled { get; set; }
         public static float CurrentPosition { get; set; }

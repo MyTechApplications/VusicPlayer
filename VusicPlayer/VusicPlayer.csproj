@@ -23,9 +23,11 @@
     <None Remove="Album.xaml" />
     <None Remove="ArtistInfo.xaml" />
     <None Remove="Controls\Timeline.xaml" />
+    <None Remove="EnlargeImage.xaml" />
     <None Remove="FoldersPage.xaml" />
     <None Remove="HomePage.xaml" />
     <None Remove="HomeWindow.xaml" />
+    <None Remove="ListViewMasterMedia.xaml" />
     <None Remove="ListViewMedia.xaml" />
     <None Remove="LogPage.xaml" />
     <None Remove="MediaControls.xaml" />
@@ -86,6 +88,12 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ListViewMasterMedia.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="EnlargeImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="NoSearchResultsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

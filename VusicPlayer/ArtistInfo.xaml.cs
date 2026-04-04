@@ -263,6 +263,8 @@ namespace VusicPlayer
                 txtEmptyAlbums.Visibility = Visibility.Collapsed;
 
             }
+            LoadMostPlayedSongs();
+
             await Task.Delay(500);
             ttProgress.IsOpen = false;
         }
@@ -302,17 +304,16 @@ namespace VusicPlayer
                 imgArtist.DisplayName = txtArtistName.Text;
                 SearchFiles();
                 Uri fallbackUri = new Uri("ms-appx:///Assets/defaultartist.png");
-
                 var currentSettings = await SettingsHelper.LoadSettingsAsync();
-                var existingAlbum = currentSettings.ArtistsList?
+                var existingArtist = currentSettings.ArtistsList?
                     .FirstOrDefault(a => a.Name == txtArtistName.Text);
-
-                if (existingAlbum != null && !string.IsNullOrEmpty(existingAlbum.Thumbnail))
+                mostplayedsongs.CollectionChanged += Mostplayedsongs_CollectionChanged;
+                if (existingArtist != null && !string.IsNullOrEmpty(existingArtist.Thumbnail))
                 {
                     try
                     {
-                        
-                        imgArtist.ProfilePicture = new BitmapImage(new Uri(existingAlbum.Thumbnail));
+
+                        imgArtist.ProfilePicture = new BitmapImage(new Uri(existingArtist.Thumbnail));
                     }
                     catch (Exception ex)
                     {
@@ -322,15 +323,20 @@ namespace VusicPlayer
                 }
                 else
                 {
-                    
+
                     imgArtist.ProfilePicture = new BitmapImage(fallbackUri);
                 }
             }
         }
+
+        private void Mostplayedsongs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+        }
+
         private bool IsFileLocked(IOException exception)
         {
             int errorCode = System.Runtime.InteropServices.Marshal.GetHRForException(exception) & ((1 << 16) - 1);
-            return errorCode == 32 || errorCode == 33; 
+            return errorCode == 32 || errorCode == 33;
         }
 
         private void btnRenameArtist_Click(object sender, RoutedEventArgs e)
@@ -339,12 +345,12 @@ namespace VusicPlayer
             {
                 try
                 {
-                
+
                     var file = TagLib.File.Create(item.FilePath);
                     file.Tag.AlbumArtists = new[] { txtRename.Text };
-                 
+
                     file.Save();
-                    
+
                 }
                 catch (IOException ex) when (IsFileLocked(ex))
                 {
@@ -426,13 +432,13 @@ namespace VusicPlayer
 
         }
 
-    
+
 
         private void txtRename_GotFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox textBox)
             {
-                
+
                 textBox.DispatcherQueue.TryEnqueue(() =>
                 {
                     textBox.SelectAll();
@@ -445,7 +451,7 @@ namespace VusicPlayer
             //Remove selected albums
         }
 
-   
+
         private void btnSelectAll_Click(object sender, RoutedEventArgs e)
         {
             grdViewAlbums.SelectAll();
@@ -541,18 +547,98 @@ namespace VusicPlayer
             ObservableCollection<string> existingPaths = new();
             foreach (var file in files)
             {
-                var tagFile = TagLib.File.Create(file.Path);
-                string[] albumartists = tagFile.Tag.AlbumArtists;
-                List<string>artistss = albumartists.ToList();
-                artistss.Add(txtArtistName.Text);
-                string[] originall = artistss.ToArray();
-                tagFile.Tag.AlbumArtists = originall;
-                tagFile.Save();
+                var alreadyexist = FoundSongs.FirstOrDefault(s => s.FilePath == file.Path);
+                if (alreadyexist == null)
+                {
+                    var tagFile = TagLib.File.Create(file.Path);
+                    string[] albumartists = tagFile.Tag.AlbumArtists;
+                    List<string> artistss = albumartists.ToList();
+                    var newArtist = txtArtistName.Text.Trim();
 
+                    if (!string.IsNullOrEmpty(newArtist) &&
+                        !artistss.Any(a => a.Equals(newArtist, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        artistss.Add(newArtist);
+                        tagFile.Tag.AlbumArtists = artistss.ToArray();
+                        tagFile.Save();
+                    }
+                }
             }
             SearchFiles();
         }
+        ObservableCollection<SongModel> mostplayedsongs = new();
+        private async void LoadMostPlayedSongs()
+        {
 
+            mostplayedsongs.Clear();
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            var mostPlayed = currentSettings.RecentMusic;
+
+            if (mostPlayed != null)
+            {
+                // Sort by PlayCount in descending order (highest first)
+                // Then use .ToList() or simply iterate over the sorted collection
+                var sortedSongs = mostPlayed.OrderByDescending(x => x.PlayCount);
+
+                foreach (var item in sortedSongs)
+                {
+                    StorageFile file = await StorageFile.GetFileFromPathAsync(item.SongPath);
+                    MusicProperties properties = await file.Properties.GetMusicPropertiesAsync();
+                    string title = !string.IsNullOrWhiteSpace(properties.Title) ? properties.Title : file.DisplayName;
+                    string album = !string.IsNullOrWhiteSpace(properties.Album) ? properties.Album : "Unknown Album";
+                    string artist = !string.IsNullOrWhiteSpace(properties.Artist) ? properties.Artist : "Unknown Artist";
+                    var settings = await SettingsHelper.LoadSettingsAsync();
+                    var favourites = settings.Favourites;
+                    var favSet = new HashSet<FavouritesModel>(favourites);
+                    bool isfav = favSet.Any(f => f.FilePath == file.Path);
+                    double opac = isfav ? 1.0 : 0.0;
+                    var colorbrush = new SolidColorBrush(Microsoft.UI.Colors.White);
+                    var glyph = "\uEC4F";
+                    if (PlaybackState.CurrentlyPlayingPath == item.SongPath)
+                    {
+                        colorbrush = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
+                        if (PlayerService.MasterPlayer!.IsPlaying)
+                            glyph = "\uE769";
+                        else
+                        {
+                            glyph = "\uE768";
+                        }
+                    }
+                    string text = isfav ? "Remove from Favourites" : "Add to Favourites";
+                    if (artist == txtArtistName.Text)
+                    {
+                        var SongModelt = new SongModel
+                        {
+                            Title = item.SongName,
+                            AlbumName = album,
+                            Artist = artist,
+                            FilePath = item.SongPath,
+                            FavOpacity = opac,
+                            FavString = text,
+                            SongDuration = properties.Duration,
+                            IsFavourite = favSet.Any(f => f.FilePath == file.Path),
+                            Glyph = glyph,
+                            TitleColor = colorbrush,
+                            IsMovableItem = Visibility.Collapsed,
+                        };
+                        mostplayedsongs.Add(SongModelt);
+                    }
+                }
+
+                lstViewMasterMostPlayed.ItemsSource = mostplayedsongs;
+
+            }
+            if(mostplayedsongs.Count == 0)
+            {
+                lstViewMasterMostPlayed.Visibility = Visibility.Collapsed;
+                txtEmptyMostPlayed.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                lstViewMasterMostPlayed.Visibility = Visibility.Visible;
+                txtEmptyMostPlayed.Visibility = Visibility.Collapsed;
+            }
+        }
         private async void btnSetArtistProfilePicture_Click(object sender, RoutedEventArgs e)
         {
             //PICK ARTIST PICTURE ON DISK
@@ -601,7 +687,7 @@ namespace VusicPlayer
                 // Don't forget to save the changes back to storage!
                 await SettingsHelper.SaveSettingsAsync(currentSettings);
             }
-          
+
         }
         private Point startPoint;
         private double startX, startY;
@@ -637,7 +723,7 @@ namespace VusicPlayer
 
         private void btnShowMoreResults_Click(object sender, RoutedEventArgs e)
         {
-          //LEAVE
+            //LEAVE
         }
         private CancellationTokenSource _loadingCts;
         private async Task AnimateStatusAsync(string baseText)

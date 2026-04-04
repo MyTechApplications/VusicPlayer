@@ -1,3 +1,4 @@
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -11,14 +12,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Vortice.MediaFoundation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI;
 using FileAttributes = System.IO.FileAttributes;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -32,12 +37,12 @@ namespace VusicPlayer
         {
             InitializeComponent();
         }
-        public ObservableCollection<SongModel> SongCollection { get; set; } = new(); 
-        public ObservableCollection<SongModel> SongCollection2 { get; set; } = new(); 
+        public ObservableCollection<SongModel> SongCollection { get; set; } = new();
+        public ObservableCollection<SongModel> SongCollection2 { get; set; } = new();
 
         public void LoadMedia(ObservableCollection<SongModel> songslist, Frame fr)
         {
-      
+
             frm = fr;
             App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(() =>
             {
@@ -58,8 +63,32 @@ namespace VusicPlayer
                 {
                     lstViewPlaylist.ItemsSource = SongCollection;
                 }
+                SongCollection.CollectionChanged += SongCollection_CollectionChanged;
             });
         }
+
+        private void SongCollection_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (PageState.IsQueuePage)
+            {
+                if (e.Action == NotifyCollectionChangedAction.Move)
+                {
+                    Debug.WriteLine("Wait's a shitstick");
+                    // The item that was moved
+                    var movedItem = e.NewItems?[0];
+
+                    int oldIndex = e.OldStartingIndex;
+                    int newIndex = e.NewStartingIndex;
+                    if (oldIndex >= 0 && oldIndex < QueueListHolder.VusicQueue.Count)
+                    {
+                        var itemToMove = QueueListHolder.VusicQueue[oldIndex];
+                        QueueListHolder.VusicQueue.Move(oldIndex, newIndex);
+                    }
+
+                }
+            }
+        }
+
         Frame? frm;
         SongModel selectedSong = new();
         private void lstViewPlaylist_ItemClick(object sender, ItemClickEventArgs e)
@@ -88,7 +117,7 @@ namespace VusicPlayer
                     }
                     paths = new();
                     paths.Add(selectedSong.FilePath);
-                   QueueService.PlayMedia(paths);
+                    QueueService.PlayMedia(paths);
 
                 }
             }
@@ -132,8 +161,25 @@ namespace VusicPlayer
                 };
 
             }
+            var mnftAddtoFav = flyout?.Items
+    .OfType<MenuFlyoutItem>()
+    .FirstOrDefault(x => x.Tag.ToString() == "Favo");
 
-
+            if (mnftAddtoFav == null) return;
+            var heartIcon = mnftAddtoFav.Icon as FontIcon;
+            if (heartIcon == null) return;
+            if (selectedsong.IsFavourite == true)
+            {
+                mnftAddtoFav.Text = "Remove from Favourites";
+                heartIcon.Glyph = "\uEB52";
+                heartIcon.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            else
+            {
+                mnftAddtoFav.Text = "Add to Favourites";
+                heartIcon.Foreground = new SolidColorBrush(Colors.Transparent);
+                heartIcon.Glyph = "\uEB51";
+            }
 
             MenuFlyoutItem playlistitem2 = new MenuFlyoutItem();
             playlistitem2.Text = "New Playlist";
@@ -143,31 +189,59 @@ namespace VusicPlayer
             playlistitem2.Click += async (sender, e) =>
             {
                 if (App.HomeWindowInstance == null) return;
-            
-            
+
+
                 tempsong = selectedsong;
-                List<string> songpathstoadd = new();
+                HashSet<string> songpathstoadd = new();
                 if (selectedsong.FilePath != null)
                 {
                     songpathstoadd.Add(selectedsong.FilePath);
                 }
                 if (frm != null)
                 {
-                    PlaylistDialogNew.LoadPlaylistCreationDialog(false, new PlaylistProperties { SongsPaths = songpathstoadd }, frm);
+                await    PlaylistDialogNew.LoadPlaylistCreationDialog(false, new PlaylistProperties { SongsPaths = songpathstoadd }, frm);
                 }
                 OceanContentDialog.Show("Create Playlist", "Create", "", "Cancel", OceanContentDialogDefault.Primary, contentsNewPlaylist, this.XamlRoot, 600, 760, OceanContentDialogType.Elevated, App.HomeWindowInstance, "addicon", "", "");
                 OceanContentDialog.PrimaryRequested += OceanContentDialog_PrimaryRequested1;
             };
             addToPlaylist?.Items.Add(playlistitem2);
+            var mnftAddtoQueue = flyout?.Items
+    .OfType<MenuFlyoutItem>()
+    .FirstOrDefault(x => x.Text == "Add to Play Queue");
+            if (mnftAddtoQueue == null) return;
+            if (PageState.IsQueuePage == true)
+            {
 
-
+                mnftAddtoQueue.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                mnftAddtoQueue.Visibility = Visibility.Visible;
+            }
+            var mnftPlayNext = flyout?.Items
+  .OfType<MenuFlyoutItem>()
+  .FirstOrDefault(x => x.Text == "Play Next");
+            if (mnftPlayNext == null) return;
+            if (QueueListHolder.VusicQueue.Count == 0)
+            {
+                mnftPlayNext.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                mnftPlayNext.Visibility = Visibility.Visible;
+            }
+            var mnftHeader = flyout?.Items
+.OfType<MenuFlyoutItem>()
+.FirstOrDefault(x => x.Name == "txtHeaderContext");
+            if (mnftHeader == null) return;
+            mnftHeader.Text = selectedsong.Title;
         }
         SongModel tempsong;
         private async void OceanContentDialog_PrimaryRequested1()
         {
             OceanContentDialog.HideDlg();
             HomeWindow.ShowWindow();
-            PlaylistDialogNew.SavePlaylist();
+           // PlaylistDialogNew.SavePlaylist();
         }
 
         private void mnftPlaySong_Click(object sender, RoutedEventArgs e)
@@ -207,7 +281,12 @@ namespace VusicPlayer
 
         private void mnftAddtoQueue_Click(object sender, RoutedEventArgs e)
         {
-
+            var menuFlyoutItem = sender as MenuFlyoutItem;
+            var selectedsong = menuFlyoutItem?.DataContext as SongModel;
+            if (selectedsong != null)
+            {
+                QueueListHolder.VusicQueue.Add(selectedsong);
+            }
         }
 
         private void mnftEditInfo_Click(object sender, RoutedEventArgs e)
@@ -217,13 +296,14 @@ namespace VusicPlayer
 
         private void mnftGoToArtist_Click(object sender, RoutedEventArgs e)
         {
-            var clickedArtist = sender as HyperlinkButton;
-
-            var clickedItem = clickedArtist?.DataContext as SongModel;
-            if (clickedArtist != null)
+            if (sender is FrameworkElement clickedElement)
             {
-
-                frm?.Navigate(typeof(ArtistInfo), clickedItem);
+                // 2. Extract the DataContext (your SongModel)
+                if (clickedElement.DataContext is SongModel clickedItem)
+                {
+                    // 3. Navigate to the Album page
+                    frm?.Navigate(typeof(ArtistInfo), clickedItem);
+                }
             }
         }
 
@@ -231,12 +311,81 @@ namespace VusicPlayer
         {
             GoToAlbum(sender);
         }
-
-        private void mnftAddToFavourites_Click(object sender, RoutedEventArgs e)
+        string justmodfavpath = "";
+        private async void mnftAddToFavourites_Click(object sender, RoutedEventArgs e)
         {
+            var menuFlyoutItem = sender as MenuFlyoutItem;
 
+            var selectedsong = menuFlyoutItem?.DataContext as SongModel;
+            if (selectedsong == null) return;
+            if (selectedsong.FilePath == null) return;
+            var currentSettings = await SettingsHelper.LoadSettingsAsync();
+            var list = currentSettings.Favourites;
+            var favos = currentSettings.Favourites.FirstOrDefault(p => p.FilePath == selectedSong.FilePath);
+            if (favos != null)
+            {
+                selectedsong.IsFavourite = false;
+                list.Remove(favos);
+            }
+            else
+            {
+                selectedsong.IsFavourite = true;
+                list.Add(new FavouritesModel { FilePath = selectedsong.FilePath ?? "" });
+            }
+
+            await SettingsHelper.SaveSettingsAsync(currentSettings);
+
+            justmodfavpath = selectedsong.FilePath;
+            CallFavButton();
+            if (menuFlyoutItem == null) return;
+            var heartIcon = menuFlyoutItem.Icon as FontIcon;
+            if (heartIcon == null) return;
+            if (selectedsong.IsFavourite == true)
+            {
+                menuFlyoutItem.Text = "Remove from Favourites";
+                heartIcon.Glyph = "\uEB52";
+                heartIcon.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            else
+            {
+                menuFlyoutItem.Text = "Add to Favourites";
+                heartIcon.Foreground = new SolidColorBrush(Colors.Transparent);
+                heartIcon.Glyph = "\uEB51";
+            }
         }
+        private void CallFavButton()
+        {
+            if (justmodfavpath == "")
+            {
+                return;
+            }
+            else
+            {
+                if (Favouritebutton == null) return;
+                var rootGrid = Favouritebutton.Content as Grid;
+                if (rootGrid == null) return;
+                if (justmodfavpath != selectedSong.FilePath) return;
+                // 2. Find the FillHeart icon by name within this specific Button
+                var fillHeartIcon = rootGrid.FindName("FillHeart") as FontIcon;
+                if (fillHeartIcon == null) return;
 
+                bool currentlyChecked = fillHeartIcon.Opacity > 0;
+
+                if (!currentlyChecked)
+                {
+                    ToolTipService.SetToolTip(Favouritebutton, "Remove from Favourites");
+
+                    // Pass the specific icon we found to your animation method
+                    AnimateHeart(fillHeartIcon, 1.0, 1.0);
+                }
+                else
+                {
+                    ToolTipService.SetToolTip(Favouritebutton, "Add to Favourites");
+
+                    AnimateHeart(fillHeartIcon, 0.0, 0.0);
+                }
+            }
+        }
         private void mnftMoveup_Click(object sender, RoutedEventArgs e)
         {
             var song = GetSelectedSong(sender);
@@ -343,16 +492,16 @@ namespace VusicPlayer
             {
                 SongCollection.Remove(item);
             }
-          if(btnRemoveSelections.Flyout is Flyout f)
+            if (btnRemoveSelections.Flyout is Flyout f)
             {
                 f.Hide();
             }
-        
+
         }
         public IList<object> SelectedItems => lstViewPlaylist.SelectedItems;
         private void lstViewPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(lstViewPlaylist.SelectedItems.Count > 0)
+            if (lstViewPlaylist.SelectedItems.Count > 0)
             {
                 stkMultiOptions.Visibility = Visibility.Visible;
             }
@@ -374,9 +523,9 @@ namespace VusicPlayer
                 lstViewEdit.SelectedItems.Add(item);
             }
             tbviAlbum.IsSelected = true;
-      
-                txtEditAlbum.Text = SongCollection[0].AlbumName;
-            
+
+            txtEditAlbum.Text = SongCollection[0].AlbumName;
+
         }
 
         private async void OceanContentDialog_PrimaryRequested()
@@ -396,7 +545,7 @@ namespace VusicPlayer
                         var file = TagLib.File.Create(item.FilePath);
                         file.Tag.Album = txtEditAlbum.Text;
                         file.Save();
-                      
+
                     }
                     catch (COMException ex)
                     {
@@ -407,10 +556,10 @@ namespace VusicPlayer
                         Logger.Log(ex.Message, "ListViewMedia.AlbumSetMultiple", Logger.LogLevelType.Error);
                     }
                 }
-                
-             
+
+
             }
-            else if(tbviArtist.IsSelected == true)
+            else if (tbviArtist.IsSelected == true)
             {
                 foreach (SongModel item in lstViewPlaylist.SelectedItems)
                 {
@@ -418,7 +567,7 @@ namespace VusicPlayer
                     {
                         item.Artist = txtEditArtist.Text;
                         var file = TagLib.File.Create(item.FilePath);
-                        file.Tag.AlbumArtists = new[] { txtEditArtist.Text};
+                        file.Tag.AlbumArtists = new[] { txtEditArtist.Text };
 
                         file.Save();
                     }
@@ -458,8 +607,8 @@ namespace VusicPlayer
 
             tbviArtist.IsSelected = true;
             lstViewEdit.ItemsSource = SongCollection;
-                txtEditArtist.Text = SongCollection[0].Artist;
-            
+            txtEditArtist.Text = SongCollection[0].Artist;
+
             foreach (var item in lstViewPlaylist.SelectedItems)
             {
                 lstViewEdit.SelectedItems.Add(item);
@@ -473,7 +622,7 @@ namespace VusicPlayer
             OceanContentDialog.Show("Properties", "Save", "", "Cancel", OceanContentDialogDefault.Primary, MassEditgrd, this.XamlRoot, 600, 600, OceanContentDialogType.Elevated, App.HomeWindowInstance, "saveicon", "", "");
             tbviAddToPlaylist.IsSelected = true;
         }
-        
+
         private async void TabView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (tbviAddToPlaylist.IsSelected)
@@ -483,10 +632,10 @@ namespace VusicPlayer
                 foreach (var item in Playlists)
                 {
                     if (item == null) return;
-                    List<string> playlistitems = new ();
+                    List<string> playlistitems = new();
                     playlistitems!.Add(item.PlaylistName);
                     lstViewAddToPlaylists.ItemsSource = playlistitems;
-                  
+
                 }
             }
         }
@@ -587,35 +736,19 @@ namespace VusicPlayer
             lstViewPlaylist.SelectAll();
         }
         bool isChecked = false;
+        private Button? Favouritebutton;
         private void FavoriteButton_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
+
             if (btn == null) return;
-
-            // 1. Get the Grid inside the Button's Content
-            var rootGrid = btn.Content as Grid;
-            if (rootGrid == null) return;
-
-            // 2. Find the FillHeart icon by name within this specific Button
-            var fillHeartIcon = rootGrid.FindName("FillHeart") as FontIcon;
-            if (fillHeartIcon == null) return;
-            // Note: Since 'isChecked' is likely a local variable, 
-            // it will reset every click. Usually, you'd check the current state:
-            bool currentlyChecked = fillHeartIcon.Opacity > 0;
-
-            if (!currentlyChecked)
+            Favouritebutton = btn;
+            var selectedsong = btn?.DataContext as SongModel;
+            if (selectedsong != null)
             {
-                ToolTipService.SetToolTip(btn, "Remove from Favourites");
-
-                // Pass the specific icon we found to your animation method
-                AnimateHeart(fillHeartIcon, 1.0, 1.0);
+                selectedSong = selectedsong;
             }
-            else
-            {
-                ToolTipService.SetToolTip(btn, "Add to Favourites");
-
-                AnimateHeart(fillHeartIcon, 0.0, 0.0);
-            }
+            CallFavButton();
         }
         private void AnimateHeart(FontIcon target, double targetOpacity, double targetScale)
         {
@@ -645,6 +778,30 @@ namespace VusicPlayer
 
         private void btnRemoveSelectionsFromFavourites_Click(object sender, RoutedEventArgs e)
         {
+
+        }
+
+        private void mnftPlaySongNext_Click(object sender, RoutedEventArgs e)
+        {
+            var menuFlyoutItem = sender as MenuFlyoutItem;
+            var selectedsong = menuFlyoutItem?.DataContext as SongModel;
+            if (selectedsong == null) return;
+            int currentindex = QueueHandler.videoindex;
+            if (currentindex == -1) return;
+            if (selectedsong.FilePath == PlaybackState.CurrentlyPlayingPath) return;
+            var existingSong = QueueListHolder.VusicQueue.FirstOrDefault(x => x.FilePath == selectedsong.FilePath);
+
+            if (existingSong != null)
+            {
+                QueueListHolder.VusicQueue.Remove(existingSong);
+            }
+
+
+            int insertAt = QueueHandler.videoindex + 1;
+
+            insertAt = Math.Max(0, Math.Min(insertAt, QueueListHolder.VusicQueue.Count));
+
+            QueueListHolder.VusicQueue.Insert(insertAt, selectedsong);
 
         }
     }

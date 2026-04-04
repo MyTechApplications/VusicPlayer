@@ -24,7 +24,6 @@ namespace VusicPlayer
 
         public static async Task SaveSettingsAsync(AppSettings settings)
         {
-            // Safety: Never save if the object itself is null
             if (settings == null) return;
 
             await _fileLock.WaitAsync();
@@ -34,20 +33,27 @@ namespace VusicPlayer
 
                 string json = JsonSerializer.Serialize(settings);
 
-                // Use a temporary file first. 
-                // This prevents the "0-byte file" bug if the app crashes during writing.
-                string tempPath = _filePath + ".tmp";
-                await File.WriteAllTextAsync(tempPath, json);
+                // Safety check: Don't overwrite good data with empty data
+                if (string.IsNullOrEmpty(json) || json == "{}") return;
 
-                // Move the temp file to the real path (overwriting the old one)
-                File.Move(tempPath, _filePath, true);
+                string tempPath = _filePath + ".tmp";
+
+                // Use a Stream with a buffer for better performance on larger settings files
+                await File.WriteAllTextAsync(tempPath, json, System.Text.Encoding.UTF8);
+
+                // Overwrite the old file with the new one
+                File.Move(tempPath, _filePath, overwrite: true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to save settings: {ex.Message}");
+                // Consider if you want to re-throw or just log
             }
             finally
             {
                 _fileLock.Release();
             }
         }
-
         public static async Task<AppSettings> LoadSettingsAsync()
         {
             await _fileLock.WaitAsync();

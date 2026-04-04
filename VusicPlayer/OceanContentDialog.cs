@@ -46,14 +46,18 @@ namespace VusicPlayer
             HomeWindow.ShowWindow();
             populs.Hide();
         }
+        public static void ClearSubscribers()
+        {
+            PrimaryRequested = null;
+        }
         public static void Show(string Title, string PrimaryButtonText, string SecondaryButtonText, string CloseButtonText, OceanContentDialogDefault DefaultButton, Microsoft.UI.Xaml.Controls.Grid Contents, XamlRoot root, int Width, int Height, OceanContentDialogType DialogType, Window ParentWindow, string PrimaryButtonIcon, string SecondaryButtonIcon, string CloseButtonIcon)
         {
             bool secondaryvisible = !string.IsNullOrEmpty(SecondaryButtonText);
           
             currentDialog= OceanDialog.ShowDialog(
   Title, secondaryvisible, Contents, DefaultButton, CloseButtonText, PrimaryButtonText, SecondaryButtonText, Width, Height, DialogType, ParentWindow, PrimaryButtonIcon, SecondaryButtonIcon, CloseButtonIcon);
-
-            if(populs == null)
+            currentDialog.ClearInternalEvents();
+            if (populs == null)
             {
                 populs = new();
             }
@@ -61,15 +65,8 @@ namespace VusicPlayer
             populs.Hide();
             CenterDialog.CenterDialogRec(currentDialog, ParentWindow);
             currentDialog.Activate();
-            currentDialog.PrimaryRequested += () =>
-            {
-                PrimaryRequested?.Invoke();
-            };
-            currentDialog.SecondaryRequested += () =>
-            {
-                SecondaryRequested?.Invoke();
-            };
-       
+            currentDialog.PrimaryRequested += () => PrimaryRequested?.Invoke();
+            currentDialog.SecondaryRequested += () => SecondaryRequested?.Invoke();
             if (DialogType == OceanContentDialogType.Movable || DialogType == OceanContentDialogType.Elevated)
             {
                 
