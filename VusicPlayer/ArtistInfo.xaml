@@ -342,14 +342,14 @@ ToolTipService.ToolTip="Set Artist Cover">
                 </GridView>
                 <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Singles"></TextBlock>
                 <TextBlock Text="There are no singles for this artist." Visibility="Collapsed" Name="txtEmptySingles"></TextBlock>
-                <local:ListViewMedia x:Name="lstViewSingles"></local:ListViewMedia>
+                <local:ListViewMasterMedia x:Name="lstViewSingles"></local:ListViewMasterMedia>
                 <StackPanel Orientation="Horizontal" Margin="0, 20">
                     <TextBlock Name="txtPlaylistContentHeader" Style="{StaticResource SubtitleTextBlockStyle}" Text="All Songs"></TextBlock>
                     <TextBlock Margin="10,5" Style="{StaticResource BaseTextBlockStyle}" ToolTipService.ToolTip="Media will play shuffled" Text="shuffled" Name="txtShuffled" Visibility="Collapsed" Foreground="{ThemeResource TextFillColorSecondaryBrush}"></TextBlock>
                 </StackPanel>
                 <TextBlock Text="There are no songs for this artist." Name="txtEmptySongs" Visibility="Collapsed"></TextBlock>
 
-                <local:ListViewMedia x:Name="lstViewAllSongs"></local:ListViewMedia>
+                <local:ListViewMasterMedia  x:Name="lstViewAllSongs"></local:ListViewMasterMedia>
 
             </StackPanel>
         </ScrollView>

@@ -142,7 +142,25 @@ namespace VusicPlayer
        ? string.Join(", ", tag.AlbumArtists)
        : "Unknown Artist";
                         AlbumsList.Add(albumName);
-
+                        var colorbrush = new SolidColorBrush(Microsoft.UI.Colors.White);
+                        var glyph = "\uEC4F";
+                        if (PlaybackState.CurrentlyPlayingPath == file.Path)
+                        {
+                            colorbrush = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
+                            if (PlayerService.MasterPlayer!.IsPlaying)
+                                glyph = "\uE769";
+                            else
+                            {
+                                glyph = "\uE768";
+                            }
+                        }
+                        var settings = await SettingsHelper.LoadSettingsAsync();
+                        var favourites = settings.Favourites;
+                        var favSet = new HashSet<FavouritesModel>(favourites);
+                        bool isfav = favSet.Any(f => f.FilePath == file.Path);
+                        double opac = isfav ? 1.0 : 0.0;
+                        string text = isfav ? "Remove from Favourites" : "Add to Favourites";
+                      
                         var song = new SongModel
                         {
                             Title = string.IsNullOrEmpty(tag.Title) ? file.Name : tag.Title,
@@ -150,7 +168,12 @@ namespace VusicPlayer
                             AlbumName = albumName,
                             SongDuration = tagFile.Properties.Duration,
                             FilePath = file.Path,
-                            Year = year
+                            Year = year,
+                            FavOpacity = opac,
+                            FavString = text,
+                            Glyph = glyph,
+                            IsFavourite = favSet.Any(f => f.FilePath == file.Path),
+                            TitleColor = colorbrush,
                         };
 
                         FoundSongs.Add(song);
@@ -169,9 +192,9 @@ namespace VusicPlayer
                     }
                 }
             }
-            lstViewSingles.LoadMedia(Singles, this.Frame);
+            lstViewSingles.ItemsSource = Singles;
             // 🔹 Load songs into UI ONCE
-            lstViewAllSongs.LoadMedia(FoundSongs, this.Frame);
+            lstViewAllSongs.ItemsSource = FoundSongs;
 
             // 🔹 STEP 3: Group albums
             var groupedAlbums = FoundSongs
@@ -208,8 +231,7 @@ namespace VusicPlayer
                 string yearstring =
                     mostCommonYear > 0 ? mostCommonYear.ToString() : "";
 
-                BitmapImage img =
-                    await LoadExistingThumbnailAsync(album.Key);
+                BitmapImage img =  await LoadExistingThumbnailAsync(album.Key ?? "Unknown Album");
 
                 albumCollection.Add(new ArtistDiscographyAlbumsModel
                 {
@@ -854,7 +876,7 @@ namespace VusicPlayer
                 ifbNoInternet.IsOpen = true;
                 ifbNoInternet.Severity = InfoBarSeverity.Error;
                 ifbActionButton.Click += ActionButton_Click1;
-
+                Logger.Log(ex.Message, "ArtistPage.FindImageOnline", Logger.LogLevelType.Error);
             }
             finally
             {
