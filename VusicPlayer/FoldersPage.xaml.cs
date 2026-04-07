@@ -15,8 +15,10 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -174,7 +176,7 @@ public sealed partial class FoldersPage : Page
         var clickedItem = (VideoItem)e.ClickedItem;
         if (clickedItem == null) return;
         if (clickedItem.FilePath == null) return;
-
+        if (chckSelectMultiple.IsChecked == true) return;
         if (clickedItem.IsFolder)
         {
             var newFolder = new FolderModel
@@ -193,8 +195,8 @@ public sealed partial class FoldersPage : Page
             bool isNewVideo = savedProgress == null;
 
             ObservableCollection<VideoItem> videoItems = new();
-         videoItems.Add(clickedItem);
-            var playerWindow = new MainWindow(videoItems , clickedItem.FilePath, startPosition, isNewVideo);
+            videoItems.Add(clickedItem);
+            var playerWindow = new MainWindow(videoItems, clickedItem.FilePath, startPosition, isNewVideo);
             playerWindow.Activate();
             App.VideoPlayerWindowInstance = playerWindow;
             HomeWindow.HideWindow();
@@ -231,12 +233,12 @@ public sealed partial class FoldersPage : Page
         //Rename File
         if (sender is MenuFlyoutItem { DataContext: VideoItem data } && !data.IsFolder)
         {
-         //   ttRenameFile.IsOpen = true;
+            //   ttRenameFile.IsOpen = true;
             var container = VideoGrid.ContainerFromItem(data) as GridViewItem;
             if (container != null)
             {
                 ttRenameFile.Target = container;
-           //     ttRenameFile.IsOpen = true;
+                //     ttRenameFile.IsOpen = true;
                 ttRenameFile.PreferredPlacement = TeachingTipPlacementMode.Bottom;
             }
             txtRenameFile.Text = Path.GetFileNameWithoutExtension(data.FilePath);
@@ -534,7 +536,10 @@ public sealed partial class FoldersPage : Page
     {
         //Rename Folder
         ttRenameFolder.IsOpen = true;
-        //     txtRenameFolder.Text = txtFolderName.Text;
+        txtRenameFolder.Text = Path.GetFileName(folderloadedpath);
+        txtRenameFolder.Focus(FocusState.Programmatic);
+        txtRenameFolder.SelectAll(); 
+        
     }
     public async Task<StorageFolder> RenameFolderWithNumberAsync(string folderPath, string desiredName)
     {
@@ -553,21 +558,22 @@ public sealed partial class FoldersPage : Page
         folderloadedpath = Path.Combine(parentPath, newName);
         await SettingsHelper.LoadSettingsAsync();
         var folders = await SettingsHelper.LoadSettingsAsync();
-        var newfolder = new FolderModel
+        var currentfold = folders.FoldersRecent.FirstOrDefault(p => p.Path == originalfoldername);
+        if(currentfold != null)
         {
-            Name = newName,
-            Path = folderloadedpath,
-        };
-        folders.FoldersRecent.Add(newfolder);
+            currentfold.Name = newName;
+            currentfold.Path = folderloadedpath;
+        }
+    
         //  txtFolderName.Text = txtRenameFolder.Text;
-
+        brdcbFolderPath.ItemsSource = GetCrumbsFromPath(folderloadedpath);
         await SettingsHelper.SaveSettingsAsync(folders);
         return folder;
     }
     private async void Button_Click_2(object sender, RoutedEventArgs e)
     {
         //Set Folder Name
-        //       originalfoldername = txtFolderName.Text;
+        originalfoldername = Path.GetFileName(currentFolderPath);
         if (txtRenameFolder.Text == "")
         {
             txtRenameFolder.Text = originalfoldername;
@@ -667,7 +673,7 @@ public sealed partial class FoldersPage : Page
         }
     }
 
-   
+
     private void BtnDelete_Click_2(object sender, RoutedEventArgs e)
     {
     }
@@ -683,7 +689,7 @@ public sealed partial class FoldersPage : Page
         {
             if (App.MainWindowInstance is HomeWindow wind)
             {
-                wind.ShowSongDetails(currentFilePath);
+                //     wind.ShowSongDetails(currentFilePath);
             }
         }
         catch (Exception ex)
@@ -855,5 +861,66 @@ public sealed partial class FoldersPage : Page
     private void btnRename_Click_3(object sender, RoutedEventArgs e)
     {
 
+    }
+
+    private void Border_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        brdcbFolderPath.Visibility = Visibility.Collapsed;
+        txtbPathEdit.Visibility = Visibility.Visible;
+        var textBox = FindChild<TextBox>(txtbPathEdit);
+
+        if (textBox != null)
+        {
+            txtbPathEdit.Focus(FocusState.Programmatic);
+            textBox.SelectAll();
+        }
+        txtbPathEdit.Text = currentFolderPath;
+    }
+    public T FindChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T typedChild) return typedChild;
+
+            var result = FindChild<T>(child);
+            if (result != null) return result;
+        }
+        return null;
+    }
+    private async void txtbPathEdit_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        if (Directory.Exists(txtbPathEdit.Text))
+        {
+            var newFolder = new FolderModel
+            {
+                Path = txtbPathEdit.Text,
+                Name = Path.GetFileName(txtbPathEdit.Text)
+            };
+
+            this.Frame.Navigate(typeof(FoldersPage), newFolder);
+
+        }
+        else
+        {
+            if (App.HomeWindowInstance == null) return;
+            txtInvalidDirectory.Text = $"The path {txtbPathEdit.Text} doesn't exist!";
+            ToolTipService.SetToolTip(txtInvalidDirectory, txtbPathEdit.Text);
+            OceanContentDialog.Show("Invalid Path", "OK", "", "", OceanContentDialogDefault.Primary, grdInvalidDirectory, XamlRoot, 500, 500, OceanContentDialogType.Elevated, App.HomeWindowInstance, "", "", "");
+            SystemSounds.Asterisk.Play();
+            OceanContentDialog.PrimaryRequested += OceanContentDialog_PrimaryRequested ;
+        }
+    }
+
+    private void OceanContentDialog_PrimaryRequested()
+    {
+        OceanContentDialog.HideDlg();
+        HomeWindow.ShowWindow();
+    }
+
+    private void Border_LostFocus(object sender, RoutedEventArgs e)
+    {
+        brdcbFolderPath.Visibility = Visibility.Visible;
+        txtbPathEdit.Visibility = Visibility.Collapsed;
     }
 }

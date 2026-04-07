@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -29,25 +30,27 @@ namespace VusicPlayer
 
         private void PlayerService_CurrentPlayState(string? obj)
         {
-            if (obj == "Paused")
+            App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(() =>
             {
-                if (FilePath == PlaybackState.CurrentlyPlayingPath)
+                if (obj == "Paused")
                 {
-                    Glyph = "\uE768"; // Paused icon
-                    TitleColor = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
-                    isPaused = true;
+                    if (FilePath == PlaybackState.CurrentlyPlayingPath)
+                    {
+                        Glyph = "\uE768";
+                        TitleColor = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
+                        isPaused = true;
+                    }
                 }
-
-            }
-            else
-            {
-                if (FilePath == PlaybackState.CurrentlyPlayingPath)
+                else
                 {
-                    isPaused = false;
-                    Glyph = "\uE769"; // Paused icon
-                    TitleColor = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
+                    if (FilePath == PlaybackState.CurrentlyPlayingPath)
+                    {
+                        isPaused = false;
+                        Glyph = "\uE769";
+                        TitleColor = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
+                    }
                 }
-            }
+            });
         }
 
         public bool isPaused { get; set; }
@@ -55,22 +58,46 @@ namespace VusicPlayer
         {
             UpdateVisualState(newPath);
         }
-        private void UpdateVisualState(string? currentPath)
+        private DateTime _dateModified;
+        public DateTime DateModified
         {
-            if (FilePath == currentPath)
+            get => _dateModified;
+            set
             {
-                if (PlayerService.MasterPlayer.IsPlaying)
-                    Glyph = "\uE769"; // Playing icon
-                else
-                    Glyph = "\uE768"; // Paused icon
-                TitleColor = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
-            }
-            else
-            {
-                Glyph = "\uEC4F"; // Default icon
-                TitleColor = new SolidColorBrush(Microsoft.UI.Colors.White);
+                _dateModified = value;
+                OnPropertyChanged(nameof(DateModified));
             }
         }
+        private DateTime _dateCreated;
+        public DateTime DateCreated
+        {
+            get => _dateCreated;
+            set
+            {
+                _dateCreated = value;
+                OnPropertyChanged(nameof(DateCreated));
+            }
+        }
+        private void UpdateVisualState(string? currentPath)
+        {
+            App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(() =>
+            {
+                if (FilePath == currentPath)
+                {
+                    if (PlayerService.MasterPlayer!.IsPlaying)
+                        Glyph = "\uE769"; // Playing icon
+                    else
+                        Glyph = "\uE768"; // Paused icon
+                    TitleColor = new SolidColorBrush(Microsoft.UI.Colors.Cyan);
+                }
+                else
+                {
+                    Glyph = "\uEC4F"; // Default icon
+                    TitleColor = new SolidColorBrush(Microsoft.UI.Colors.White);
+                }
+            });
+        }
+
 
         public bool isPlaying => FilePath == PlaybackState.CurrentlyPlayingPath;
         public string? Title
@@ -92,12 +119,25 @@ namespace VusicPlayer
         private Visibility isMovableitem = Visibility.Visible;
         public Visibility IsMovableItem
         {
-            get => isMovableitem;   
+            get => isMovableitem;
             set
             {
                 if (isMovableitem != value)
                 {
                     isMovableitem = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private Visibility isArtistItem = Visibility.Visible;
+        public Visibility IsArtistItem
+        {
+            get => isArtistItem;
+            set
+            {
+                if (isArtistItem != value)
+                {
+                    isArtistItem = value;
                     OnPropertyChanged();
                 }
             }
@@ -126,6 +166,18 @@ namespace VusicPlayer
             get => _glyph;
             set { _glyph = value; OnPropertyChanged(nameof(Glyph)); }
         }
+        private string mediatype = "Playlist";// Default color
+        public string MediaType
+        {
+            get => mediatype;
+            set { mediatype = value; OnPropertyChanged(nameof(MediaType)); }
+        }
+        private string removetext = "Remove";// Default color
+        public string Remove
+        {
+            get => removetext;
+            set { removetext = value; OnPropertyChanged(nameof(Remove)); }
+        }
         private bool _isCompleted;
         private bool isFav;
         public bool IsCompleted
@@ -150,7 +202,22 @@ namespace VusicPlayer
         public string FormattedDuration => SongDuration.HasValue
             ? $"{(int)SongDuration.Value.TotalMinutes:D2}:{SongDuration.Value.Seconds:D2}"
             : "00:00";
-        public string? FilePath { get; set; }
+        private string? _filePath;
+        public string? FilePath
+        {
+            get => _filePath;
+            set
+            {
+                _filePath = value;
+                // Fetch once when path is set
+                if (System.IO.File.Exists(_filePath))
+                {
+                    DateModified = System.IO.File.GetLastWriteTime(_filePath);
+                    DateCreated = File.GetCreationTime(_filePath);
+                }
+                OnPropertyChanged(nameof(FilePath));
+            }
+        }
         public event PropertyChangedEventHandler? PropertyChanged;
         private bool _isFavorite;
         public bool IsFavourite

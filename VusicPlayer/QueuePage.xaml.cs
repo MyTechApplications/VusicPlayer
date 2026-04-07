@@ -128,6 +128,7 @@ namespace VusicPlayer
             btnVolume.IsEnabled = true;
             sldVolume.IsEnabled = true;
             btnNext.IsEnabled = true;
+            btnOptions.IsEnabled = true;
             var player = PlayerService.MasterPlayer;
             if (player == null) return;
             if (player.IsPlaying)
@@ -1532,26 +1533,14 @@ s.Title?.StartsWith(query, StringComparison.OrdinalIgnoreCase) == true)
         {
             if (PlayerService.MasterPlayer != null)
             {
-                Debug.WriteLine("CHECK1");
-                string pitchString = obj.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
-                if (PlayerService.MasterPlayer.Config.Audio.Filters == null)
-                    PlayerService.MasterPlayer.Config.Audio.Filters = new();
-
-                var pitchFilter = new Filter()
+                if (obj == 0) return;
+                PlayerService.MasterPlayer.Config.Audio.Pitch = obj;
+                PlayerService.MasterPlayer.Config.Audio.ReloadFilters();
+                txtPitchValue.Text = obj.ToString("F4");
+                if(stkPitchCustom.Visibility == Visibility.Visible)
                 {
-                    Name = "pitch_control",
-                    Args = "asetrate=44100,atempo=1.0"
-                };
-                int newRate = (int)(44100 * obj);
-
-                // We also have to adjust atempo to counteract the speed change
-                // If pitch is 1.5x, we set tempo to 1/1.5 (0.66) to stay at normal speed
-                double compensationTempo = 1.0 / obj;
-                string tempoStr = compensationTempo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
-
-                // Update both keys in your named filter
-                PlayerService.MasterPlayer.Config.Audio.UpdateFilter("pitch_control", "sample_rate", newRate.ToString());
-                PlayerService.MasterPlayer.Config.Audio.UpdateFilter("pitch_control", "atempo", tempoStr);
+                    nmbPitchCustom.Value = sldPitch.Value;
+                }
             }
         }
         string tempid = "";
@@ -1568,6 +1557,51 @@ s.Title?.StartsWith(query, StringComparison.OrdinalIgnoreCase) == true)
             if (playlist != null)
             {
                 this.Frame.Navigate(typeof(Playlist), playlist);
+            }
+        }
+
+        private void nmbPitchCustom_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            sldPitch.Value = nmbPitchCustom.Value;
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            if(stkPitchCustom.Visibility == Visibility.Visible)
+            {
+                stkPitchCustom.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                stkPitchCustom.Visibility = Visibility.Visible;
+
+            }
+            nmbPitchCustom.Value = sldPitch.Value;
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            if (PlayerService.MasterPlayer != null)
+            {
+                if (nmbPitchCustom.Value == 0) return;
+                PlayerService.MasterPlayer.Config.Audio.Pitch = nmbPitchCustom.Value;
+                PlayerService.MasterPlayer.Config.Audio.ReloadFilters();
+                txtPitchValue.Text = nmbPitchCustom.Value.ToString("F4");
+            }
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            if (PlayerService.MasterPlayer != null)
+            {
+                PlayerService.MasterPlayer.Config.Audio.Pitch = 1;
+                PlayerService.MasterPlayer.Config.Audio.ReloadFilters();
+                txtPitchValue.Text = "1.0";
+                sldPitch.Value = 1;
+                if (stkPitchCustom.Visibility == Visibility.Visible)
+                {
+                    nmbPitchCustom.Value = sldPitch.Value;
+                }
             }
         }
     }

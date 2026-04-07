@@ -119,7 +119,7 @@ CornerRadius="16"
                         </StackPanel>
                     </Button>
 
-                    <ToggleButton Background="Transparent" BorderBrush="Transparent" Name="btnShuffle" Click="btnShuffle_Click" Margin="5"
+                    <ToggleButton Background="Transparent" BorderBrush="Transparent" Name="btnShuffle" Checked="btnShuffle_Checked" Unchecked="btnShuffle_Unchecked" Margin="5"
                   ToolTipService.ToolTip="Shuffle playlist">
                         <Image Width="25" Source="/Assets/shuffleicon.png" />
                     </ToggleButton>
@@ -132,7 +132,7 @@ CornerRadius="16"
                         </StackPanel>
 
                     </Button>
-                    <Button Name="btnSetArtistProfilePicture" Margin="5"
+                    <Button Name="btnSetArtistProfilePicture" Margin="5" Background="Transparent" BorderBrush="Transparent" 
 ToolTipService.ToolTip="Set Artist Cover">
                         <Button.Flyout>
                             <Flyout>

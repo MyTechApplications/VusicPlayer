@@ -105,21 +105,48 @@
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
+            <ContentDialog>
+                <Grid Name="grdInvalidDirectory" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Image Width="50" Source="/Assets/sourceerror.png" Grid.Column="0"></Image>
+                    <TextBlock Margin="10, 0" VerticalAlignment="Center" TextWrapping="Wrap" Name="txtInvalidDirectory" Grid.Column="1"></TextBlock>
+                </Grid>
+            </ContentDialog>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <BreadcrumbBar Name="brdcbFolderPath" ItemClicked="brdcbFolderPath_ItemClicked" >
-                    <BreadcrumbBar.ItemTemplate>
-                        <DataTemplate x:DataType="local:FolderNode">
-                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Label}" />
-                        </DataTemplate>
-                    </BreadcrumbBar.ItemTemplate>
-                </BreadcrumbBar>                
-                <Button Margin="10, 0" ToolTipService.ToolTip="Rename Folder" Name="btnRenameFolder" Click="Button_Click_1">
-                    <Image Width="20" Source="/Assets/renameicon.png"></Image>
+                <Border 
+Padding="10,0" Tapped="Border_Tapped" LostFocus="Border_LostFocus"
+VerticalAlignment="Top" 
+HorizontalAlignment="Center"
+Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" 
+BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+BorderThickness="1" 
+CornerRadius="12">
+                    <Grid>
+                    <AutoSuggestBox Visibility="Collapsed" Name="txtbPathEdit" QuerySubmitted="txtbPathEdit_QuerySubmitted"></AutoSuggestBox>
+                    <BreadcrumbBar Name="brdcbFolderPath" ItemClicked="brdcbFolderPath_ItemClicked" >
+                        <BreadcrumbBar.ItemTemplate>
+                            <DataTemplate x:DataType="local:FolderNode">
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Label}" />
+                            </DataTemplate>
+                        </BreadcrumbBar.ItemTemplate>
+                        </BreadcrumbBar>
+                    </Grid>
+                </Border>
+             
+                <Button Margin="10, 4"  Background="Transparent" ToolTipService.ToolTip="Rename Folder" Name="btnRenameFolder" Click="Button_Click_1">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        
+                        <Image Width="20" Source="/Assets/renameicon.png"></Image>
+                        <TextBlock Text="Rename Folder"></TextBlock>
+                    </StackPanel>
                 </Button>
-                <TeachingTip Name="ttRenameFolder" IsOpen="False" Target="{x:Bind btnRenameFolder}">
-                    <StackPanel Orientation="Vertical">
+                <TeachingTip Name="ttRenameFolder" IsLightDismissEnabled="False" IsOpen="False" Target="{x:Bind btnRenameFolder}">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" Margin="0, 30">
                         <TextBox Name="txtRenameFolder" PlaceholderText="Rename Folder"></TextBox>
-                        <Button Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10, 5" Click="Button_Click_2" Padding="2">
+                        <Button Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10, 10" Click="Button_Click_2" Padding="2">
                       
                             <StackPanel Orientation="Horizontal">
                                 <Image Width="25" Source="/Assets/tickicon.png"></Image>

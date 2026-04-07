@@ -220,6 +220,10 @@ namespace VusicPlayer
                     new Uri($"ms-appx:///Assets/{iconName}.png")
                 );
             }
+            else
+            {
+                img.Visibility = Visibility.Collapsed;
+            }
         }
         public void Setup(string Title, bool secondaryvisible, Grid contents, OceanContentDialogDefault dlg, string CloseButtonTex, string primarybtntex, string secondarybtntext, string pbi, string sbi, string cbi)
         {

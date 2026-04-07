@@ -4,6 +4,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="../../Tes/Flyleaf/FlyleafLib/FlyleafLib.csproj" />
   <Project Path="Updater/Updater.csproj" Id="ac08451b-e9c6-4f96-b6dd-5eacb6b66b22">
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />

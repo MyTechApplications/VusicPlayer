@@ -1,3 +1,4 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -371,8 +372,13 @@ namespace VusicPlayer
             {
                 if (clickedVideo.FilePath != null)
                 {
+                 
                     var playerWindow = new MainWindow(loadedVideos, clickedVideo.FilePath, clickedVideo.CurrentDuration, false);
+                    var appWindow = playerWindow.AppWindow;
+                    if(appWindow.Presenter is OverlappedPresenter presenter)
+                    {
 
+                    }
                     playerWindow.Activate();
                     App.VideoPlayerWindowInstance = playerWindow;
                     HomeWindow.HideWindow();
@@ -535,7 +541,16 @@ namespace VusicPlayer
 
         private void MenuFlyoutItem_Click_7(object sender, RoutedEventArgs e)
         {
-
+            if (sender is FrameworkElement element && element.DataContext is VideoProgress song)
+            {
+                if (App.MainWindowInstance is HomeWindow homeWindow)
+                {
+                    if (!string.IsNullOrEmpty(song.FilePath))
+                    {
+                //        homeWindow.ShowSongDetails(song.FilePath);
+                    }
+                }
+            }
         }
         private static readonly string[] AudioExtensions = { ".mp3", ".wav", ".ogg", ".m4a", ".aac", ".wma", ".flac", ".ac3", ".alac", ".aiff", ".opus", ".ape", ".wv", ".tta", ".dsf", ".dff", ".mp2", ".amr", ".au", ".snd", ".mka" };
         private static readonly string[] VideoExtensions = { ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".ts", ".m2ts", ".mts", ".3gp", ".3g2", ".f4v", ".mpg", ".mpeg", ".vob", ".asf", ".rm", ".rmvb", ".ogv" };

@@ -6,10 +6,10 @@
     xmlns:local="using:VusicPlayer"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
-    xmlns:ui="using:CommunityToolkit.WinUI"
-       xmlns:winui="using:FlyleafLib.Controls.WinUI"
-    mc:Ignorable="d">
+ mc:Ignorable="d"
+    xmlns:ui="using:CommunityToolkit.WinUI">
+    <!--xmlns:winui="using:FlyleafLib.Controls.WinUI"-->
+   
     <Grid PointerMoved="Grid_PointerMoved" PointerEntered="Grid_PointerEntered">
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -18,7 +18,7 @@
         <Grid Name="Load" >
             <ProgressRing HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True"></ProgressRing>
         </Grid>
-        <winui:FlyleafHost Grid.Row="0" PointerMoved="videoView_PointerMoved" PointerEntered="videoView_PointerEntered"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="mediaPlayerMain"></winui:FlyleafHost>
+        <!--<winui:FlyleafHost Grid.Row="0" PointerMoved="videoView_PointerMoved" PointerEntered="videoView_PointerEntered"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="mediaPlayerMain"></winui:FlyleafHost>-->
         <TextBlock Text="+10" Name="txtSeekForward" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="50, 0" Style="{StaticResource TitleLargeTextBlockStyle}" Opacity="0"></TextBlock>
         <TextBlock Foreground="White" Name="txtLoaded"  IsHitTestVisible="True" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="50, 50, 0, 0" Style="{StaticResource SubtitleTextBlockStyle}" Opacity="0"></TextBlock>
         <Button Visibility="Collapsed" BorderThickness="0" HorizontalAlignment="Right" Width="200" VerticalAlignment="Bottom" Name="btnNextVideo" Margin="10, 150" Click="btnNext_Click" Background="Transparent" BorderBrush="Transparent">

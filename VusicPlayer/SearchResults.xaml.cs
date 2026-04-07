@@ -191,7 +191,7 @@ namespace VusicPlayer
                 case "mnftSongDetails":
                     if (App.MainWindowInstance is HomeWindow wind)
                     {
-                        wind.ShowSongDetails(selectedsong.FilePath);
+                     //   wind.ShowSongDetails(selectedsong.FilePath);
                     }
                     break;
                 case "mnftAddtoPlaylist":

@@ -307,11 +307,18 @@ AlwaysUseFallback="False"/>
 
                                     </StackPanel>
                                     <TeachingTip Name="ttPitch" IsOpen="False" Target="{x:Bind btnOptions}">
-                                        <StackPanel Orientation="Vertical" Spacing="5">
-                                            <TextBlock Text="Pitch" Style="{StaticResource BaseTextBlockStyle}"></TextBlock>
-                                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                                <local:SliderReuse Width="200" IsTooltipEnabled="False" x:Name="sldPitch" Value="50" Maximum="100" ValueChanged="sldPitch_ValueChanged"></local:SliderReuse>
-                                                <TextBlock Name="txtPitchValue" ></TextBlock>
+                                        <StackPanel Margin="5, 0" Orientation="Vertical" Spacing="10">
+                                            <TextBlock  Text="Pitch" Style="{StaticResource BaseTextBlockStyle}"></TextBlock>
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <local:SliderReuse Width="200" IsTooltipEnabled="False" x:Name="sldPitch"  Value="1" Maximum="7" Minimum="0.1" ValueChanged="sldPitch_ValueChanged"></local:SliderReuse>
+                                                <TextBlock Text="1.0" Margin="0,4" Name="txtPitchValue" ></TextBlock>
+                                            </StackPanel>
+                                            <Button Content="Reset Pitch" Click="Button_Click_5"></Button>
+                                            <ToggleButton Content="Custom" Click="Button_Click_3"></ToggleButton>
+
+                                            <StackPanel Visibility="Collapsed" Orientation="Horizontal" Name="stkPitchCustom" Spacing="5">
+                                                <NumberBox Minimum="0.06" Maximum="7" SmallChange="0.1" LargeChange="1" SpinButtonPlacementMode="Inline" Name="nmbPitchCustom" ValueChanged="nmbPitchCustom_ValueChanged"></NumberBox>
+                                                <Button Content="Set Pitch" Click="Button_Click_4"></Button>
                                             </StackPanel>
                                         </StackPanel>
                                     </TeachingTip>

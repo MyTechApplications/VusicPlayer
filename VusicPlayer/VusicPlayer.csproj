@@ -30,6 +30,7 @@
     <None Remove="ListViewMasterMedia.xaml" />
     <None Remove="ListViewMedia.xaml" />
     <None Remove="LogPage.xaml" />
+    <None Remove="MasterPage.xaml" />
     <None Remove="MediaControls.xaml" />
     <None Remove="MiniPlayerWind.xaml" />
     <None Remove="MusicLibrary.xaml" />
@@ -48,6 +49,7 @@
     <None Remove="VideoLib.xaml" />
     <None Remove="VideoLibrary.xaml" />
     <None Remove="VideoOptionsWindow.xaml" />
+    <None Remove="WindowPopup.xaml" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -74,20 +76,28 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219" />
     <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
-    <PackageReference Include="Flyleaf.FFmpeg.Bindings" Version="8.0.1" />
-    <PackageReference Include="FlyleafLib" Version="3.10.3" />
-    <PackageReference Include="FlyleafLib.Controls.WinUI" Version="1.3.3" />
+    <PackageReference Include="Flyleaf.FFmpeg.Bindings" Version="8.0.0" />
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.2" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Tes\Flyleaf\FlyleafLib\FlyleafLib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Assets\appicon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="MasterPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="WindowPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ListViewMasterMedia.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -202,10 +202,10 @@ namespace VusicPlayer
                 currentSettings.SavedPlaylists.Add(newPlaylist);
                 await SettingsHelper.SaveSettingsAsync(currentSettings);
                 MyItems.Add(newPlaylist);
-            
+
                 OceanContentDialog.HideDlg();
                 HomeWindow.ShowWindow();
-             
+
 
                 UIUpdate();
             }
@@ -225,7 +225,7 @@ namespace VusicPlayer
             var files = await PickFiles.PickAudioFileAsync(App.HomeWindowInstance, "Choose Audio");
             if (files != null)
             {
-           
+
 
                 if (files.Path != null)
                 {
@@ -238,7 +238,8 @@ namespace VusicPlayer
                         string album = !string.IsNullOrWhiteSpace(properties.Album) ? properties.Album : "Unknown Album";
                         string artist = !string.IsNullOrWhiteSpace(properties.Artist) ? properties.Artist : "Unknown Artist";
                         ObservableCollection<SongModel> temp = new();
-                        temp.Add(new SongModel {
+                        temp.Add(new SongModel
+                        {
                             Title = title,
                             AlbumName = album,
                             Artist = artist,
@@ -690,7 +691,7 @@ namespace VusicPlayer
                 }
             }
             lstViewPlaylistAddedSongs.StartBringIntoView();
-            lstViewPlaylistAddedSongs.ItemsSource = AllSongs;   
+            lstViewPlaylistAddedSongs.ItemsSource = AllSongs;
         }
 
         private void asbSearchSongs_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -726,6 +727,20 @@ namespace VusicPlayer
             CoverOptions.Visibility = Visibility.Collapsed;
             btnAddPlaylistCover.IsEnabled = true;
             imgPlaylistCov.Source = new BitmapImage(new Uri("ms-appx:///Assets/playlistdefaultdark.png"));
+        }
+
+        private void MenuFlyoutItem_Click_3(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.DataContext is RecentMusic song)
+            {
+                if (App.MainWindowInstance is HomeWindow homeWindow)
+                {
+                    if (!string.IsNullOrEmpty(song.SongPath))
+                    {
+                 //       homeWindow.ShowSongDetails(song.SongPath);
+                    }
+                }
+            }
         }
     }
         #endregion

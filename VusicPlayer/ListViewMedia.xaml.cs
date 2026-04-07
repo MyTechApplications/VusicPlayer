@@ -270,7 +270,7 @@ namespace VusicPlayer
             var selectedsong = menuFlyoutItem?.DataContext as SongModel;
             if (App.MainWindowInstance is HomeWindow wind)
             {
-                wind.ShowSongDetails(selectedsong.FilePath);
+         //       wind.ShowSongDetails(selectedsong.FilePath);
             }
         }
 

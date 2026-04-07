@@ -160,7 +160,7 @@ namespace VusicPlayer
                         bool isfav = favSet.Any(f => f.FilePath == file.Path);
                         double opac = isfav ? 1.0 : 0.0;
                         string text = isfav ? "Remove from Favourites" : "Add to Favourites";
-                      
+
                         var song = new SongModel
                         {
                             Title = string.IsNullOrEmpty(tag.Title) ? file.Name : tag.Title,
@@ -169,9 +169,12 @@ namespace VusicPlayer
                             SongDuration = tagFile.Properties.Duration,
                             FilePath = file.Path,
                             Year = year,
+                            Remove = "Remove from artist",
+                            MediaType = "ArtistAll",
                             FavOpacity = opac,
                             FavString = text,
                             Glyph = glyph,
+                            IsArtistItem = Visibility.Collapsed,
                             IsFavourite = favSet.Any(f => f.FilePath == file.Path),
                             TitleColor = colorbrush,
                         };
@@ -231,7 +234,7 @@ namespace VusicPlayer
                 string yearstring =
                     mostCommonYear > 0 ? mostCommonYear.ToString() : "";
 
-                BitmapImage img =  await LoadExistingThumbnailAsync(album.Key ?? "Unknown Album");
+                BitmapImage img = await LoadExistingThumbnailAsync(album.Key ?? "Unknown Album");
 
                 albumCollection.Add(new ArtistDiscographyAlbumsModel
                 {
@@ -257,15 +260,17 @@ namespace VusicPlayer
             int count2 = albumCollection.Count;
             txtAlbumCount.Text =
              $"• {count2} {(count2 == 1 ? "Album" : "Albums")}";
-            var sortedArtists = uniqueArtists.OrderBy(a => a);
+            var 
+                edArtists = uniqueArtists.OrderBy(a => a);
             if (Singles.Count == 0)
             {
                 txtEmptySingles.Visibility = Visibility.Visible;
+                lstViewSingles.Visibility = Visibility.Collapsed;
             }
             else
             {
                 txtEmptySingles.Visibility = Visibility.Collapsed;
-
+                lstViewSingles.Visibility = Visibility.Visible;
             }
             if (FoundSongs.Count == 0)
             {
@@ -330,6 +335,7 @@ namespace VusicPlayer
                 var existingArtist = currentSettings.ArtistsList?
                     .FirstOrDefault(a => a.Name == txtArtistName.Text);
                 mostplayedsongs.CollectionChanged += Mostplayedsongs_CollectionChanged;
+                FoundSongs.CollectionChanged += FoundSongs_CollectionChanged;
                 if (existingArtist != null && !string.IsNullOrEmpty(existingArtist.Thumbnail))
                 {
                     try
@@ -351,8 +357,55 @@ namespace VusicPlayer
             }
         }
 
-        private void Mostplayedsongs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void FoundSongs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (var removedItem in e.OldItems.Cast<SongModel>())
+                    {
+                        if (removedItem.FilePath != null)
+                        {
+                            if (FileReady.IsFileReady(removedItem.FilePath))
+                            {
+                                var file = TagLib.File.Create(removedItem.FilePath);
+                                file.Tag.AlbumArtists = file.Tag.AlbumArtists
+                .Where(artist => artist != txtArtistName.Text)
+                .ToArray();
+
+                                file.Save();
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        private async void Mostplayedsongs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    var currentSettings = await SettingsHelper.LoadSettingsAsync();
+                    var Recentmusic = currentSettings.RecentMusic;
+                    foreach (var removedItem in e.OldItems.Cast<SongModel>())
+                    {
+                        var match = Recentmusic.FirstOrDefault(rm =>
+                                string.Equals(rm.SongPath, removedItem.FilePath, StringComparison.OrdinalIgnoreCase));
+
+                        // 2. If a match is found, remove it
+                        if (match != null)
+                        {
+                            Recentmusic.Remove(match);
+                        }
+                    }
+                    await SettingsHelper.SaveSettingsAsync(currentSettings);
+                }
+
+            }
         }
 
         private bool IsFileLocked(IOException exception)
@@ -424,33 +477,6 @@ namespace VusicPlayer
 
         private void btnShuffle_Click(object sender, RoutedEventArgs e)
         {
-            if (btnShuffle.IsChecked == true)
-            {
-                shuffleenabled = true;
-                txtShuffled.Visibility = Visibility.Visible;
-
-            }
-            else
-            {
-                shuffleenabled = false;
-                txtShuffled.Visibility = Visibility.Collapsed;
-                if (playallrunning == true)
-                {
-                    if (paths.Count != 0)
-                    {
-                        paths.Clear();
-                    }
-                    paths = new();
-                    foreach (var itm in FoundSongs)
-                    {
-                        if (itm.FilePath != null)
-                        {
-                            paths.Add(itm.FilePath);
-                        }
-                    }
-                    PlayerService.UpdatePlayQueue(paths);
-                }
-            }
 
         }
 
@@ -490,9 +516,11 @@ namespace VusicPlayer
             {
                 if (FoundSongs.Count > 0)
                 {
-                    var clickedPlaylist = e.ClickedItem as ArtistDiscographyAlbumsModel;
-                    var songtemp = new SongModel { AlbumName = clickedPlaylist.AlbumName };
-                    this.Frame?.Navigate(typeof(Album), songtemp);
+                    if (e.ClickedItem is ArtistDiscographyAlbumsModel clickedPlaylist)
+                    {
+                        var songtemp = new SongModel { AlbumName = clickedPlaylist.AlbumName };
+                        this.Frame?.Navigate(typeof(Album), songtemp);
+                    }
                 }
             }
         }
@@ -586,6 +614,7 @@ namespace VusicPlayer
                     }
                 }
             }
+          await  Task.Delay(1500);
             SearchFiles();
         }
         ObservableCollection<SongModel> mostplayedsongs = new();
@@ -609,6 +638,8 @@ namespace VusicPlayer
                     string title = !string.IsNullOrWhiteSpace(properties.Title) ? properties.Title : file.DisplayName;
                     string album = !string.IsNullOrWhiteSpace(properties.Album) ? properties.Album : "Unknown Album";
                     string artist = !string.IsNullOrWhiteSpace(properties.Artist) ? properties.Artist : "Unknown Artist";
+                    var filetag = TagLib.File.Create(item.SongPath);
+                    var Artists = filetag.Tag.AlbumArtists;
                     var settings = await SettingsHelper.LoadSettingsAsync();
                     var favourites = settings.Favourites;
                     var favSet = new HashSet<FavouritesModel>(favourites);
@@ -627,7 +658,7 @@ namespace VusicPlayer
                         }
                     }
                     string text = isfav ? "Remove from Favourites" : "Add to Favourites";
-                    if (artist == txtArtistName.Text)
+                    if (Artists.Contains(txtArtistName.Text, StringComparer.OrdinalIgnoreCase))
                     {
                         var SongModelt = new SongModel
                         {
@@ -641,7 +672,10 @@ namespace VusicPlayer
                             IsFavourite = favSet.Any(f => f.FilePath == file.Path),
                             Glyph = glyph,
                             TitleColor = colorbrush,
+                            Remove = "Remove from History",
+                            MediaType = "ArtistMP",
                             IsMovableItem = Visibility.Collapsed,
+                            IsArtistItem = Visibility.Collapsed
                         };
                         mostplayedsongs.Add(SongModelt);
                     }
@@ -650,7 +684,7 @@ namespace VusicPlayer
                 lstViewMasterMostPlayed.ItemsSource = mostplayedsongs;
 
             }
-            if(mostplayedsongs.Count == 0)
+            if (mostplayedsongs.Count == 0)
             {
                 lstViewMasterMostPlayed.Visibility = Visibility.Collapsed;
                 txtEmptyMostPlayed.Visibility = Visibility.Visible;
@@ -1194,6 +1228,43 @@ namespace VusicPlayer
         private void mnftDeleteAlbum_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+        ObservableCollection<SongModel> original = new();
+
+        private void Shuffle()
+        {
+
+            if (btnShuffle.IsChecked == true)
+            {
+                original.Clear();
+                foreach (var item in QueueListHolder.VusicQueue)
+                {
+                    original.Add(item);
+                }
+                QueueHandler.ShuffleList();
+            }
+            else
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    QueueListHolder.VusicQueue.Clear();
+                    foreach (var item in original)
+                    {
+                        QueueListHolder.VusicQueue.Add(item);
+                    }
+                });
+                QueueHandler.ResetVideoIndex();
+            }
+        }
+
+        private void btnShuffle_Checked(object sender, RoutedEventArgs e)
+        {
+            Shuffle();
+        }
+
+        private void btnShuffle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Shuffle();
         }
 
         private void cropCircle_PointerReleased(object sender, PointerRoutedEventArgs e)

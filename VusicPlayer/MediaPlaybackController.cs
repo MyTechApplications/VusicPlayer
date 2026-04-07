@@ -69,6 +69,12 @@ namespace VusicPlayer
             get => volumetext;
             set { volumetext = value; OnPropertyChanged(); }
         }
+        private string playpausetooltip = "Play";
+        public string PlayPauseToolTipSer
+        {
+            get => playpausetooltip;
+            set { playpausetooltip = value; OnPropertyChanged(); }
+        }
         private string volglyph = "\uE767";
         public string VolumeGlyph
         {

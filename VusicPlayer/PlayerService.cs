@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
@@ -67,12 +68,11 @@ namespace VusicPlayer
                 _ => Colors.White
             };
 
-       volForeground= new SolidColorBrush(iconColor);
+            volForeground = new SolidColorBrush(iconColor);
         }
 
         public static void CreatePlayer()
         {
-            Debug.WriteLine("Called Create Player");
             if (MasterPlayer == null)
             {
                 MasterPlayer = new Player();
@@ -84,9 +84,9 @@ namespace VusicPlayer
                 maintimer.Tick += Maintimer_Tick;
             }
             MasterPlayer.PlaybackStopped += MasterPlayer_PlaybackStopped;
-       
-                maintimer.Start();
-            
+
+            maintimer.Start();
+
         }
         public static async void PlayFile(string path)
         {
@@ -95,51 +95,69 @@ namespace VusicPlayer
 
 
             StorageFile file = await StorageFile.GetFileFromPathAsync(path);
-                var musicProps = await file.Properties.GetMusicPropertiesAsync();
+            var musicProps = await file.Properties.GetMusicPropertiesAsync();
 
-                TimeSpan duration = musicProps.Duration;
-                //    sldMain!.Maximum = duration.TotalSeconds;
-                UIController.TotalDuration = duration.TotalSeconds;
-                UIController.TotalDurationString = duration.ToString(@"hh\:mm\:ss");
-                UIController.SongDisplayName = Path.GetFileName(path);
-                string album = !string.IsNullOrWhiteSpace(musicProps.Album) ? musicProps.Album : "Unknown Album";
-                string artist = !string.IsNullOrWhiteSpace(musicProps.Artist) ? musicProps.Artist : "Unknown Artist";
-                UIController.AlbumDisplayName = album;
-                UIController.ArtistDisplayName = artist;
-                await LoadMediaAsync(path);
-            
-                MasterPlayer?.Open(path);
-                Play();
-            var settings = await SettingsHelper.LoadSettingsAsync();
-            var existingSong = settings.RecentMusic.FirstOrDefault(x => x.SongPath == path);
-            if (existingSong == null)
+            TimeSpan duration = musicProps.Duration;
+            //    sldMain!.Maximum = duration.TotalSeconds;
+            UIController.TotalDuration = duration.TotalSeconds;
+            UIController.TotalDurationString = duration.ToString(@"hh\:mm\:ss");
+            UIController.SongDisplayName = Path.GetFileName(path);
+            string album = !string.IsNullOrWhiteSpace(musicProps.Album) ? musicProps.Album : "Unknown Album";
+            string artist = !string.IsNullOrWhiteSpace(musicProps.Artist) ? musicProps.Artist : "Unknown Artist";
+            UIController.AlbumDisplayName = album;
+            UIController.ArtistDisplayName = artist;
+            await LoadMediaAsync(path);
+
+            MasterPlayer?.Open(path);
+            MediaCompleted = false;
+            Play();
+            App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(async () =>
             {
-                
-                var newRecent = new RecentMusic
+                var settings = await SettingsHelper.LoadSettingsAsync();
+                var existingSong = settings.RecentMusic.FirstOrDefault(x => x.SongPath == path);
+                if (existingSong == null)
                 {
-                    SongName = Path.GetFileName(path),
-                    SongPath = path,
-                    FolderName = new DirectoryInfo(Path.GetDirectoryName(path) ?? string.Empty).Name,
-                    PlayCount = 1 
-                };
-                settings.RecentMusic.Insert(0, newRecent);
-            }
-            else
-            {
-                existingSong.PlayCount++;
-                settings.RecentMusic.Remove(existingSong);
-                settings.RecentMusic.Insert(0, existingSong);
-            }
-        
 
-            await SettingsHelper.SaveSettingsAsync(settings);
+                    var newRecent = new RecentMusic
+                    {
+                        SongName = Path.GetFileName(path),
+                        SongPath = path,
+                        FolderName = new DirectoryInfo(Path.GetDirectoryName(path) ?? string.Empty).Name,
+                        PlayCount = 1
+                    };
+                    settings.RecentMusic.Insert(0, newRecent);
+                }
+                else
+                {
+                    existingSong.PlayCount++;
+                    settings.RecentMusic.Remove(existingSong);
+                    settings.RecentMusic.Insert(0, existingSong);
+                }
 
+
+                await SettingsHelper.SaveSettingsAsync(settings);
+            });
         }
+        public static bool MediaCompleted { get; set; }
         private static void MasterPlayer_PlaybackStopped(object? sender, PlaybackStoppedArgs e)
         {
-        if(UIController.TotalDurationString == UIController.RunningDurationString)
+            if (UIController.TotalDurationString == UIController.RunningDurationString)
             {
-                Debug.WriteLine("Fromthat");
+                MediaCompleted = true;
+                App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(async () =>
+                {
+
+                    var bitm = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
+                    maintimer?.Stop();
+                    UIController.CurrentPosition = 0;
+                    UIController.PlayPauseToolTipSer = "Play";
+                    UIController.Thumbnail = bitm;
+
+
+
+                }); 
+            
+
                 QueueHandler.PlayNext();
             }
         }
@@ -225,13 +243,10 @@ namespace VusicPlayer
 
             // 2. Update the global state
             // The UI will "pick this up" automatically on whatever page is open
-          UIController.Thumbnail2 = bitmap;
+            UIController.Thumbnail2 = bitmap;
         }
         public static MediaPlaybackController UIController => MediaPlaybackController.instance;
-        public static void AttachUI(TextBlock txtDur, SliderReuse slider, TextBlock txtTotal)
-        {
-        
-        }
+
 
         public static void SldMain_DragStarted()
         {
@@ -252,12 +267,16 @@ namespace VusicPlayer
         public static void Play()
         {
             if (MasterPlayer == null) return;
+            if (MediaCompleted == true)
+            {
+                MasterPlayer.CurTime = 0;
+            }
             MasterPlayer.Play();
             CurrentPlayState?.Invoke("Play");
-            App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(async () =>
+            App.HomeWindowInstance?.DispatcherQueue.TryEnqueue( () =>
             {
                 var bitm = new BitmapImage(new Uri("ms-appx:///Assets/pause.png"));
-
+                UIController.PlayPauseToolTipSer = "Pause";
                 UIController.Thumbnail = bitm;
                 maintimer?.Start();
 
@@ -272,6 +291,7 @@ namespace VusicPlayer
             App.HomeWindowInstance?.DispatcherQueue.TryEnqueue(async () =>
             {
                 var bitm = new BitmapImage(new Uri("ms-appx:///Assets/play.png"));
+                UIController.PlayPauseToolTipSer = "Play";
 
                 UIController.Thumbnail = bitm;
                 maintimer?.Stop();

@@ -139,7 +139,7 @@ namespace VusicPlayer
                 {
                     if (!string.IsNullOrEmpty(songModel.FilePath))
                     {
-                        homeWindow.ShowSongDetails(songModel.FilePath);
+               //         homeWindow.ShowSongDetails(songModel.FilePath);
                     }
                 }
             }
@@ -161,7 +161,7 @@ namespace VusicPlayer
                 {
                     if (!string.IsNullOrEmpty(songModel.FilePath))
                     {
-                        homeWindow.ShowSongDetails(songModel.FilePath);
+         //               homeWindow.ShowSongDetails(songModel.FilePath);
                     }
                 }
             }
@@ -381,21 +381,6 @@ namespace VusicPlayer
             tbviAlbum.IsSelected = true;
             ShowEditOptionsForMultiple();
         }
-        public bool IsFileReady(string path)
-        {
-            try
-            {
-                // Try to open the file with Exclusive access
-                using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                {
-                    return true;
-                }
-            }
-            catch (IOException)
-            {
-                return false; // File is locked by another process
-            }
-        }
 
         private void OceanContentDialog_PrimaryRequested1()
         {
@@ -411,7 +396,7 @@ namespace VusicPlayer
                     try
                     {
                         if (item.FilePath == null) continue;
-                        if (IsFileReady(item.FilePath))
+                        if (FileReady.IsFileReady(item.FilePath))
                         {
                             item.AlbumName = txtEditAlbum.Text;
                             var file = TagLib.File.Create(item.FilePath);
@@ -450,7 +435,7 @@ namespace VusicPlayer
                     try
                     {
                         if (item.FilePath == null) continue;
-                        if (IsFileReady(item.FilePath))
+                        if (FileReady.IsFileReady(item.FilePath))
                         {
                             item.Artist = txtEditArtist.Text;
                             var file = TagLib.File.Create(item.FilePath);
@@ -581,6 +566,101 @@ namespace VusicPlayer
         private void btnAddtoselectedPl_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void btnSortItems_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void mnftSortName_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted = this.ItemsSource.OrderBy(p => p.Title).ToList();
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var oldIndex = this.ItemsSource.IndexOf(sorted[i]);
+                var newIndex = i;
+
+                if (oldIndex != newIndex)
+                {
+                    this.ItemsSource.Move(oldIndex, newIndex);
+                }
+            }
+        }
+
+        private void mnftSortDuration_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted = this.ItemsSource.OrderBy(p => p.SongDuration).ToList();
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var oldIndex = this.ItemsSource.IndexOf(sorted[i]);
+                var newIndex = i;
+
+                if (oldIndex != newIndex)
+                {
+                    this.ItemsSource.Move(oldIndex, newIndex);
+                }
+            }
+        }
+
+ 
+
+        private void mnftSortbyArtist_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted = this.ItemsSource.OrderBy(p => p.Artist).ToList();
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var oldIndex = this.ItemsSource.IndexOf(sorted[i]);
+                var newIndex = i;
+
+                if (oldIndex != newIndex)
+                {
+                    this.ItemsSource.Move(oldIndex, newIndex);
+                }
+            }
+        }
+
+        private void mnftSortbyAlbum_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted = this.ItemsSource.OrderBy(p => p.AlbumName).ToList();
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var oldIndex = this.ItemsSource.IndexOf(sorted[i]);
+                var newIndex = i;
+
+                if (oldIndex != newIndex)
+                {
+                    this.ItemsSource.Move(oldIndex, newIndex);
+                }
+            }
+        }
+
+        private void mnftSortbyDateMod_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted =ItemsSource.OrderByDescending(p => p.DateModified).ToList();
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var oldIndex = ItemsSource.IndexOf(sorted[i]);
+                if (oldIndex != i)
+                {
+                    ItemsSource.Move(oldIndex, i);
+                }
+            }
+        }
+
+        private void mnftSortbyDateCreated_Click(object sender, RoutedEventArgs e)
+        {
+            var sorted = ItemsSource.OrderByDescending(p => p.DateCreated).ToList();
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var oldIndex = ItemsSource.IndexOf(sorted[i]);
+                if (oldIndex != i)
+                {
+                    ItemsSource.Move(oldIndex, i);
+                }
+            }
         }
     }
 }

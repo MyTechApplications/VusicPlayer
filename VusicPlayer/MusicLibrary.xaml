@@ -104,14 +104,14 @@ AlwaysUseFallback="False"/>
                                             <FontIcon Glyph="&#xE8DA;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="View File Info" >
+                                    <MenuFlyoutItem Text="View File Info" Click="MenuFlyoutItem_Click_3">
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="D"></FontIcon>
+                                            <FontIcon Glyph="&#xE946;"></FontIcon>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                 </MenuFlyout>
                             </StackPanel.ContextFlyout>
-                            <Image Source="{Binding plthumb}" Width="70" Height="70" Stretch="UniformToFill"/>
+                            <Image Source="{Binding Thumbnail}" Width="70" Height="70" Stretch="UniformToFill"/>
 
                             <TextBlock Text="{Binding SongName}" Visibility="Visible" TextWrapping="Wrap" />
                             <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding FolderName}" Visibility="Visible" TextWrapping="Wrap" />
