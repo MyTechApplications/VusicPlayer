@@ -171,7 +171,7 @@ namespace VusicPlayer
 
                 FFmpegPath = Path.Combine(AppContext.BaseDirectory, "FFmpegDLLs")
             });
-            mediaPlayerMain.Player = player;
+       //     mediaPlayerMain.Player = player;
         }
         private void Global_KeyDown(object sender, KeyRoutedEventArgs e)
         {
@@ -385,7 +385,7 @@ namespace VusicPlayer
         private async void PlayMedia(string path)
         {
             player = new Player(new Config());
-            mediaPlayerMain.Player = player;
+        //    mediaPlayerMain.Player = player;
             player.Open(path);
             player.Play();
             UpdatePlayPauseUI("play");
